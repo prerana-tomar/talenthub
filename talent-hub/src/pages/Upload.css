@@ -1,0 +1,128 @@
+/* ── Upload Page ── */
+.th-upload-page {
+  min-height: 100vh;
+  background: #0d0d14;
+  padding: 60px 24px 80px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.th-upload-page h1 {
+  font-size: 32px;
+  font-weight: 900;
+  color: #fff;
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+
+.th-upload-page .sub {
+  color: #7a7f94;
+  font-size: 14px;
+  margin: 0 0 28px;
+}
+
+/* ── Dropzone ── */
+.th-dropzone {
+  border: 2px dashed rgba(255,255,255,0.15);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.03);
+  padding: 40px 24px;
+  text-align: center;
+  margin-bottom: 24px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.th-dropzone:hover {
+  border-color: rgba(245,200,66,0.4);
+  background: rgba(245,200,66,0.04);
+}
+
+.th-dropzone-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.th-dropzone p {
+  color: #9ca3b8;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.th-dropzone strong {
+  color: #fff;
+}
+
+/* ── Form ── */
+.th-upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.th-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.th-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #9ca3b8;
+  letter-spacing: 0.3px;
+}
+
+.th-field input,
+.th-field select {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.th-field input::placeholder {
+  color: #555a6e;
+}
+
+.th-field input:focus,
+.th-field select:focus {
+  border-color: rgba(124,77,255,0.5);
+}
+
+.th-field select option {
+  background: #1a1a2e;
+  color: #fff;
+}
+
+/* ── Publish Button ── */
+.th-btn-main {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #f5c842, #ff8c00);
+  border: none;
+  border-radius: 12px;
+  color: #000;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  margin-top: 4px;
+}
+
+.th-btn-main:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.th-btn-main:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}

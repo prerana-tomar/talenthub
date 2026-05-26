@@ -1,0 +1,409 @@
+/* ══ VIDEO CARD ════════════════════════════════════════════ */
+.video-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  font-family: 'Poppins', sans-serif;
+}
+
+.video-card:hover {
+  border-color: rgba(124,58,237,0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+}
+
+/* Toast */
+.vc-toast {
+  position: absolute;
+  top: 10px; left: 50%; transform: translateX(-50%);
+  background: rgba(20,20,40,0.95);
+  border: 1px solid rgba(124,58,237,0.4);
+  color: #c4b5fd;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 20;
+  white-space: nowrap;
+  animation: vcToastIn 0.2s ease;
+  pointer-events: none;
+}
+@keyframes vcToastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Category badge */
+.video-category-badge {
+  position: absolute;
+  top: 10px; left: 10px;
+  background: #7c3aed;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  z-index: 5;
+  letter-spacing: 0.3px;
+}
+
+/* Delete button */
+.delete-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: rgba(239,68,68,0.85);
+  border: none;
+  color: #fff;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 6;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.15s;
+}
+.video-card:hover .delete-btn { opacity: 1; }
+.delete-btn:hover { background: #ef4444; }
+
+/* ── THUMBNAIL ─────────────────────────────────────────── */
+.video-thumbnail {
+  position: relative;
+  height: 168px;
+  background: #0a0a0f;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.video-thumbnail video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.video-thumbnail video.vc-playing { transform: scale(1.02); }
+
+.video-placeholder {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px; color: #555;
+}
+.video-placeholder span { font-size: 36px; }
+.video-placeholder p    { font-size: 12px; }
+
+/* Play overlay */
+.vc-play-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.video-thumbnail:hover .vc-play-overlay { opacity: 1; }
+
+.vc-play-btn-big {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(124,58,237,0.9);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: #fff;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.5);
+  transition: transform 0.15s;
+}
+.vc-play-overlay:hover .vc-play-btn-big { transform: scale(1.1); }
+
+/* Inline controls */
+.vc-controls {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+  padding: 24px 10px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 10;
+}
+
+.vc-ctrl-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  line-height: 1;
+}
+.vc-ctrl-btn:hover { background: rgba(255,255,255,0.15); }
+
+.vc-progress-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.vc-progress-fill {
+  height: 100%;
+  background: #a78bfa;
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+.vc-time {
+  font-size: 10px;
+  color: rgba(255,255,255,0.75);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Views badge */
+.view-badge {
+  position: absolute;
+  bottom: 8px; right: 8px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: flex; align-items: center; gap: 4px;
+  z-index: 4;
+}
+
+/* ── CARD BODY ─────────────────────────────────────────── */
+.video-card-body {
+  padding: 11px 12px 12px;
+}
+
+.video-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.video-title:hover { color: #a78bfa; }
+
+.video-meta { margin-bottom: 10px; }
+
+.uploader-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.uploader-avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+  overflow: hidden; flex-shrink: 0;
+}
+.uploader-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.uploader-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.video-date {
+  font-size: 11px;
+  color: #555;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ══ ACTIONS — fully redesigned ════════════════════════════ */
+.video-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 36px 36px;
+  gap: 6px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+/* Base action button */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.55);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  padding: 0 10px;
+}
+
+/* ✅ Like button */
+.like-btn {
+  background: rgba(239,68,68,0.07);
+  border-color: rgba(239,68,68,0.15);
+  color: rgba(255,255,255,0.6);
+}
+.like-btn:hover {
+  background: rgba(239,68,68,0.15);
+  border-color: rgba(239,68,68,0.4);
+  color: #ef4444;
+  transform: scale(1.03);
+}
+.like-btn.liked {
+  background: rgba(239,68,68,0.18);
+  border-color: rgba(239,68,68,0.45);
+  color: #ef4444;
+  box-shadow: 0 2px 10px rgba(239,68,68,0.2);
+}
+
+/* ✅ Save button */
+.save-btn {
+  background: rgba(124,58,237,0.07);
+  border-color: rgba(124,58,237,0.15);
+  color: rgba(255,255,255,0.6);
+}
+.save-btn:hover {
+  background: rgba(124,58,237,0.18);
+  border-color: rgba(124,58,237,0.45);
+  color: #a78bfa;
+  transform: scale(1.03);
+}
+.save-btn.saved {
+  background: rgba(124,58,237,0.2);
+  border-color: rgba(124,58,237,0.5);
+  color: #a78bfa;
+  box-shadow: 0 2px 10px rgba(124,58,237,0.2);
+}
+
+/* ✅ Message/Comment button — icon only */
+.msg-btn {
+  width: 36px;
+  height: 34px;
+  padding: 0;
+  background: rgba(52,211,153,0.07);
+  border-color: rgba(52,211,153,0.15);
+  color: rgba(255,255,255,0.55);
+  border-radius: 8px;
+}
+.msg-btn:hover {
+  background: rgba(52,211,153,0.15);
+  border-color: rgba(52,211,153,0.4);
+  color: #34d399;
+  transform: scale(1.08);
+}
+
+/* ✅ Share button — icon only */
+.share-btn {
+  width: 36px;
+  height: 34px;
+  padding: 0;
+  background: rgba(245,166,35,0.07);
+  border-color: rgba(245,166,35,0.15);
+  color: rgba(255,255,255,0.55);
+  border-radius: 8px;
+  margin-left: 0;
+}
+.share-btn:hover {
+  background: rgba(245,166,35,0.15);
+  border-color: rgba(245,166,35,0.4);
+  color: #f5a623;
+  transform: scale(1.08);
+}
+
+/* ── DELETE MODAL ──────────────────────────────────────── */
+.delete-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.delete-modal {
+  background: #13131f;
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  max-width: 340px; width: 100%;
+  animation: vcModalIn 0.2s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+@keyframes vcModalIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.delete-modal-icon { font-size: 40px; margin-bottom: 12px; }
+.delete-modal h3   { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+.delete-modal p    { font-size: 13px; color: #888; line-height: 1.6; margin-bottom: 20px; }
+
+.delete-modal-actions { display: flex; gap: 10px; }
+
+.cancel-btn {
+  flex: 1;
+  padding: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #aaa;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cancel-btn:hover { background: rgba(255,255,255,0.1); }
+
+.confirm-delete-btn {
+  flex: 1;
+  padding: 10px;
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  box-shadow: 0 4px 14px rgba(239,68,68,0.3);
+}
+.confirm-delete-btn:hover    { opacity: 0.88; }
+.confirm-delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── LIGHT MODE ────────────────────────────────────────── */
+body.light-mode .video-card       { background: #fff; border-color: rgba(0,0,0,0.08); }
+body.light-mode .video-title      { color: #0f0f1a; }
+body.light-mode .uploader-name    { color: #555; }
+body.light-mode .video-date       { color: #aaa; }
+body.light-mode .action-btn       { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: #555; }
+body.light-mode .action-btn:hover { background: rgba(0,0,0,0.08); color: #111; }
+body.light-mode .delete-modal     { background: #fff; border-color: rgba(239,68,68,0.2); }
+body.light-mode .delete-modal h3  { color: #0f0f1a; }
+body.light-mode .cancel-btn       { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #555; }
+body.light-mode .vc-toast         { background: rgba(255,255,255,0.95); color: #7c3aed; border-color: rgba(124,58,237,0.3); }

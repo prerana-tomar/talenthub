@@ -1,0 +1,518 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+* { box-sizing: border-box; }
+
+.thoughts-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ── HEADER ── */
+.thoughts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  gap: 12px;
+}
+
+.thoughts-header-left h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 4px;
+  background: linear-gradient(135deg, #a78bfa, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.thoughts-header-left p {
+  color: #64748b;
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.new-thought-btn {
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  color: #fff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 50px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+}
+.new-thought-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(124,58,237,0.5);
+}
+
+/* ── POST FORM ── */
+.thought-form {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border: 1px solid #7c3aed55;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 28px;
+  display: flex;
+  gap: 14px;
+  animation: slideDown 0.3s ease;
+  box-shadow: 0 8px 32px rgba(124,58,237,0.15);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.thought-form-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(124,58,237,0.4);
+}
+
+.thought-form-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.thought-form-right textarea {
+  width: 100%;
+  background: #0d0d1f;
+  border: 1px solid #2a2a4a;
+  border-radius: 14px;
+  color: #e2e8f0;
+  padding: 14px 16px;
+  font-size: 0.92rem;
+  resize: none;
+  outline: none;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.thought-form-right textarea:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+}
+.thought-form-right textarea::placeholder { color: #475569; }
+
+.thought-form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.char-count {
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.post-btn {
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(124,58,237,0.3);
+}
+.post-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(124,58,237,0.45);
+}
+.post-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+/* ── CATEGORIES ── */
+.thoughts-categories {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.thought-cat-btn {
+  padding: 7px 16px;
+  border-radius: 50px;
+  border: 1px solid #2a2a4a;
+  background: #12122a;
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s;
+}
+.thought-cat-btn:hover {
+  border-color: #7c3aed55;
+  color: #a78bfa;
+}
+.thought-cat-btn.active {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(124,58,237,0.35);
+}
+
+/* ── CARDS ── */
+.thoughts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.thought-card {
+  background: #0f0f1f;
+  border: 1px solid #1e1e3a;
+  border-radius: 20px;
+  padding: 20px;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+
+.thought-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #7c3aed, #ec4899, #06b6d4);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.thought-card:hover {
+  border-color: #7c3aed33;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(124,58,237,0.12);
+}
+
+.thought-card:hover::before { opacity: 1; }
+
+/* Card header */
+.thought-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.thought-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(124,58,237,0.3);
+}
+
+.thought-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.thought-author {
+  color: #e2e8f0;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.thought-time {
+  color: #475569;
+  font-size: 0.74rem;
+  margin-top: 1px;
+}
+
+.thought-category-badge {
+  background: linear-gradient(135deg, #7c3aed22, #ec4899222);
+  color: #a78bfa;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 50px;
+  border: 1px solid #7c3aed33;
+  letter-spacing: 0.3px;
+}
+
+.thought-delete-btn {
+  background: none;
+  border: none;
+  color: #334155;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  line-height: 1;
+}
+.thought-delete-btn:hover {
+  color: #ef4444;
+  background: #ef444411;
+}
+
+/* Text */
+.thought-text {
+  color: #cbd5e1;
+  font-size: 0.93rem;
+  line-height: 1.75;
+  margin: 0 0 16px;
+  white-space: pre-wrap;
+}
+
+.thought-image {
+  width: 100%;
+  border-radius: 14px;
+  margin-bottom: 16px;
+  object-fit: cover;
+  max-height: 300px;
+  border: 1px solid #1e1e3a;
+}
+
+/* Actions */
+.thought-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-top: 14px;
+  border-top: 1px solid #1e1e3a;
+}
+
+.thought-like-btn {
+  background: none;
+  border: none;
+  color: #475569;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid transparent;
+}
+.thought-like-btn:hover {
+  color: #f43f5e;
+  background: #f43f5e11;
+  border-color: #f43f5e22;
+}
+.thought-like-btn.liked {
+  color: #f43f5e;
+  background: #f43f5e11;
+  border-color: #f43f5e33;
+}
+
+.thought-comments-count {
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── SKELETON ── */
+.thought-skeleton {
+  height: 140px;
+  background: linear-gradient(90deg, #0f0f1f 25%, #1a1a2e 50%, #0f0f1f 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 20px;
+  border: 1px solid #1e1e3a;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── EMPTY ── */
+.thoughts-empty {
+  text-align: center;
+  padding: 70px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.thoughts-empty-icon {
+  font-size: 4rem;
+  filter: drop-shadow(0 0 20px rgba(124,58,237,0.4));
+}
+
+.thoughts-empty h3 {
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.thoughts-empty p {
+  color: #475569;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.thoughts-empty-btn {
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  margin-top: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+}
+.thoughts-empty-btn:hover { transform: translateY(-2px); }
+
+@media (max-width: 480px) {
+  .thoughts-page { padding: 20px 14px 40px; }
+  .thoughts-header { flex-direction: column; align-items: flex-start; }
+  .thought-form { flex-direction: column; }
+}
+
+
+
+
+
+/* ── EDIT BUTTON ── */
+.thought-owner-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.thought-edit-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.88rem;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  line-height: 1;
+}
+.thought-edit-btn:hover {
+  color: #a78bfa;
+  background: #7c3aed11;
+}
+
+.thought-delete-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.88rem;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  line-height: 1;
+}
+.thought-delete-btn:hover {
+  color: #ef4444;
+  background: #ef444411;
+}
+
+/* ── EDIT BOX ── */
+.thought-edit-box {
+  margin-bottom: 14px;
+}
+
+.thought-edit-textarea {
+  width: 100%;
+  background: #0d0d1f;
+  border: 1px solid #7c3aed;
+  border-radius: 12px;
+  color: #e2e8f0;
+  padding: 12px 14px;
+  font-size: 0.92rem;
+  font-family: 'Poppins', sans-serif;
+  resize: none;
+  outline: none;
+  line-height: 1.6;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+  box-sizing: border-box;
+}
+
+.thought-edit-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.thought-edit-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-cancel-btn {
+  padding: 7px 16px;
+  background: transparent;
+  border: 1px solid #2a2a4a;
+  color: #888;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s;
+}
+.edit-cancel-btn:hover:not(:disabled) {
+  border-color: #7c3aed;
+  color: #fff;
+}
+
+.edit-save-btn {
+  padding: 7px 16px;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: opacity 0.2s;
+  box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+}
+.edit-save-btn:hover:not(:disabled) { opacity: 0.88; }
+.edit-save-btn:disabled,
+.edit-cancel-btn:disabled { opacity: 0.5; cursor: not-allowed; }
