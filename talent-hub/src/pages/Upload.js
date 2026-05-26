@@ -2,6 +2,8 @@ import './Upload.css';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API = 'https://talenthub-w1cc.onrender.com';
+
 function Upload() {
   const [title, setTitle]       = useState('');
   const [category, setCategory] = useState('Music');
@@ -25,7 +27,6 @@ function Upload() {
       return;
     }
 
-    // ✅ Fixed: was 'token', now 'th_token' (matches Login.js)
     const token = localStorage.getItem('th_token');
     if (!token) {
       setError('You must be logged in to upload. Please sign in first.');
@@ -64,9 +65,9 @@ function Upload() {
           }
         };
 
-        xhr.onerror = () => reject(new Error('Network error. Is the backend running on port 5000?'));
+        xhr.onerror = () => reject(new Error('Network error. Cannot connect to server.'));
 
-        xhr.open('POST', 'http://localhost:5000/api/videos');
+        xhr.open('POST', `${API}/api/videos`);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.send(formData);
       });
@@ -87,7 +88,6 @@ function Upload() {
       <h1>Upload Your<br /><span style={{ color: '#f5c842' }}>Performance</span></h1>
       <p className="sub">Share your talent with the world in under 60 seconds.</p>
 
-      {/* Error banner */}
       {error && (
         <div style={{
           background: 'rgba(220,53,69,0.12)',
@@ -102,7 +102,6 @@ function Upload() {
         </div>
       )}
 
-      {/* DROPZONE */}
       <div
         className="th-dropzone"
         onDragOver={e => e.preventDefault()}
@@ -125,7 +124,6 @@ function Upload() {
         />
       </div>
 
-      {/* Progress bar */}
       {loading && (
         <div style={{ margin: '16px 0' }}>
           <div style={{
@@ -155,7 +153,6 @@ function Upload() {
         </div>
       )}
 
-      {/* FORM */}
       <div className="th-upload-form">
         <div className="th-field">
           <label>Video Title</label>
