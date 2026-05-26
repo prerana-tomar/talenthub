@@ -10,27 +10,31 @@ const app    = express();
 const server = http.createServer(app);
 const highlightRoutes = require('./routes/highlights');
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'https://talenthub-mn78.vercel.app',
+];
+
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
   },
 });
 
-app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:3001'] }));
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
-app.use('/api/auth',     require('./routes/auth'));
-app.use('/api/videos',   require('./routes/videos'));
-app.use('/api/thoughts', require('./routes/thoughts')); // ✅ NAYA ADD KIYA
-// Existing routes ke neeche add karo:
+app.use('/api/auth',         require('./routes/auth'));
+app.use('/api/videos',       require('./routes/videos'));
+app.use('/api/thoughts',     require('./routes/thoughts'));
 app.use('/api/competitions', require('./routes/competitions'));
-app.use('/api/messages', require('./routes/messages'));
-app.use('/api/saved',    require('./routes/saved'));
-app.use('/api/highlights', highlightRoutes);
-
+app.use('/api/messages',     require('./routes/messages'));
+app.use('/api/saved',        require('./routes/saved'));
+app.use('/api/highlights',   highlightRoutes);
 
 // MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -44,7 +48,6 @@ const liveRooms = new Map();
 io.on('connection', (socket) => {
   console.log('Socket connected:', socket.id);
 
-  // ── GO LIVE ──
   socket.on('go-live', ({ hostId, hostName, title, category }) => {
     const roomId = socket.id;
     liveRooms.set(roomId, {
@@ -62,7 +65,6 @@ io.on('connection', (socket) => {
     console.log(`${hostName} went live — room: ${roomId}`);
   });
 
-  // ── JOIN ROOM ──
   socket.on('join-room', ({ roomId, viewerName }) => {
     const room = liveRooms.get(roomId);
     if (!room) { socket.emit('room-not-found'); return; }
@@ -82,7 +84,6 @@ io.on('connection', (socket) => {
     });
   });
 
-  // ── WebRTC SIGNALING ──
   socket.on('webrtc-offer', ({ to, offer }) => {
     io.to(to).emit('webrtc-offer', { from: socket.id, offer });
   });
@@ -95,7 +96,6 @@ io.on('connection', (socket) => {
     io.to(to).emit('webrtc-ice', { from: socket.id, candidate });
   });
 
-  // ── CHAT MESSAGE ──
   socket.on('chat-message', ({ roomId, sender, message }) => {
     const room = liveRooms.get(roomId);
     if (!room) return;
@@ -112,14 +112,12 @@ io.on('connection', (socket) => {
     io.to(roomId).emit('chat-message', msg);
   });
 
-  // ── END LIVE ──
   socket.on('end-live', ({ roomId }) => {
     liveRooms.delete(roomId);
     io.to(roomId).emit('live-ended');
     io.emit('live-rooms-update', getLiveRoomsList());
   });
 
-  // ── DISCONNECT ──
   socket.on('disconnect', () => {
     if (liveRooms.has(socket.id)) {
       io.to(socket.id).emit('live-ended');
@@ -149,7 +147,6 @@ function getLiveRoomsList() {
   }));
 }
 
-// REST endpoint — get live rooms
 app.get('/api/live/rooms', (req, res) => {
   res.json(getLiveRoomsList());
 });
