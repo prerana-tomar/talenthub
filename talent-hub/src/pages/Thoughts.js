@@ -26,8 +26,8 @@ export default function Thoughts() {
     setLoading(true);
     try {
       const url = category === 'All'
-        ? 'http://localhost:5000/api/thoughts'
-        : `http://localhost:5000/api/thoughts?category=${category}`;
+        ? 'https://talenthub-w1cc.onrender.com/api/thoughts'
+        : `https://talenthub-w1cc.onrender.com/api/thoughts?category=${category}`;
       const res  = await fetch(url);
       const data = await res.json();
       setThoughts(data.thoughts || data || []);
@@ -39,7 +39,7 @@ export default function Thoughts() {
     if (!text.trim()) return;
     setPosting(true);
     try {
-      const res = await fetch('http://localhost:5000/api/thoughts', {
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/thoughts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export default function Thoughts() {
   const handleLike = async (id) => {
     if (!token) return alert('Login karo pehle!');
     try {
-      const res  = await fetch(`http://localhost:5000/api/thoughts/${id}/like`, {
+      const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/thoughts/${id}/like`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -76,7 +76,7 @@ export default function Thoughts() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this thought?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/thoughts/${id}`, {
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/thoughts/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -99,7 +99,7 @@ export default function Thoughts() {
     if (!editText.trim()) return;
     setEditSaving(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/thoughts/${id}`, {
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/thoughts/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -281,7 +281,7 @@ export default function Thoughts() {
 
               {thought.image && (
                 <img
-                  src={`http://localhost:5000${thought.image}`}
+                  src={`https://talenthub-w1cc.onrender.com${thought.image}`}
                   alt="thought"
                   className="thought-image"
                 />

@@ -37,7 +37,7 @@ const Settings = () => {
   const fetchMyVideos = async () => {
     setVideoLoad(true);
     try {
-      const res  = await fetch('http://localhost:5000/api/videos/my', {
+      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/videos/my', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -62,7 +62,7 @@ const Settings = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res  = await fetch('http://localhost:5000/api/auth/update-profile', {
+      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/auth/update-profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ const Settings = () => {
     }
     setLoading(true);
     try {
-      const res  = await fetch('http://localhost:5000/api/auth/change-password', {
+      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/auth/change-password', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ const Settings = () => {
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/delete-account', {
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/auth/delete-account', {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -154,7 +154,7 @@ const Settings = () => {
     if (!window.confirm(`Delete "${videoTitle}"?\n\nThis cannot be undone.`)) return;
     setDeleting(videoId);
     try {
-      const res = await fetch(`http://localhost:5000/api/videos/${videoId}`, {
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${videoId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -328,7 +328,7 @@ const Settings = () => {
                     {/* Thumbnail */}
                     <div className="video-row-thumb">
                       <video
-                        src={`http://localhost:5000${video.videoUrl || video.url || ''}`}
+                        src={`https://talenthub-w1cc.onrender.com${video.videoUrl || video.url || ''}`}
                         muted
                         onMouseEnter={e => e.target.play()}
                         onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }}

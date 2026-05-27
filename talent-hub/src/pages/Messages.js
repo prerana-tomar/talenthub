@@ -3,8 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import './Messages.css';
 
-const API    = 'http://localhost:5000/api';
-const SOCKET = 'http://localhost:5000';
+const API    = 'https://talenthub-w1cc.onrender.com/api';
+const SOCKET = 'https://talenthub-w1cc.onrender.com';
 
 export default function Messages() {
   const navigate = useNavigate();

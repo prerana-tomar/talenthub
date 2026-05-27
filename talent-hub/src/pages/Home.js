@@ -55,14 +55,14 @@ export default function Home() {
   const user = JSON.parse(localStorage.getItem('th_user') || 'null');
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/auth/count')
+    fetch('https://talenthub-w1cc.onrender.com/api/auth/count')
       .then(r => r.json())
       .then(d => { setRealUserCount(d.count); setRealStats(prev => ({ ...prev, users: d.count })); })
       .catch(() => setRealUserCount(null));
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/videos')
+    fetch('https://talenthub-w1cc.onrender.com/api/videos')
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -74,21 +74,21 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/auth/top-performers')
+    fetch('https://talenthub-w1cc.onrender.com/api/auth/top-performers')
       .then(r => r.json())
       .then(d => setTopPerformers(Array.isArray(d) ? d : []))
       .catch(() => setTopPerformers([]));
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/thoughts?limit=3')
+    fetch('https://talenthub-w1cc.onrender.com/api/thoughts?limit=3')
       .then(r => r.json())
       .then(d => setRecentThoughts(d.thoughts || d || []))
       .catch(() => setRecentThoughts([]));
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/competitions')
+    fetch('https://talenthub-w1cc.onrender.com/api/competitions')
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
@@ -111,8 +111,8 @@ export default function Home() {
       setLoading(true);
       try {
         const url = activeCategory === 'All'
-          ? 'http://localhost:5000/api/videos'
-          : `http://localhost:5000/api/videos?category=${activeCategory}`;
+          ? 'https://talenthub-w1cc.onrender.com/api/videos'
+          : `https://talenthub-w1cc.onrender.com/api/videos?category=${activeCategory}`;
         const res  = await fetch(url);
         const data = await res.json();
         setVideos(Array.isArray(data) ? data : []);
@@ -127,7 +127,7 @@ export default function Home() {
     if (query.trim().length < 2) { setSearchResults([]); return; }
     setSearching(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/videos/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/search?q=${encodeURIComponent(query)}`);
       if (res.ok) {
         const data = await res.json();
         setSearchResults(data.videos ? data.videos.slice(0, 6) : data.slice(0, 6));

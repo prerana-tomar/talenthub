@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import './Live.css';
 
-const SOCKET_URL = 'http://localhost:5000';
+const SOCKET_URL = 'https://talenthub-w1cc.onrender.com';
 
 const ICE_SERVERS = {
   iceServers: [

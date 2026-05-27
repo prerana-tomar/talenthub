@@ -75,7 +75,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
     if (!uploaderId) return;
     setFollowLoad(true);
     try {
-      const res  = await fetch(`http://localhost:5000/api/auth/follow/${uploaderId}`, {
+      const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/auth/follow/${uploaderId}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -102,7 +102,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
     e.stopPropagation();
     if (!token) { navigate('/login'); return; }
     try {
-      const res = await fetch(`http://localhost:5000/api/videos/${video._id}/like`, {
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${video._id}/like`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -118,7 +118,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
     if (!token) { navigate('/login'); return; }
     setSavingVid(true);
     try {
-      const res  = await fetch(`http://localhost:5000/api/saved/video/${video._id}`, {
+      const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/saved/video/${video._id}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -186,7 +186,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/videos/${video._id}`, {
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${video._id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -285,7 +285,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
           <div className="uploader-row">
             <div className="uploader-avatar">
               {video.uploader?.profilePic ? (
-                <img src={`http://localhost:5000${video.uploader.profilePic}`} alt={uploaderName} />
+                <img src={`https://talenthub-w1cc.onrender.com${video.uploader.profilePic}`} alt={uploaderName} />
               ) : (
                 <span>{uploaderName?.[0]?.toUpperCase() || 'U'}</span>
               )}

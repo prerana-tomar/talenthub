@@ -38,7 +38,7 @@ function Navbar() {
     }
     setSearching(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/videos/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/search?q=${encodeURIComponent(query)}`);
       if (res.ok) {
         const data = await res.json();
         setSearchResults(data.slice(0, 6));

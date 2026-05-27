@@ -11,7 +11,7 @@ const TopPerformers = () => {
 
   const fetchTopPerformers = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/users/top-performers');
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/users/top-performers');
       const data = await res.json();
       // Support both array and { users: [] } response shapes
       setPerformers(Array.isArray(data) ? data.slice(0, 5) : (data.users || data.performers || []).slice(0, 5));
@@ -85,7 +85,7 @@ const TopPerformers = () => {
             <div className="tp-avatar">
               {user.profilePic ? (
                 <img
-                  src={`http://localhost:5000${user.profilePic}`}
+                  src={`https://talenthub-w1cc.onrender.com${user.profilePic}`}
                   alt={user.username}
                 />
               ) : (

@@ -100,7 +100,7 @@ const COMPETITIONS = [
 
 // ── REAL BACKEND API ─────────────────────────────────────────────────────────
 // Replace BASE_URL with your actual backend URL
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://talenthub-w1cc.onrender.com";
 
 async function fetchStats() {
   try {

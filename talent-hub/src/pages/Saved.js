@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Saved.css';
 
-const API = 'http://localhost:5000/api';
+const API = 'https://talenthub-w1cc.onrender.com/api';
 
 export default function Saved() {
   const navigate = useNavigate();
@@ -120,7 +120,7 @@ export default function Saved() {
                       onClick={() => navigate(`/video/${video._id}`)}
                     >
                       <video
-                        src={`http://localhost:5000${video.url || video.videoUrl || ''}`}
+                        src={`https://talenthub-w1cc.onrender.com${video.url || video.videoUrl || ''}`}
                         muted
                         onMouseEnter={e => e.target.play()}
                         onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }}
