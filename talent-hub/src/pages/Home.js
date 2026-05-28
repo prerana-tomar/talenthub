@@ -6,9 +6,9 @@ import './Home.css';
 const CATEGORIES = ['All','Singing','Dance','Rap','Comedy','Acting','Instrumental','Poetry'];
 
 const FALLBACK_COMPETITIONS = [
-  { icon:'🎤', name:'Singing Superstar', date:'30 May, 2025', color:'#a78bfa', status:'upcoming', prize:'₹5,000' },
-  { icon:'💃', name:'Dance Battle',      date:'05 Jun, 2025', color:'#f472b6', status:'upcoming', prize:'₹3,000' },
-  { icon:'🎙', name:'Rap Showdown',      date:'12 Jun, 2025', color:'#34d399', status:'active',   prize:'₹2,000' },
+  { icon:'🎤', name:'Singing Superstar', date:'Coming Soon', color:'#a78bfa', status:'upcoming' },
+  { icon:'💃', name:'Dance Battle',      date:'Coming Soon', color:'#f472b6', status:'upcoming' },
+  { icon:'🎙', name:'Rap Showdown',      date:'Coming Soon', color:'#34d399', status:'active'   },
 ];
 
 const NAV_ITEMS = [
@@ -525,7 +525,7 @@ export default function Home() {
                 <div className="th-comp-name">{c.name}</div>
                 <div className="th-comp-date">
                   {c.status === 'active' ? '🟢 Active' : '⏳ Upcoming'}
-                  {c.prize ? ` · ${c.prize}` : c.date ? ` · ${c.date}` : ''}
+                  {c.date ? ` · ${c.date}` : ''}
                 </div>
               </div>
               <button
