@@ -369,16 +369,22 @@ export default function Home() {
                 className="th-hero-img"
               />
               <div className="th-hero-img-overlay" />
-              <div className="th-live-card">
-                <div className="th-live-badge"><span className="th-live-dot" /> LIVE NOW</div>
-                <div className="th-live-title">Neon Nights</div>
-                <div className="th-live-by">Life Performance</div>
-                <div className="th-live-footer">
-                  <span>❤️ 12.4K</span>
-                  <span>👁 98K</span>
-                  <button className="th-live-play">▶</button>
-                </div>
-              </div>
+             <div className="th-live-card">
+  <div className="th-live-badge"><span className="th-live-dot" /> LIVE NOW</div>
+  <div className="th-live-title">India's Talent Stage</div>
+  <div className="th-live-by">Live Performances</div>
+  <div className="th-live-footer">
+    <span>❤️ {fmt(realStats.views)}</span>
+    <span>👁 {fmt(realStats.users)}</span>
+    <button className="th-live-play" onClick={() => navigate('/live')}>▶</button>
+  </div>
+</div> 
+
+
+
+
+
+
             </div>
           </div>
 
@@ -588,3 +594,39 @@ export default function Home() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
