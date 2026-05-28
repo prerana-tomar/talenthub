@@ -23,46 +23,48 @@ const NAV_ITEMS = [
 ];
 
 const BOTTOM_NAV = [
-  { icon:'👤', label:'My Profile', path:'/profile' },
-  { icon:'📤', label:'My Uploads', path:'/uploads' },
+  { icon:'👤', label:'My Profile',    path:'/profile' },
+  { icon:'📤', label:'My Uploads',    path:'/uploads' },
   { icon:'✦',  label:'AI Highlights', path:'/highlight-studio' },
-  { icon:'🔖', label:'Saved',      path:'/saved' },
-  { icon:'➕', label:'Following',  path:'/following' },
-  { icon:'💬', label:'Messages',   path:'/messages' },
-  { icon:'⚙️', label:'Settings',   path:'/settings' },
+  { icon:'🔖', label:'Saved',         path:'/saved' },
+  { icon:'➕', label:'Following',     path:'/following' },
+  { icon:'💬', label:'Messages',      path:'/messages' },
+  { icon:'⚙️', label:'Settings',      path:'/settings' },
 ];
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [activePage, setActivePage]         = useState('Home');
-  const [videos, setVideos]       = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [darkMode, setDarkMode]   = useState(true);
-  const [competitions, setCompetitions] = useState(FALLBACK_COMPETITIONS);
+  const [videos, setVideos]                 = useState([]);
+  const [loading, setLoading]               = useState(true);
+  const [darkMode, setDarkMode]             = useState(true);
+  const [competitions, setCompetitions]     = useState(FALLBACK_COMPETITIONS);
 
-  const [realUserCount, setRealUserCount] = useState(null);
-  const [realStats, setRealStats]         = useState({ users: 0, videos: 0, views: 0 });
-  const [topPerformers, setTopPerformers] = useState([]);
+  const [realUserCount, setRealUserCount]   = useState(null);
+  const [realStats, setRealStats]           = useState({ users:0, videos:0, views:0 });
+  const [topPerformers, setTopPerformers]   = useState([]);
   const [recentThoughts, setRecentThoughts] = useState([]);
 
-  const [searchQuery,   setSearchQuery]   = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [searchOpen,    setSearchOpen]    = useState(false);
-  const [searching,     setSearching]     = useState(false);
+  const [searchQuery,   setSearchQuery]     = useState('');
+  const [searchResults, setSearchResults]   = useState([]);
+  const [searchOpen,    setSearchOpen]      = useState(false);
+  const [searching,     setSearching]       = useState(false);
   const searchRef = useRef(null);
 
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('th_user') || 'null');
 
+  const API = 'https://talenthub-w1cc.onrender.com';
+
   useEffect(() => {
-    fetch('https://talenthub-w1cc.onrender.com/api/auth/count')
+    fetch(`${API}/api/auth/count`)
       .then(r => r.json())
       .then(d => { setRealUserCount(d.count); setRealStats(prev => ({ ...prev, users: d.count })); })
       .catch(() => setRealUserCount(null));
   }, []);
 
   useEffect(() => {
-    fetch('https://talenthub-w1cc.onrender.com/api/videos')
+    fetch(`${API}/api/videos`)
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -74,28 +76,27 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetch('https://talenthub-w1cc.onrender.com/api/auth/top-performers')
+    fetch(`${API}/api/auth/top-performers`)
       .then(r => r.json())
       .then(d => setTopPerformers(Array.isArray(d) ? d : []))
       .catch(() => setTopPerformers([]));
   }, []);
 
   useEffect(() => {
-    fetch('https://talenthub-w1cc.onrender.com/api/thoughts?limit=3')
+    fetch(`${API}/api/thoughts?limit=3`)
       .then(r => r.json())
       .then(d => setRecentThoughts(d.thoughts || d || []))
       .catch(() => setRecentThoughts([]));
   }, []);
 
   useEffect(() => {
-    fetch('https://talenthub-w1cc.onrender.com/api/competitions')
+    fetch(`${API}/api/competitions`)
       .then(r => r.json())
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data) && data.length > 0)
           setCompetitions(data.filter(c => c.status !== 'ended').slice(0, 3));
-        }
       })
-      .catch(() => {}); // fallback already set
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -111,8 +112,8 @@ export default function Home() {
       setLoading(true);
       try {
         const url = activeCategory === 'All'
-          ? 'https://talenthub-w1cc.onrender.com/api/videos'
-          : `https://talenthub-w1cc.onrender.com/api/videos?category=${activeCategory}`;
+          ? `${API}/api/videos`
+          : `${API}/api/videos?category=${activeCategory}`;
         const res  = await fetch(url);
         const data = await res.json();
         setVideos(Array.isArray(data) ? data : []);
@@ -127,7 +128,7 @@ export default function Home() {
     if (query.trim().length < 2) { setSearchResults([]); return; }
     setSearching(true);
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`${API}/api/videos/search?q=${encodeURIComponent(query)}`);
       if (res.ok) {
         const data = await res.json();
         setSearchResults(data.videos ? data.videos.slice(0, 6) : data.slice(0, 6));
@@ -170,7 +171,7 @@ export default function Home() {
   return (
     <div className={`th-app${darkMode ? '' : ' light-mode'}`}>
 
-      {/* SIDEBAR */}
+      {/* ══ SIDEBAR ══ */}
       <aside className="th-sidebar">
         <div className="th-sidebar-logo" onClick={() => navigate('/')}>
           <span className="th-logo-text">TALENT<span className="th-logo-accent">HUB</span></span>
@@ -225,7 +226,7 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* MAIN */}
+      {/* ══ MAIN ══ */}
       <main className="th-main">
 
         {/* TOPBAR */}
@@ -247,9 +248,7 @@ export default function Home() {
                 autoComplete="off"
               />
               {searchQuery && (
-                <button
-                  type="button"
-                  className="th-search-clear"
+                <button type="button" className="th-search-clear"
                   onClick={() => { setSearchQuery(''); setSearchResults([]); searchRef.current?.focus(); }}
                 >✕</button>
               )}
@@ -259,9 +258,7 @@ export default function Home() {
               <div className="th-search-dropdown">
                 {searching && <div className="th-search-status">Searching...</div>}
                 {!searching && searchResults.map(r => (
-                  <div
-                    key={r._id}
-                    className="th-search-item"
+                  <div key={r._id} className="th-search-item"
                     onClick={() => { setSearchOpen(false); setSearchQuery(''); setSearchResults([]); navigate(`/video/${r._id}`); }}
                   >
                     <span className="th-search-item-icon">▶</span>
@@ -291,8 +288,7 @@ export default function Home() {
 
           <nav className="th-topnav">
             {['Home','Explore','Upload','Competitions'].map(link => (
-              <Link
-                key={link}
+              <Link key={link}
                 to={link === 'Home' ? '/' : `/${link.toLowerCase()}`}
                 className={`th-topnav-link${activePage === link ? ' active' : ''}`}
                 onClick={() => setActivePage(link)}
@@ -330,7 +326,7 @@ export default function Home() {
           </div>
         </header>
 
-        {/* HERO */}
+        {/* ══ HERO ══ */}
         <section className="th-hero">
           <div className="th-hero-inner">
             <div className="th-hero-text">
@@ -369,25 +365,22 @@ export default function Home() {
                 className="th-hero-img"
               />
               <div className="th-hero-img-overlay" />
-             <div className="th-live-card">
-  <div className="th-live-badge"><span className="th-live-dot" /> LIVE NOW</div>
-  <div className="th-live-title">India's Talent Stage</div>
-  <div className="th-live-by">Live Performances</div>
-  <div className="th-live-footer">
-    <span>❤️ {fmt(realStats.views)}</span>
-    <span>👁 {fmt(realStats.users)}</span>
-    <button className="th-live-play" onClick={() => navigate('/live')}>▶</button>
-  </div>
-</div> 
 
-
-
-
-
-
+              {/* ✅ Live card — fake data hataya */}
+              <div className="th-live-card">
+                <div className="th-live-badge">
+                  <span className="th-live-dot" /> LIVE NOW
+                </div>
+                <div className="th-live-title">India's Talent Stage</div>
+                <div className="th-live-by">Live Performances</div>
+                <div className="th-live-footer">
+                  <button className="th-live-play" onClick={() => navigate('/live')}>▶</button>
+                </div>
+              </div>
             </div>
           </div>
 
+          {/* Stats Row */}
           <div className="th-stats-row">
             {[
               { icon:'👥', val: fmt(realStats.users),  label:'Performers',        accent:'#a855f7', bg:'rgba(168,85,247,0.08)',  border:'rgba(168,85,247,0.25)' },
@@ -409,7 +402,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* EXPLORE BY CATEGORY */}
+        {/* ══ EXPLORE BY CATEGORY ══ */}
         <section className="th-section">
           <div className="th-section-header">
             <h2 className="th-section-title">Explore by Category</h2>
@@ -417,18 +410,15 @@ export default function Home() {
           </div>
           <div className="th-category-row">
             {CATEGORIES.map(cat => (
-              <button
-                key={cat}
+              <button key={cat}
                 className={`th-cat-pill${activeCategory === cat ? ' active' : ''}`}
                 onClick={() => setActiveCategory(cat)}
-              >
-                {cat}
-              </button>
+              >{cat}</button>
             ))}
           </div>
         </section>
 
-        {/* TRENDING + TOP PERFORMERS */}
+        {/* ══ TRENDING + TOP PERFORMERS ══ */}
         <section className="th-section th-two-col">
           <div className="th-trending">
             <div className="th-section-header">
@@ -475,8 +465,7 @@ export default function Home() {
                 <div className="th-performers-empty-icon">🌟</div>
                 <h4>No Top Performers Yet!</h4>
                 <p>Upload your performance and get likes to appear here!</p>
-                <button
-                  className="th-btn-primary"
+                <button className="th-btn-primary"
                   style={{marginTop:14, fontSize:13, padding:'9px 20px'}}
                   onClick={() => navigate('/upload')}
                 >⬆ Upload & Shine</button>
@@ -484,9 +473,7 @@ export default function Home() {
             ) : (
               <div className="th-performers-list">
                 {topPerformers.map((p, i) => (
-                  <div
-                    key={p._id || i}
-                    className="th-performer-row"
+                  <div key={p._id || i} className="th-performer-row"
                     style={{cursor:'pointer'}}
                     onClick={() => navigate(`/profile/${p._id}`)}
                   >
@@ -508,7 +495,7 @@ export default function Home() {
         </section>
       </main>
 
-      {/* RIGHT PANEL */}
+      {/* ══ RIGHT PANEL ══ */}
       <aside className="th-right-panel">
 
         {/* Upcoming Competitions */}
@@ -518,9 +505,7 @@ export default function Home() {
             <Link to="/competitions" className="th-view-all">View All</Link>
           </div>
           {competitions.map((c, i) => (
-            <div
-              key={i}
-              className="th-comp-row"
+            <div key={i} className="th-comp-row"
               onClick={() => navigate('/competitions')}
               style={{cursor:'pointer'}}
             >
@@ -534,8 +519,7 @@ export default function Home() {
                   {c.date ? ` · ${c.date}` : ''}
                 </div>
               </div>
-              <button
-                className="th-participate-btn"
+              <button className="th-participate-btn"
                 onClick={(e) => { e.stopPropagation(); navigate('/competitions'); }}
               >
                 {c.status === 'active' ? 'Join' : 'Soon'}
@@ -544,7 +528,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* THOUGHTS WIDGET */}
+        {/* Thoughts Widget */}
         <div className="th-panel-section th-thoughts-widget">
           <div className="th-panel-header">
             <span className="th-panel-title">💭 Thoughts</span>
@@ -568,7 +552,7 @@ export default function Home() {
                   <div className="th-thought-item-content">
                     <div className="th-thought-item-author">{t.author?.username}</div>
                     <div className="th-thought-item-text">
-                      {t.text?.length > 60 ? t.text.slice(0, 60) + '...' : t.text}
+                      {t.text?.length > 60 ? t.text.slice(0,60) + '...' : t.text}
                     </div>
                     <div className="th-thought-item-meta">
                       ❤️ {t.likes?.length || 0} · {formatTime(t.createdAt)}
@@ -582,51 +566,13 @@ export default function Home() {
             </div>
           )}
         </div>
-
       </aside>
 
       {searchOpen && (
-        <div
-          style={{ position:'fixed', inset:0, zIndex:998 }}
+        <div style={{ position:'fixed', inset:0, zIndex:998 }}
           onClick={() => { setSearchOpen(false); setSearchQuery(''); setSearchResults([]); }}
         />
       )}
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
