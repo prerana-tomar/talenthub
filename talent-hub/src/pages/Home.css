@@ -1089,7 +1089,7 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
   color: #a78bfa;
   background: rgba(124,58,237,0.12);
 }
-.th-mobile-nav-btn .mob-icon { font-size: 20px; line-height: 1; }
+.th-mobile-nav-btn .mob-icon  { font-size: 20px; line-height: 1; }
 .th-mobile-nav-btn .mob-label { font-size: 9px; white-space: nowrap; }
 
 /* Upload button in bottom nav */
@@ -1100,6 +1100,17 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
   padding: 8px 14px;
   box-shadow: 0 4px 14px rgba(124,58,237,0.4);
 }
+
+/* ══ MOBILE TOPBAR LOGO (sirf mobile pe dikhega) ══════════ */
+.th-mobile-logo {
+  display: none;
+  font-family: 'Bebas Neue', 'Impact', sans-serif;
+  font-size: 18px;
+  color: #fff;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+.th-mobile-logo span { color: #a78bfa; }
 
 /* ══ RESPONSIVE ════════════════════════════════════════════ */
 @media (max-width: 1280px) {
@@ -1119,93 +1130,144 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
   .th-two-col { grid-template-columns: 1fr; }
   .th-performers-panel { display: none; }
   .th-hero-img-wrap { display: none; }
-  .th-stats-row { grid-template-columns: repeat(2,1fr); }
+  .th-stats-row { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* ══ MOBILE (≤600px) — poora fix ═════════════════════════ */
-@media (max-width: 600px) {
-  /* Sidebar hide */
-  .th-sidebar { display: none !important; }
+/* ══ MOBILE (≤768px) — complete fix ══════════════════════ */
+@media (max-width: 768px) {
+  /* App layout */
+  .th-app {
+    flex-direction: column;
+    padding-bottom: 70px; /* bottom nav ke liye space */
+  }
+
+  /* Sidebar + right panel completely hide */
+  .th-sidebar     { display: none !important; }
   .th-right-panel { display: none !important; }
 
-  /* Bottom nav show */
+  /* Bottom nav show karo */
   .th-mobile-bottom-nav { display: block; }
 
-  /* Main content ke neeche space — bottom nav ke liye */
-  .th-app { padding-bottom: 62px; }
-  .th-main { padding-bottom: 10px; }
+  /* Main area full width */
+  .th-main { width: 100%; }
 
-  /* Topbar fix */
+  /* ── TOPBAR fix ── */
   .th-topbar {
     padding: 0 12px;
-    height: 52px;
+    height: 54px;
     gap: 8px;
   }
+
+  /* Mobile pe logo topbar mein dikhao */
+  .th-mobile-logo { display: block; }
+
+  /* Top nav links hide */
   .th-topnav { display: none; }
+
+  /* Search bar full flex */
   .th-search-wrap { max-width: none; flex: 1; }
+  .th-search-dropdown {
+    min-width: 0;
+    width: calc(100vw - 24px);
+    left: 0;
+  }
 
-  /* Search dropdown full width */
-  .th-search-dropdown { min-width: 0; width: calc(100vw - 24px); left: 0; }
-
-  /* User pill — sirf avatar dikhao */
-  .th-user-name { display: none; }
-  .th-user-pill { padding: 3px 5px 3px 3px; }
+  /* User pill compact */
+  .th-user-name  { display: none; }
   .th-logout-btn { display: none; }
+  .th-user-pill  { padding: 3px 5px 3px 3px; }
 
-  /* Notification icons chhote */
-  .th-icon-btn { width: 28px; height: 28px; }
+  /* Icon buttons chhote */
+  .th-icon-btn { width: 30px; height: 30px; }
 
-  /* Hero full width */
-  .th-hero { padding: 16px 14px 14px; }
-  .th-hero-inner { flex-direction: column; gap: 14px; }
-  .th-hero-img-wrap { display: none; }
-  .th-hero-title { font-size: 36px; }
-  .th-hero-desc { font-size: 12px; max-width: 100%; }
-  .th-hero-btns { gap: 8px; }
-  .th-btn-primary, .th-btn-outline { padding: 9px 14px; font-size: 12px; }
+  /* ── HERO ── */
+  .th-hero {
+    padding: 16px 14px 14px;
+  }
+  .th-hero-inner {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .th-hero-img-wrap { display: none !important; }
+  .th-hero-title { font-size: 38px; }
+  .th-hero-desc  { font-size: 12px; max-width: 100%; }
+  .th-hero-btns  { gap: 8px; }
+  .th-btn-primary,
+  .th-btn-outline { padding: 9px 14px; font-size: 12px; }
 
-  /* Stats 2x2 grid */
+  /* ── STATS — 2x2 grid ── */
   .th-stats-row {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
-  .th-stat-box { padding: 12px 10px; }
-  .th-stat-val { font-size: 18px; }
+  .th-stat-box  { padding: 12px 10px; }
+  .th-stat-val  { font-size: 18px; }
+  .th-stat-icon { font-size: 16px; }
+  .th-stat-icon-wrap { width: 30px; height: 30px; }
 
-  /* Sections */
+  /* ── SECTIONS ── */
   .th-section { padding: 14px 14px 0; }
+  .th-section-title { font-size: 14px; }
+
+  /* Two col -> single col */
   .th-two-col {
     grid-template-columns: 1fr;
     gap: 0;
-    padding-bottom: 20px;
+    padding-bottom: 16px;
   }
 
-  /* Video grid — 1 column on very small, 2 on normal mobile */
+  /* Performers hide on mobile */
+  .th-performers-panel { display: none !important; }
+
+  /* ── VIDEO GRID — 2 columns ── */
   .th-video-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
-  .th-loading-grid { grid-template-columns: repeat(2, 1fr); }
+  .th-loading-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .th-skeleton { height: 160px; }
 
-  /* Category pills scroll */
+  /* ── CATEGORY PILLS — horizontal scroll ── */
   .th-category-row {
     flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 4px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    gap: 6px;
   }
   .th-category-row::-webkit-scrollbar { display: none; }
-  .th-cat-pill { flex-shrink: 0; }
-
-  /* Performers panel hide on mobile */
-  .th-performers-panel { display: none; }
+  .th-cat-pill { flex-shrink: 0; font-size: 11px; padding: 5px 11px; }
 }
 
+/* ══ SMALL MOBILE (≤480px) ════════════════════════════════ */
+@media (max-width: 480px) {
+  .th-hero-title { font-size: 32px; }
+  .th-hero-badge { font-size: 9px; padding: 3px 9px; }
+  .th-social-proof { font-size: 12px; }
+
+  /* Stats still 2x2 */
+  .th-stats-row { grid-template-columns: repeat(2, 1fr); gap: 7px; }
+  .th-stat-val  { font-size: 16px; }
+
+  /* Video grid — 2 col on medium phones, 1 col on tiny */
+  .th-video-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+
+  /* Mobile nav labels thoda chhota */
+  .th-mobile-nav-btn .mob-label { font-size: 8px; }
+  .th-mobile-nav-btn .mob-icon  { font-size: 18px; }
+  .th-mobile-nav-btn            { min-width: 44px; padding: 5px 7px; }
+}
+
+/* ══ VERY SMALL (≤360px) ══════════════════════════════════ */
 @media (max-width: 360px) {
-  .th-hero-title { font-size: 30px; }
+  .th-hero-title { font-size: 28px; }
   .th-video-grid { grid-template-columns: 1fr; }
-  .th-stats-row  { grid-template-columns: repeat(2,1fr); }
+  .th-stats-row  { grid-template-columns: repeat(2, 1fr); }
+  .th-topbar     { padding: 0 10px; gap: 6px; }
 }
 
 /* ══ LIGHT MODE ════════════════════════════════════════════ */
@@ -1215,19 +1277,22 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
 .light-mode .th-right-panel { background: linear-gradient(180deg, #ffffff 0%, #faf8ff 100%) !important; border-left: 1px solid rgba(124,58,237,0.1) !important; }
 .light-mode .th-mobile-bottom-nav { background: rgba(255,255,255,0.97) !important; border-top: 1px solid rgba(124,58,237,0.1) !important; }
 .light-mode .th-mobile-nav-btn { color: #888 !important; }
-.light-mode .th-mobile-nav-btn.active { color: #7c3aed !important; background: rgba(124,58,237,0.08) !important; }
-.light-mode .th-logo-text   { color: #1a1a2e !important; }
-.light-mode .th-logo-accent { color: #7c3aed !important; }
-.light-mode .th-logo-sub    { color: #9b8fc0 !important; }
-.light-mode .th-sidenav-item { color: #4a4a6a !important; }
+.light-mode .th-mobile-nav-btn.active,
+.light-mode .th-mobile-nav-btn:hover { color: #7c3aed !important; background: rgba(124,58,237,0.08) !important; }
+.light-mode .th-mobile-logo       { color: #1a1a2e !important; }
+.light-mode .th-mobile-logo span  { color: #7c3aed !important; }
+.light-mode .th-logo-text         { color: #1a1a2e !important; }
+.light-mode .th-logo-accent       { color: #7c3aed !important; }
+.light-mode .th-logo-sub          { color: #9b8fc0 !important; }
+.light-mode .th-sidenav-item      { color: #4a4a6a !important; }
 .light-mode .th-sidenav-item:hover  { background: rgba(124,58,237,0.08) !important; color: #7c3aed !important; }
 .light-mode .th-sidenav-item.active { background: rgba(124,58,237,0.15) !important; color: #7c3aed !important; }
 .light-mode .th-search-form  { background: #f3eeff !important; border-color: rgba(124,58,237,0.2) !important; }
 .light-mode .th-search-input { color: #1a1a2e !important; }
 .light-mode .th-search-input::placeholder { color: #aaa !important; }
-.light-mode .th-search-dropdown { background: #fff !important; }
+.light-mode .th-search-dropdown   { background: #fff !important; }
 .light-mode .th-search-item-title { color: #1a1a2e !important; }
-.light-mode .th-topnav-link { color: #4a4a6a !important; }
+.light-mode .th-topnav-link       { color: #4a4a6a !important; }
 .light-mode .th-topnav-link:hover { color: #7c3aed !important; }
 .light-mode .th-icon-btn  { background: #f3eeff !important; color: #7c3aed !important; }
 .light-mode .th-user-pill { background: #f3eeff !important; }
@@ -1236,13 +1301,13 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
 .light-mode .th-hero-accent { color: #e8750a !important; }
 .light-mode .th-hero-desc   { color: #4a4a6a !important; }
 .light-mode .th-section-title { color: #1a1a2e !important; }
-.light-mode .th-cat-pill { background: #f3eeff !important; color: #4a4a6a !important; }
+.light-mode .th-cat-pill        { background: #f3eeff !important; color: #4a4a6a !important; }
 .light-mode .th-cat-pill.active { background: #7c3aed !important; color: #fff !important; }
-.light-mode .th-perf-name { color: #1a1a2e !important; }
+.light-mode .th-perf-name   { color: #1a1a2e !important; }
 .light-mode .th-panel-title { color: #1a1a2e !important; }
-.light-mode .th-comp-name { color: #1a1a2e !important; }
-.light-mode .th-comp-row { background: #f8f4ff !important; }
-.light-mode .th-stat-box { background: #fff !important; border-color: rgba(124,58,237,0.12) !important; }
-.light-mode .th-stat-label { color: #64748b !important; }
+.light-mode .th-comp-name   { color: #1a1a2e !important; }
+.light-mode .th-comp-row    { background: #f8f4ff !important; }
+.light-mode .th-stat-box    { background: #fff !important; border-color: rgba(124,58,237,0.12) !important; }
+.light-mode .th-stat-label  { color: #64748b !important; }
 .light-mode .th-performers-panel { background: #fff !important; border-color: rgba(124,58,237,0.12) !important; }
-.light-mode .th-thought-item { background: #f8f4ff !important; border-color: rgba(124,58,237,0.12) !important; }
+.light-mode .th-thought-item     { background: #f8f4ff !important; border-color: rgba(124,58,237,0.12) !important; }

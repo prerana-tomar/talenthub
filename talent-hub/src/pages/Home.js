@@ -229,8 +229,14 @@ export default function Home() {
       {/* ══ MAIN ══ */}
       <main className="th-main">
 
-        {/* TOPBAR */}
+        {/* ══ TOPBAR ══ */}
         <header className="th-topbar">
+
+          {/* ✅ Mobile pe logo dikhega — desktop pe CSS se hide hoga */}
+          <div className="th-mobile-logo" onClick={() => navigate('/')}>
+            TALENT<span>HUB</span>
+          </div>
+
           <div className="th-search-wrap">
             <form onSubmit={handleSearchSubmit} className="th-search-form">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2.5">
@@ -365,8 +371,6 @@ export default function Home() {
                 className="th-hero-img"
               />
               <div className="th-hero-img-overlay" />
-
-              {/* ✅ Live card — fake data hataya */}
               <div className="th-live-card">
                 <div className="th-live-badge">
                   <span className="th-live-dot" /> LIVE NOW
@@ -568,20 +572,14 @@ export default function Home() {
         </div>
       </aside>
 
+      {/* Search overlay */}
       {searchOpen && (
         <div style={{ position:'fixed', inset:0, zIndex:998 }}
           onClick={() => { setSearchOpen(false); setSearchQuery(''); setSearchResults([]); }}
         />
       )}
 
-
-
-
-
-
-
-
-{/* ══ MOBILE BOTTOM NAV ══ */}
+      {/* ══ MOBILE BOTTOM NAV ══ */}
       <nav className="th-mobile-bottom-nav">
         <div className="th-mobile-bottom-nav-inner">
           <Link to="/" className={`th-mobile-nav-btn ${activePage==='Home'?'active':''}`} onClick={()=>setActivePage('Home')}>
@@ -606,6 +604,7 @@ export default function Home() {
           </Link>
         </div>
       </nav>
+
     </div>
   );
 }
