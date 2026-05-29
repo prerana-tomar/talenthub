@@ -10,6 +10,9 @@ const app    = express();
 const server = http.createServer(app);
 const highlightRoutes = require('./routes/highlights');
 
+// ✅ Uploads folder serve karo — SIRF EK BAAR
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
@@ -25,7 +28,6 @@ const io = new Server(server, {
 
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/auth',         require('./routes/auth'));
