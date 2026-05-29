@@ -573,6 +573,39 @@ export default function Home() {
           onClick={() => { setSearchOpen(false); setSearchQuery(''); setSearchResults([]); }}
         />
       )}
+
+
+
+
+
+
+
+
+{/* ══ MOBILE BOTTOM NAV ══ */}
+      <nav className="th-mobile-bottom-nav">
+        <div className="th-mobile-bottom-nav-inner">
+          <Link to="/" className={`th-mobile-nav-btn ${activePage==='Home'?'active':''}`} onClick={()=>setActivePage('Home')}>
+            <span className="mob-icon">🏠</span>
+            <span className="mob-label">Home</span>
+          </Link>
+          <Link to="/explore" className={`th-mobile-nav-btn ${activePage==='Explore'?'active':''}`} onClick={()=>setActivePage('Explore')}>
+            <span className="mob-icon">🔍</span>
+            <span className="mob-label">Explore</span>
+          </Link>
+          <Link to="/upload" className="th-mobile-nav-btn upload-mob">
+            <span className="mob-icon">⬆</span>
+            <span className="mob-label">Upload</span>
+          </Link>
+          <Link to="/competitions" className="th-mobile-nav-btn">
+            <span className="mob-icon">🏆</span>
+            <span className="mob-label">Contest</span>
+          </Link>
+          <Link to="/profile" className="th-mobile-nav-btn">
+            <span className="mob-icon">👤</span>
+            <span className="mob-label">Profile</span>
+          </Link>
+        </div>
+      </nav>
     </div>
   );
 }
