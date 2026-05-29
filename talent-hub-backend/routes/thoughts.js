@@ -1,38 +1,32 @@
-// routes/thoughts.js  — COMPLETE FILE, replace karo apni existing file se
 const express  = require('express');
 const router   = express.Router();
 const multer   = require('multer');
-const path     = require('path');
-const fs       = require('fs');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
 const Thought  = require('../models/Thought');
 const authMiddleware = require('../middleware/auth');
 
-// ── Multer setup ──────────────────────────────────────────────
-const uploadDir = path.join(__dirname, '..', 'uploads', 'thoughts');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+// ── Cloudinary config ─────────────────────────────────────────
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename:    (req, file, cb) => {
-    const ext  = path.extname(file.originalname);
-    const name = `thought_${Date.now()}_${Math.round(Math.random() * 1e6)}${ext}`;
-    cb(null, name);
+// ── Multer + Cloudinary Storage ───────────────────────────────
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder:          'talenthub/thoughts',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    transformation:  [{ width: 1080, crop: 'limit', quality: 'auto' }],
   },
 });
 
-const fileFilter = (req, file, cb) => {
-  const allowed = /jpeg|jpg|png|gif|webp/;
-  if (allowed.test(file.mimetype)) cb(null, true);
-  else cb(new Error('Only images allowed'), false);
-};
-
 const upload = multer({
   storage,
-  fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 },
 });
-
-const imgUrl = (filename) => `/uploads/thoughts/${filename}`;
 
 // GET /api/thoughts
 router.get('/', async (req, res) => {
@@ -63,7 +57,7 @@ router.post('/', authMiddleware, upload.array('images', 4), async (req, res) => 
       return res.status(400).json({ message: 'Text ya image zaroori hai' });
     }
 
-    const images = req.files ? req.files.map(f => imgUrl(f.filename)) : [];
+    const images = req.files ? req.files.map(f => f.path) : [];
 
     const thought = await Thought.create({
       author:   req.user.id || req.user._id,
@@ -77,7 +71,6 @@ router.post('/', authMiddleware, upload.array('images', 4), async (req, res) => 
     res.status(201).json(populated);
   } catch (err) {
     console.error('POST thought error:', err);
-    if (req.files) req.files.forEach(f => fs.unlink(f.path, () => {}));
     res.status(500).json({ message: 'Server error: ' + err.message });
   }
 });
@@ -113,10 +106,15 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     }
 
     if (thought.images && thought.images.length > 0) {
-      thought.images.forEach(imgPath => {
-        const fullPath = path.join(__dirname, '..', imgPath);
-        fs.unlink(fullPath, () => {});
-      });
+      for (const imgUrl of thought.images) {
+        try {
+          const parts    = imgUrl.split('/');
+          const file     = parts[parts.length - 1].split('.')[0];
+          const folder   = parts[parts.length - 2];
+          const publicId = `${folder}/${file}`;
+          await cloudinary.uploader.destroy(publicId);
+        } catch (e) {}
+      }
     }
 
     await thought.deleteOne();
@@ -156,7 +154,7 @@ router.post('/:id/comments', authMiddleware, async (req, res) => {
 
     thought.comments.push({
       author: req.user.id || req.user._id,
-      text: text.trim(),
+      text:   text.trim(),
     });
     await thought.save();
     await thought.populate('comments.author', 'username');
