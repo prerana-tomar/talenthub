@@ -3,17 +3,29 @@ import { Link, useNavigate, NavLink } from 'react-router-dom';
 import './Navbar.css';
 
 function Navbar() {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen]     = useState(false);
+  const [searchQuery, setSearchQuery]   = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [searching, setSearching] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [searching, setSearching]       = useState(false);
+  const [menuOpen, setMenuOpen]         = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const searchRef = useRef(null);
+  const [activePage, setActivePage]     = useState('');
+  const searchRef  = useRef(null);
   const dropdownRef = useRef(null);
-  const navigate = useNavigate();
+  const navigate   = useNavigate();
 
   const user = JSON.parse(localStorage.getItem('th_user') || 'null');
+
+  // Set active page on load
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path === '/')                  setActivePage('home');
+    else if (path.includes('explore')) setActivePage('explore');
+    else if (path.includes('upload'))  setActivePage('upload');
+    else if (path.includes('competi')) setActivePage('compete');
+    else if (path.includes('profile')) setActivePage('profile');
+    else if (path.includes('thought')) setActivePage('thoughts');
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('th_token');
@@ -40,7 +52,6 @@ function Navbar() {
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -61,9 +72,7 @@ function Navbar() {
         const data = await res.json();
         setSearchResults(data.slice(0, 6));
       }
-    } catch {
-      setSearchResults([]);
-    }
+    } catch { setSearchResults([]); }
     setSearching(false);
   };
 
@@ -89,7 +98,7 @@ function Navbar() {
       <nav className="navbar">
 
         {/* Logo */}
-        <Link to="/" className="navbar-brand">
+        <Link to="/" className="navbar-brand" onClick={() => setActivePage('home')}>
           <span className="brand-talent">TALENT</span>
           <span className="brand-hub">HUB</span>
           <span className="brand-tagline">✦ INDIA'S TALENT STAGE</span>
@@ -151,13 +160,13 @@ function Navbar() {
           )}
         </div>
 
-        {/* Nav Links */}
+        {/* Nav Links (desktop) */}
         <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
-          <Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>Home</Link>
-          <Link to="/explore" className="nav-link" onClick={() => setMenuOpen(false)}>Explore</Link>
-          <Link to="/upload" className="nav-link" onClick={() => setMenuOpen(false)}>Upload</Link>
+          <Link to="/"                  className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('home'); }}>Home</Link>
+          <Link to="/explore"           className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('explore'); }}>Explore</Link>
+          <Link to="/upload"            className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('upload'); }}>Upload</Link>
           <NavLink to="/highlight-studio" className="nav-link" onClick={() => setMenuOpen(false)}>✦ AI Highlights</NavLink>
-          <Link to="/competitions" className="nav-link" onClick={() => setMenuOpen(false)}>
+          <Link to="/competitions"      className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('compete'); }}>
             Competitions <span className="nav-badge">New</span>
           </Link>
         </div>
@@ -178,16 +187,10 @@ function Navbar() {
             </svg>
           </button>
 
-          {/* User Avatar with Dropdown OR Login Button */}
           {user ? (
             <div className="navbar-user-wrap" ref={dropdownRef}>
-              <button
-                className="navbar-avatar-btn"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-              >
-                <div className="navbar-avatar">
-                  {user.username?.[0]?.toUpperCase() || 'U'}
-                </div>
+              <button className="navbar-avatar-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
+                <div className="navbar-avatar">{user.username?.[0]?.toUpperCase() || 'U'}</div>
                 <span className="navbar-username">{user.username}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="6 9 12 15 18 9" />
@@ -197,28 +200,20 @@ function Navbar() {
               {dropdownOpen && (
                 <div className="navbar-dropdown">
                   <div className="navbar-dropdown-header">
-                    <div className="navbar-dropdown-avatar">
-                      {user.username?.[0]?.toUpperCase() || 'U'}
-                    </div>
+                    <div className="navbar-dropdown-avatar">{user.username?.[0]?.toUpperCase() || 'U'}</div>
                     <div>
                       <div className="navbar-dropdown-name">{user.username}</div>
                       <div className="navbar-dropdown-email">{user.email}</div>
                     </div>
                   </div>
                   <div className="navbar-dropdown-divider" />
-                  <button className="navbar-dropdown-item" onClick={() => { navigate('/profile'); setDropdownOpen(false); }}>
-                    👤 My Profile
-                  </button>
-                  <button className="navbar-dropdown-item" onClick={() => { navigate('/uploads'); setDropdownOpen(false); }}>
-                    📤 My Uploads
-                  </button>
-                  <button className="navbar-dropdown-item" onClick={() => { navigate('/settings'); setDropdownOpen(false); }}>
-                    ⚙️ Settings
-                  </button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/profile');  setDropdownOpen(false); }}>👤 My Profile</button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/uploads');  setDropdownOpen(false); }}>📤 My Uploads</button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/thoughts'); setDropdownOpen(false); }}>💭 Thoughts</button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/saved');    setDropdownOpen(false); }}>🔖 Saved</button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/settings'); setDropdownOpen(false); }}>⚙️ Settings</button>
                   <div className="navbar-dropdown-divider" />
-                  <button className="navbar-dropdown-item navbar-dropdown-logout" onClick={handleLogout}>
-                    ↩ Logout
-                  </button>
+                  <button className="navbar-dropdown-item navbar-dropdown-logout" onClick={handleLogout}>↩ Logout</button>
                 </div>
               )}
             </div>
@@ -240,6 +235,50 @@ function Navbar() {
       {dropdownOpen && (
         <div className="search-backdrop" onClick={() => setDropdownOpen(false)} />
       )}
+
+      {/* ✅ MOBILE BOTTOM NAV — Explore, Thoughts jaise sabhi pages pe dikhega */}
+      <nav className="nb-bottom-nav">
+        <div className="nb-bottom-nav-inner">
+
+          <Link to="/"
+            className={`nb-nav-btn ${activePage === 'home' ? 'active' : ''}`}
+            onClick={() => setActivePage('home')}
+          >
+            <span className="nb-icon">🏠</span>
+            <span className="nb-label">Home</span>
+          </Link>
+
+          <Link to="/explore"
+            className={`nb-nav-btn ${activePage === 'explore' ? 'active' : ''}`}
+            onClick={() => setActivePage('explore')}
+          >
+            <span className="nb-icon">🔍</span>
+            <span className="nb-label">Explore</span>
+          </Link>
+
+          <Link to="/upload" className="nb-nav-btn nb-upload" onClick={() => setActivePage('upload')}>
+            <span className="nb-icon">⬆</span>
+            <span className="nb-label">Upload</span>
+          </Link>
+
+          <Link to="/thoughts"
+            className={`nb-nav-btn ${activePage === 'thoughts' ? 'active' : ''}`}
+            onClick={() => setActivePage('thoughts')}
+          >
+            <span className="nb-icon">💭</span>
+            <span className="nb-label">Thoughts</span>
+          </Link>
+
+          <Link to="/profile"
+            className={`nb-nav-btn ${activePage === 'profile' ? 'active' : ''}`}
+            onClick={() => setActivePage('profile')}
+          >
+            <span className="nb-icon">👤</span>
+            <span className="nb-label">Profile</span>
+          </Link>
+
+        </div>
+      </nav>
     </>
   );
 }
