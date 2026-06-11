@@ -461,3 +461,361 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
 .light-mode .th-comp-row  { background: #f8f4ff !important; }
 .light-mode .th-comp-name { color: #1a1a2e !important; }
 .light-mode .th-panel-title { color: #1a1a2e !important; }
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE ONLY CSS — sirf 768px se neeche apply hoga
+   Laptop view bilkul same rahega
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+
+  /* ── Layout ── */
+  .th-app {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100vw !important;
+    overflow-x: hidden !important;
+    background: #0a0a0f !important;
+    padding-bottom: 68px !important;
+  }
+
+  .th-sidebar     { display: none !important; }
+  .th-right-panel { display: none !important; }
+  .th-performers-panel { display: none !important; }
+
+  .th-main {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    flex: 1 !important;
+  }
+
+  /* ── YouTube style Topbar ── */
+  .th-topbar {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 14px !important;
+    height: 56px !important;
+    background: #0f0f0f !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    gap: 10px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    overflow: visible !important;
+  }
+
+  .th-mobile-logo {
+    display: block !important;
+    font-family: 'Bebas Neue', 'Impact', sans-serif !important;
+    font-size: 22px !important;
+    color: #fff !important;
+    letter-spacing: 2px !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+  }
+  .th-mobile-logo span { color: #a855f7 !important; }
+
+  .th-topnav { display: none !important; }
+
+  .th-search-wrap {
+    flex: 1 !important;
+    max-width: none !important;
+    position: relative !important;
+  }
+
+  .th-search-form {
+    height: 36px !important;
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    border-radius: 20px !important;
+    padding: 0 14px !important;
+  }
+
+  .th-search-dropdown {
+    min-width: 0 !important;
+    width: calc(100vw - 28px) !important;
+    left: 0 !important;
+  }
+
+  .th-user-name  { display: none !important; }
+  .th-logout-btn { display: none !important; }
+  .th-user-pill  {
+    padding: 2px !important;
+    background: transparent !important;
+    border: none !important;
+    max-width: none !important;
+  }
+  .th-user-avatar {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 12px !important;
+    border: 2px solid #a855f7 !important;
+  }
+  .th-icon-btn { width: 30px !important; height: 30px !important; }
+
+  /* ── Hero — YouTube style banner ── */
+  .th-hero {
+    padding: 0 !important;
+    background: #0a0a0f !important;
+    position: relative !important;
+  }
+  .th-hero::before,
+  .th-hero::after { display: none !important; }
+
+  .th-hero-inner {
+    flex-direction: column !important;
+    gap: 0 !important;
+    margin-bottom: 0 !important;
+    position: relative !important;
+  }
+
+  /* Hero image — full width banner */
+  .th-hero-img-wrap {
+    display: block !important;
+    width: 100% !important;
+    height: 200px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    flex-shrink: unset !important;
+  }
+  .th-hero-img {
+    width: 100% !important;
+    height: 200px !important;
+    border-radius: 0 !important;
+    object-fit: cover !important;
+  }
+  .th-hero-img-overlay {
+    border-radius: 0 !important;
+    background: linear-gradient(to top,
+      rgba(10,10,15,0.92) 0%,
+      rgba(10,10,15,0.4) 50%,
+      transparent 100%) !important;
+  }
+
+  /* Live card inside banner */
+  .th-live-card {
+    position: absolute !important;
+    bottom: 12px !important;
+    left: 12px !important;
+    right: 12px !important;
+    background: rgba(10,10,20,0.88) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 10px !important;
+    padding: 8px 10px !important;
+  }
+
+  /* Hero text below banner */
+  .th-hero-text {
+    padding: 14px 14px 0 !important;
+    order: 2 !important;
+  }
+
+  .th-hero-badge {
+    font-size: 9px !important;
+    padding: 3px 10px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .th-hero-title {
+    font-size: 30px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .th-hero-desc {
+    font-size: 12px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 12px !important;
+    max-width: 100% !important;
+    color: rgba(255,255,255,0.55) !important;
+  }
+
+  .th-hero-btns {
+    display: flex !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .th-btn-primary {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+    border-radius: 8px !important;
+  }
+
+  .th-btn-outline {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+    border-radius: 8px !important;
+  }
+
+  .th-social-proof {
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* ── Stats — YouTube style 2x2 ── */
+  .th-stats-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    padding: 14px 14px 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .th-stat-box {
+    background: #161616 !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+  }
+
+  .th-stat-val   { font-size: 22px !important; font-weight: 800 !important; }
+  .th-stat-label { font-size: 9px !important; }
+  .th-stat-icon-wrap { width: 32px !important; height: 32px !important; margin-bottom: 6px !important; }
+  .th-stat-icon  { font-size: 15px !important; }
+
+  /* ── Sections ── */
+  .th-section {
+    padding: 16px 14px 0 !important;
+  }
+
+  .th-section-title { font-size: 15px !important; font-weight: 700 !important; }
+
+  /* Category pills — horizontal scroll */
+  .th-category-row {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    padding-bottom: 6px !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+  .th-category-row::-webkit-scrollbar { display: none !important; }
+  .th-cat-pill {
+    flex-shrink: 0 !important;
+    padding: 6px 14px !important;
+    font-size: 12px !important;
+    border-radius: 20px !important;
+    background: #161616 !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    white-space: nowrap !important;
+  }
+  .th-cat-pill.active {
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+    color: #fff !important;
+  }
+
+  /* ── Two col — single col ── */
+  .th-two-col {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    padding-bottom: 16px !important;
+  }
+
+  /* ── YouTube style Video Grid ── */
+  .th-video-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .th-loading-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 0 14px !important;
+  }
+
+  .th-skeleton {
+    height: 200px !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* ── Bottom Navigation — YouTube style ── */
+  .th-mobile-bottom-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 58px !important;
+    background: #0f0f0f !important;
+    border-top: 1px solid rgba(255,255,255,0.1) !important;
+    backdrop-filter: blur(20px) !important;
+    z-index: 9999 !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    align-items: stretch !important;
+  }
+
+  .th-mobile-bottom-nav-inner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    width: 100% !important;
+    height: 58px !important;
+    padding: 0 !important;
+  }
+
+  .th-mobile-nav-btn {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    background: transparent !important;
+    border: none !important;
+    color: rgba(255,255,255,0.5) !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 500 !important;
+    padding: 6px 10px !important;
+    border-radius: 10px !important;
+    transition: all 0.2s !important;
+    min-width: 52px !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    flex: 1 !important;
+  }
+
+  .th-mobile-nav-btn .mob-icon  { font-size: 22px !important; line-height: 1 !important; }
+  .th-mobile-nav-btn .mob-label { font-size: 9px !important; white-space: nowrap !important; }
+
+  .th-mobile-nav-btn.active {
+    color: #fff !important;
+    background: transparent !important;
+  }
+  .th-mobile-nav-btn.active .mob-icon { filter: drop-shadow(0 0 6px #a855f7) !important; }
+
+  .th-mobile-nav-btn.upload-mob {
+    background: linear-gradient(135deg, #7c3aed, #a855f7) !important;
+    color: #fff !important;
+    border-radius: 14px !important;
+    padding: 10px 12px !important;
+    margin-top: -14px !important;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.6) !important;
+    min-width: 56px !important;
+    flex: none !important;
+  }
+}
+
+/* ── Small phones ── */
+@media (max-width: 480px) {
+  .th-hero-title { font-size: 26px !important; }
+  .th-stats-row  { gap: 7px !important; }
+  .th-stat-val   { font-size: 20px !important; }
+  .th-mobile-nav-btn { min-width: 44px !important; padding: 5px 6px !important; }
+  .th-mobile-nav-btn .mob-icon  { font-size: 20px !important; }
+  .th-mobile-nav-btn .mob-label { font-size: 8px !important; }
+}
+
+@media (max-width: 360px) {
+  .th-hero-title { font-size: 22px !important; }
+  .th-topbar { padding: 0 10px !important; }
+}
