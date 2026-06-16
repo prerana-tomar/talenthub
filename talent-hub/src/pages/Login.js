@@ -39,7 +39,7 @@ function Login() {
         setError(data.message || 'Login failed. Please try again.');
       }
     } catch (err) {
-      setError('Cannot connect to server. Make sure the backend is running.');
+      setError('Server start ho raha hai... 60 second baad dobara try karein.');
     } finally {
       setLoading(false);
     }
@@ -62,7 +62,7 @@ function Login() {
         setError(data.message || 'Google login failed');
       }
     } catch {
-      setError('Network error. Cannot connect to server.');
+      setError('Server start ho raha hai... 60 second baad dobara try karein.');
     }
   };
 
