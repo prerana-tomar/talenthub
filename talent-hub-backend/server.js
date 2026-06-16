@@ -17,6 +17,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
   'https://talenthub-mn78.vercel.app',
+  'https://talenthub-ochre.vercel.app',
+  'https://talenthub-git-main-prerana-tomars-projects.vercel.app',
 ];
 
 const io = new Server(server, {
