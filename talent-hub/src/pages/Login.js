@@ -22,7 +22,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/auth/google', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ email, password }),

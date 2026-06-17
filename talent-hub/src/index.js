@@ -5,7 +5,7 @@ import './index.css';
 import App from './App';
 
 // Server ko app load hote hi wake up karo
-fetch('https://talenthub-w1cc.onrender.com/api/auth/count').catch(() => {});
+fetch('https://talenthub-w1cc.onrender.com/health').catch(() => {});
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
