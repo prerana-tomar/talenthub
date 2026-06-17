@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import './Live.css';
 
-const SOCKET_URL = 'https://talenthub-w1cc.onrender.com';
+const SOCKET_URL = '';
 
 const ICE_SERVERS = {
   iceServers: [
@@ -35,7 +35,6 @@ export default function Live() {
   const peerRef        = useRef(null);
   const chatEndRef     = useRef(null);
 
-  // ── SOCKET SETUP ──
   useEffect(() => {
     const socket = io(SOCKET_URL, { transports: ['websocket'] });
     socketRef.current = socket;
@@ -53,40 +52,32 @@ export default function Live() {
       stopStream();
     });
 
-    // Host — viewer joined, send offer
     socket.on('viewer-joined', async ({ viewerId }) => {
       if (!localStream.current) return;
       const pc = new RTCPeerConnection(ICE_SERVERS);
       peers.current[viewerId] = pc;
-
       localStream.current.getTracks().forEach(track => {
         pc.addTrack(track, localStream.current);
       });
-
       pc.onicecandidate = ({ candidate }) => {
         if (candidate) socket.emit('webrtc-ice', { to: viewerId, candidate });
       };
-
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       socket.emit('webrtc-offer', { to: viewerId, offer });
     });
 
-    // Viewer — receive offer
     socket.on('webrtc-offer', async ({ from, offer }) => {
       const pc = new RTCPeerConnection(ICE_SERVERS);
       peerRef.current = pc;
-
       pc.ontrack = (event) => {
         if (remoteVideoRef.current) {
           remoteVideoRef.current.srcObject = event.streams[0];
         }
       };
-
       pc.onicecandidate = ({ candidate }) => {
         if (candidate) socket.emit('webrtc-ice', { to: from, candidate });
       };
-
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
@@ -121,7 +112,6 @@ export default function Live() {
     };
   }, []);
 
-  // ✅ Camera ko mode change hone ke BAAD set karo
   useEffect(() => {
     if (mode === 'host' && localStream.current) {
       const trySetVideo = (attempts = 0) => {
@@ -129,13 +119,9 @@ export default function Live() {
           localVideoRef.current.srcObject = localStream.current;
           localVideoRef.current.muted     = true;
           localVideoRef.current.play()
-            .then(() => {
-              console.log('✅ Camera working!');
-              setCameraReady(true);
-            })
+            .then(() => { setCameraReady(true); })
             .catch(err => console.error('Play error:', err));
         } else if (attempts < 10) {
-          // DOM mount nahi hua — 100ms baad retry
           setTimeout(() => trySetVideo(attempts + 1), 100);
         }
       };
@@ -143,7 +129,6 @@ export default function Live() {
     }
   }, [mode]);
 
-  // Chat auto scroll
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chat]);
@@ -159,67 +144,32 @@ export default function Live() {
     setCameraReady(false);
   };
 
-  // ── GO LIVE ──
   const handleGoLive = async () => {
     if (!user)                    { navigate('/login'); return; }
     if (!goLiveForm.title.trim()) { setError('Title required!'); return; }
-
     setLoading(true);
     setError('');
-
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width:      { ideal: 1280 },
-          height:     { ideal: 720 },
-          facingMode: 'user',
-        },
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
         audio: true,
       });
-
-      console.log('✅ Stream got:', stream.getTracks());
       localStream.current = stream;
-
       socketRef.current.emit('go-live', {
-        hostId:   socketRef.current.id,
-        hostName: user.username,
-        title:    goLiveForm.title,
-        category: goLiveForm.category,
+        hostId: socketRef.current.id, hostName: user.username,
+        title: goLiveForm.title, category: goLiveForm.category,
       });
-
       setActiveRoom(socketRef.current.id);
       setViewerCount(0);
       setChat([]);
-      setMode('host'); // ← last mein — useEffect trigger karega
+      setMode('host');
     } catch (err) {
-      console.error('Camera error:', err.name, err.message);
       if (err.name === 'NotReadableError') {
-        setError('❌ Camera already in use! Zoom/Teams/OBS band karo phir try karo.');
+        setError('❌ Camera already in use!');
       } else if (err.name === 'NotAllowedError') {
-        setError('❌ Camera permission denied! Browser mein Allow karo.');
+        setError('❌ Camera permission denied!');
       } else if (err.name === 'NotFoundError') {
-        setError('❌ Camera not found! Check karo camera connected hai.');
-      } else if (err.name === 'OverconstrainedError') {
-        // Retry with basic constraints
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: true,
-          });
-          localStream.current = stream;
-          socketRef.current.emit('go-live', {
-            hostId:   socketRef.current.id,
-            hostName: user.username,
-            title:    goLiveForm.title,
-            category: goLiveForm.category,
-          });
-          setActiveRoom(socketRef.current.id);
-          setViewerCount(0);
-          setChat([]);
-          setMode('host');
-        } catch (e2) {
-          setError('❌ Camera error: ' + e2.message);
-        }
+        setError('❌ Camera not found!');
       } else {
         setError('❌ Camera error: ' + err.message);
       }
@@ -227,21 +177,15 @@ export default function Live() {
     setLoading(false);
   };
 
-  // ── JOIN ROOM ──
   const handleJoinRoom = (room) => {
     if (!user) { navigate('/login'); return; }
     setActiveRoom(room.roomId);
     setMode('watch');
     setChat([]);
     setError('');
-
-    socketRef.current.emit('join-room', {
-      roomId:     room.roomId,
-      viewerName: user.username,
-    });
+    socketRef.current.emit('join-room', { roomId: room.roomId, viewerName: user.username });
   };
 
-  // ── END LIVE ──
   const handleEndLive = () => {
     socketRef.current.emit('end-live', { roomId: activeRoom });
     stopStream();
@@ -250,7 +194,6 @@ export default function Live() {
     setChat([]);
   };
 
-  // ── LEAVE ROOM ──
   const handleLeaveRoom = () => {
     stopStream();
     setMode('browse');
@@ -259,14 +202,11 @@ export default function Live() {
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
   };
 
-  // ── SEND CHAT ──
   const handleSendChat = (e) => {
     e.preventDefault();
     if (!chatInput.trim() || !activeRoom) return;
     socketRef.current.emit('chat-message', {
-      roomId:  activeRoom,
-      sender:  user?.username || 'Guest',
-      message: chatInput.trim(),
+      roomId: activeRoom, sender: user?.username || 'Guest', message: chatInput.trim(),
     });
     setChatInput('');
   };
@@ -276,7 +216,6 @@ export default function Live() {
   return (
     <div className="live-page">
 
-      {/* TOPBAR */}
       <header className="live-topbar">
         <button className="live-back-btn" onClick={() => navigate('/')}>← Back</button>
         <div className="live-topbar-logo" onClick={() => navigate('/')}>
@@ -293,10 +232,8 @@ export default function Live() {
         )}
       </header>
 
-      {/* ERROR */}
       {error && <div className="live-error">⚠️ {error}</div>}
 
-      {/* ── BROWSE MODE ── */}
       {mode === 'browse' && (
         <div className="live-browse">
           <div className="live-go-live-section">
@@ -304,26 +241,50 @@ export default function Live() {
               <div className="live-go-live-icon">🎥</div>
               <h2>Go Live</h2>
               <p>Share your talent with the world in real-time!</p>
+
+              {/* ✅ COMING SOON BANNER */}
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(124,58,237,0.15), rgba(236,72,153,0.1))',
+                border: '1px solid rgba(124,58,237,0.3)',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '16px',
+                textAlign: 'center',
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>🚀</div>
+                <div style={{ color: '#a78bfa', fontWeight: 700, fontSize: '16px', marginBottom: '4px' }}>
+                  Coming Soon!
+                </div>
+                <div style={{ color: '#888', fontSize: '12px', lineHeight: 1.5 }}>
+                  Live streaming feature abhi develop ho rahi hai.<br />
+                  Bahut jald aayegi — stay tuned! ✨
+                </div>
+              </div>
+
               <div className="live-form">
                 <input
                   className="live-input"
                   placeholder="Performance title..."
                   value={goLiveForm.title}
                   onChange={e => setGoLiveForm(p => ({ ...p, title: e.target.value }))}
+                  disabled
+                  style={{ opacity: 0.5, cursor: 'not-allowed' }}
                 />
                 <select
                   className="live-select"
                   value={goLiveForm.category}
                   onChange={e => setGoLiveForm(p => ({ ...p, category: e.target.value }))}
+                  disabled
+                  style={{ opacity: 0.5, cursor: 'not-allowed' }}
                 >
                   {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                 </select>
                 <button
                   className="live-go-btn"
-                  onClick={handleGoLive}
-                  disabled={loading}
+                  disabled={true}
+                  style={{ opacity: 0.6, cursor: 'not-allowed', background: '#444' }}
                 >
-                  {loading ? '⏳ Starting...' : '🔴 Go Live Now'}
+                  🚀 Coming Soon
                 </button>
               </div>
             </div>
@@ -350,23 +311,16 @@ export default function Live() {
                       <div className="live-room-badge">
                         <span className="live-dot" /> LIVE
                       </div>
-                      <div className="live-room-viewers">
-                        👁 {room.viewers} watching
-                      </div>
+                      <div className="live-room-viewers">👁 {room.viewers} watching</div>
                     </div>
                     <div className="live-room-info">
                       <div className="live-room-title">{room.title}</div>
                       <div className="live-room-host">
-                        <div className="live-room-host-avatar">
-                          {room.hostName?.[0]?.toUpperCase()}
-                        </div>
+                        <div className="live-room-host-avatar">{room.hostName?.[0]?.toUpperCase()}</div>
                         <span>{room.hostName}</span>
                         <span className="live-room-cat">{room.category}</span>
                       </div>
-                      <button
-                        className="live-join-btn"
-                        onClick={() => handleJoinRoom(room)}
-                      >
+                      <button className="live-join-btn" onClick={() => handleJoinRoom(room)}>
                         ▶ Join Stream
                       </button>
                     </div>
@@ -378,122 +332,81 @@ export default function Live() {
         </div>
       )}
 
-      {/* ── HOST MODE ── */}
       {mode === 'host' && (
         <div className="live-stream-layout">
           <div className="live-stream-main">
-
             <div className="live-stream-header">
-              <div className="live-stream-status">
-                <span className="live-dot" /> LIVE
-              </div>
+              <div className="live-stream-status"><span className="live-dot" /> LIVE</div>
               <div className="live-stream-title">{goLiveForm.title}</div>
               <div className="live-stream-viewers">👁 {viewerCount} viewers</div>
-              <button className="live-end-btn" onClick={handleEndLive}>
-                ⏹ End Stream
-              </button>
+              <button className="live-end-btn" onClick={handleEndLive}>⏹ End Stream</button>
             </div>
-
             <div className="live-video-wrap">
-              {/* ✅ Camera loading state */}
               {!cameraReady && (
                 <div className="live-camera-loading">
                   <div className="live-camera-spinner" />
                   <p>Starting camera...</p>
                 </div>
               )}
-              <video
-                ref={localVideoRef}
-                autoPlay
-                muted
-                playsInline
-                className="live-video"
-                style={{ display: cameraReady ? 'block' : 'none' }}
-              />
+              <video ref={localVideoRef} autoPlay muted playsInline className="live-video"
+                style={{ display: cameraReady ? 'block' : 'none' }} />
               <div className="live-video-label">You (Host)</div>
             </div>
-
             <div className="live-stream-stats">
               <div className="live-stat">👁 {viewerCount} watching</div>
               <div className="live-stat">💬 {chat.length} messages</div>
               <div className="live-stat">🎭 {goLiveForm.category}</div>
             </div>
           </div>
-
           <div className="live-chat">
             <div className="live-chat-header">💬 Live Chat</div>
             <div className="live-chat-messages">
-              {chat.length === 0 ? (
-                <div className="live-chat-empty">No messages yet...</div>
-              ) : (
+              {chat.length === 0 ? <div className="live-chat-empty">No messages yet...</div> :
                 chat.map(msg => (
                   <div key={msg.id} className="live-chat-msg">
                     <span className="live-chat-sender">{msg.sender}</span>
                     <span className="live-chat-text">{msg.message}</span>
                   </div>
-                ))
-              )}
+                ))}
               <div ref={chatEndRef} />
             </div>
             <form className="live-chat-form" onSubmit={handleSendChat}>
-              <input
-                className="live-chat-input"
-                placeholder="Say something..."
-                value={chatInput}
-                onChange={e => setChatInput(e.target.value)}
-              />
+              <input className="live-chat-input" placeholder="Say something..."
+                value={chatInput} onChange={e => setChatInput(e.target.value)} />
               <button type="submit" className="live-chat-send">↑</button>
             </form>
           </div>
         </div>
       )}
 
-      {/* ── WATCH MODE ── */}
       {mode === 'watch' && (
         <div className="live-stream-layout">
           <div className="live-stream-main">
-
             <div className="live-stream-header">
               <button className="live-back-btn" onClick={handleLeaveRoom}>← Leave</button>
-              <div className="live-stream-status">
-                <span className="live-dot" /> LIVE
-              </div>
+              <div className="live-stream-status"><span className="live-dot" /> LIVE</div>
               <div className="live-stream-viewers">👁 {viewerCount} watching</div>
             </div>
-
             <div className="live-video-wrap">
-              <video
-                ref={remoteVideoRef}
-                autoPlay
-                playsInline
-                className="live-video"
-              />
+              <video ref={remoteVideoRef} autoPlay playsInline className="live-video" />
               <div className="live-video-label">Live Stream</div>
             </div>
           </div>
-
           <div className="live-chat">
             <div className="live-chat-header">💬 Live Chat</div>
             <div className="live-chat-messages">
-              {chat.length === 0 ? (
-                <div className="live-chat-empty">No messages yet...</div>
-              ) : (
+              {chat.length === 0 ? <div className="live-chat-empty">No messages yet...</div> :
                 chat.map(msg => (
                   <div key={msg.id} className={`live-chat-msg${msg.sender === user?.username ? ' own' : ''}`}>
                     <span className="live-chat-sender">{msg.sender}</span>
                     <span className="live-chat-text">{msg.message}</span>
                   </div>
-                ))
-              )}
+                ))}
               <div ref={chatEndRef} />
             </div>
             <form className="live-chat-form" onSubmit={handleSendChat}>
-              <input
-                className="live-chat-input"
-                placeholder="Say something..."
-                value={chatInput}
-                onChange={e => setChatInput(e.target.value)}
-              />
+              <input className="live-chat-input" placeholder="Say something..."
+                value={chatInput} onChange={e => setChatInput(e.target.value)} />
               <button type="submit" className="live-chat-send">↑</button>
             </form>
           </div>
