@@ -20,6 +20,7 @@ const NAV_ITEMS = [
   { icon:'⭐', label:'Top Performers',    path:'/top' },
   { icon:'📊', label:'Leaderboard',       path:'/leaderboard' },
   { icon:'💭', label:'Thoughts',          path:'/thoughts' },
+  { icon:'✍️', label:'Creative Studio', path:'/creative-studio' },
 ];
 
 const BOTTOM_NAV = [
@@ -54,7 +55,7 @@ export default function Home() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('th_user') || 'null');
 
-  const API = 'https://talenthub-w1cc.onrender.com';
+  const API = '';
 
   useEffect(() => {
     fetch(`${API}/api/auth/count`)
@@ -594,9 +595,9 @@ export default function Home() {
             <span className="mob-icon">⬆</span>
             <span className="mob-label">Upload</span>
           </Link>
-          <Link to="/competitions" className="th-mobile-nav-btn">
-            <span className="mob-icon">🏆</span>
-            <span className="mob-label">Contest</span>
+          <Link to="/thoughts" className={`th-mobile-nav-btn ${activePage==='Thoughts'?'active':''}`} onClick={()=>setActivePage('Thoughts')}>
+            <span className="mob-icon">💭</span>
+            <span className="mob-label">Thoughts</span>
           </Link>
           <Link to="/profile" className="th-mobile-nav-btn">
             <span className="mob-icon">👤</span>

@@ -20,7 +20,7 @@ export default function MyUploads() {
   const fetchMyVideos = async () => {
     setLoading(true);
     try {
-      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/videos/my', {
+      const res  = await fetch('/api/videos/my', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -33,7 +33,7 @@ export default function MyUploads() {
     if (!window.confirm('Permanently delete this video?')) return;
     setDeletingId(id);
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${id}`, {
+      const res = await fetch(`/api/videos/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -142,7 +142,7 @@ export default function MyUploads() {
               {/* Thumbnail */}
               <div className="mu-thumb">
                 <video
-                  src={`https://talenthub-w1cc.onrender.com${video.videoUrl}`}
+                  src={`${video.videoUrl}`}
                   muted
                   onMouseEnter={e => e.target.play()}
                   onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }}

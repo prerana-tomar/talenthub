@@ -26,7 +26,7 @@ const Categories = () => {
 
   const fetchCategoryStats = async () => {
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/videos/category-stats');
+      const res = await fetch('/api/videos/category-stats');
       const data = await res.json();
       // Expect: { Music: 12, Dance: 8, ... }
       setStats(data || {});
@@ -38,7 +38,7 @@ const Categories = () => {
   const fetchVideosByCategory = async (cat) => {
     setLoading(true);
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos?category=${cat}`);
+      const res = await fetch(`/api/videos?category=${cat}`);
       const data = await res.json();
       setVideos(data.videos || data || []);
     } catch (err) {
@@ -91,7 +91,7 @@ const Categories = () => {
                 onClick={() => window.location.href = `/video/${video._id}`}
               >
                 <div className="video-thumb">
-                  <video src={`https://talenthub-w1cc.onrender.com${video.videoUrl}`} muted />
+                  <video src={`${video.videoUrl}`} muted />
                   <div className="video-overlay">
                     <span className="play-icon">▶</span>
                   </div>

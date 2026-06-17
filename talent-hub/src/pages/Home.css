@@ -413,7 +413,7 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
   }
   .th-mobile-logo span { color: #a855f7 !important; }
   .th-topnav { display: none !important; }
-  .th-search-wrap { flex: 1 !important; max-width: none !important; }
+  .th-search-wrap { display: none !important; }
   .th-search-form {
     height: 36px !important;
     border-radius: 18px !important;
@@ -434,7 +434,7 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
   .th-hero-img-wrap {
     display: block !important;
     width: 100% !important;
-    height: 200px !important;
+    height: auto !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     order: 1 !important;
@@ -443,12 +443,16 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
   }
   .th-hero-img { width: 100% !important; height: 200px !important; border-radius: 0 !important; object-fit: cover !important; }
   .th-hero-img-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    height: 200px !important;
     border-radius: 0 !important;
     background: linear-gradient(to top, rgba(10,10,15,0.92) 0%, rgba(10,10,15,0.3) 60%, transparent 100%) !important;
   }
   .th-live-card {
-    position: absolute !important;
-    bottom: 10px !important; left: 12px !important; right: 12px !important;
+    position: relative !important;
+    bottom: auto !important; left: auto !important; right: auto !important;
+    margin: 12px 14px 0 !important;
     border-radius: 10px !important;
     padding: 8px 10px !important;
     background: rgba(8,8,18,0.9) !important;

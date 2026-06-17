@@ -16,7 +16,7 @@ const Leaderboard = () => {
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(
-        `https://talenthub-w1cc.onrender.com/api/users/leaderboard?period=${period}&category=${category}`,
+        `/api/users/leaderboard?period=${period}&category=${category}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
@@ -116,7 +116,7 @@ const Leaderboard = () => {
               <div className="podium-card podium-second">
                 <div className="podium-avatar">
                   {performers[1]?.profilePic ? (
-                    <img src={`https://talenthub-w1cc.onrender.com${performers[1].profilePic}`} alt={performers[1]?.username} />
+                    <img src={`${performers[1].profilePic}`} alt={performers[1]?.username} />
                   ) : (
                     <span>{performers[1]?.username?.[0]?.toUpperCase()}</span>
                   )}
@@ -132,7 +132,7 @@ const Leaderboard = () => {
                 <div className="podium-crown">👑</div>
                 <div className="podium-avatar large">
                   {performers[0]?.profilePic ? (
-                    <img src={`https://talenthub-w1cc.onrender.com${performers[0].profilePic}`} alt={performers[0]?.username} />
+                    <img src={`${performers[0].profilePic}`} alt={performers[0]?.username} />
                   ) : (
                     <span>{performers[0]?.username?.[0]?.toUpperCase()}</span>
                   )}
@@ -147,7 +147,7 @@ const Leaderboard = () => {
               <div className="podium-card podium-third">
                 <div className="podium-avatar">
                   {performers[2]?.profilePic ? (
-                    <img src={`https://talenthub-w1cc.onrender.com${performers[2].profilePic}`} alt={performers[2]?.username} />
+                    <img src={`${performers[2].profilePic}`} alt={performers[2]?.username} />
                   ) : (
                     <span>{performers[2]?.username?.[0]?.toUpperCase()}</span>
                   )}
@@ -175,7 +175,7 @@ const Leaderboard = () => {
                   <div className="performer-avatar">
                     {performer.profilePic ? (
                       <img
-                        src={`https://talenthub-w1cc.onrender.com${performer.profilePic}`}
+                        src={`${performer.profilePic}`}
                         alt={performer.username}
                       />
                     ) : (

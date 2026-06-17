@@ -22,7 +22,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/auth/login', {
+      const res = await fetch('/api/auth/login', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ email, password }),
@@ -47,7 +47,7 @@ function Login() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/auth/google', {
+      const res = await fetch('/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credentialResponse.credential }),

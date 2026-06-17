@@ -25,7 +25,7 @@ export default function VideoPlayer() {
     const fetchVideo = async () => {
       setLoading(true);
       try {
-        const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${id}`);
+        const res  = await fetch(`/api/videos/${id}`);
         const data = await res.json();
         if (!data || !data._id) { setLoading(false); return; }
         setVideo(data);
@@ -34,10 +34,10 @@ export default function VideoPlayer() {
         setLiked(user ? arr.includes(user._id) : false);
 
         // View increment
-        await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${id}/view`, { method: 'POST' });
+        await fetch(`/api/videos/${id}/view`, { method: 'POST' });
 
         // Related videos
-        const relRes  = await fetch('https://talenthub-w1cc.onrender.com/api/videos');
+        const relRes  = await fetch('/api/videos');
         const relData = await relRes.json();
         setRelated(
           Array.isArray(relData)
@@ -56,7 +56,7 @@ export default function VideoPlayer() {
   const handleLike = async () => {
     if (!token) { navigate('/login'); return; }
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${id}/like`, {
+      const res = await fetch(`/api/videos/${id}/like`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -155,7 +155,7 @@ export default function VideoPlayer() {
             <div className="vp-uploader">
               <div className="vp-avatar">
                 {video.uploader?.profilePic ? (
-                  <img src={`https://talenthub-w1cc.onrender.com${video.uploader.profilePic}`} alt="" />
+                  <img src={`${video.uploader.profilePic}`} alt="" />
                 ) : (
                   <span>{video.uploader?.username?.[0]?.toUpperCase() || 'U'}</span>
                 )}

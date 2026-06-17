@@ -539,7 +539,7 @@
   .hamburger  { display: flex; }
 
   /* Search full width */
-  .navbar-search-wrap { max-width: none; flex: 1; }
+  .navbar-search-wrap { display: none !important; }
   .navbar-search-dropdown { min-width: unset; }
 
   /* Username hide, sirf avatar */

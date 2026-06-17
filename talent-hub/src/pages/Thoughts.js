@@ -36,8 +36,8 @@ export default function Thoughts() {
     setLoading(true);
     try {
       const url = category === 'All'
-        ? 'https://talenthub-w1cc.onrender.com/api/thoughts'
-        : `https://talenthub-w1cc.onrender.com/api/thoughts?category=${category}`;
+        ? '/api/thoughts'
+        : `/api/thoughts?category=${category}`;
       const res  = await fetch(url);
       const data = await res.json();
       setThoughts(data.thoughts || data || []);
@@ -91,14 +91,14 @@ export default function Thoughts() {
         formData.append('category', category === 'All' ? 'General' : category);
         selectedImages.forEach(img => formData.append('images', img));
 
-        res  = await fetch('https://talenthub-w1cc.onrender.com/api/thoughts', {
+        res  = await fetch('/api/thoughts', {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
         });
       } else {
         // No images — send JSON as before
-        res  = await fetch('https://talenthub-w1cc.onrender.com/api/thoughts', {
+        res  = await fetch('/api/thoughts', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ export default function Thoughts() {
   const handleLike = async (id) => {
     if (!token) return alert('Login karo pehle!');
     try {
-      const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/thoughts/${id}/like`, {
+      const res  = await fetch(`/api/thoughts/${id}/like`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -140,7 +140,7 @@ export default function Thoughts() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this thought?')) return;
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/thoughts/${id}`, {
+      const res = await fetch(`/api/thoughts/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -156,7 +156,7 @@ export default function Thoughts() {
     if (!editText.trim()) return;
     setEditSaving(true);
     try {
-      const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/thoughts/${id}`, {
+      const res  = await fetch(`/api/thoughts/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ text: editText }),
@@ -178,7 +178,7 @@ export default function Thoughts() {
     if (!commentText || !token) return;
     setPostingComment(true);
     try {
-      const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/thoughts/${thoughtId}/comments`, {
+      const res  = await fetch(`/api/thoughts/${thoughtId}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ text: commentText }),
@@ -213,7 +213,7 @@ export default function Thoughts() {
   const getImageUrl = (img) => {
     if (!img) return null;
     if (img.startsWith('http')) return img;
-    return `https://talenthub-w1cc.onrender.com${img}`;
+    return `${img}`;
   };
 
   return (

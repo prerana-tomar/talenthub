@@ -21,6 +21,7 @@ import Following from './pages/Following';
 import Saved    from './pages/Saved';
 import Messages from './pages/Messages';
 import HighlightStudio from './pages/HighlightStudio';
+import CreativeStudio from './pages/CreativeStudio';
 
 
 
@@ -85,6 +86,7 @@ function App() {
           <Route path="/saved"    element={<WithNavbar><ProtectedRoute><Saved /></ProtectedRoute></WithNavbar>} />
           <Route path="/messages" element={<WithNavbar><ProtectedRoute><Messages /></ProtectedRoute></WithNavbar>} />
           <Route path="/highlight-studio" element={<WithNavbar><ProtectedRoute><HighlightStudio /></ProtectedRoute></WithNavbar>} />
+          <Route path="/creative-studio" element={<WithNavbar><CreativeStudio /></WithNavbar>} />
           
 
           

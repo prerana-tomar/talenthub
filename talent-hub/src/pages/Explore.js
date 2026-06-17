@@ -40,7 +40,7 @@ export default function Explore() {
   const fetchVideos = async (pageNum = 1, reset = false) => {
     setLoading(true);
     try {
-      let url = `https://talenthub-w1cc.onrender.com/api/videos/search?sort=${sort}&page=${pageNum}&limit=${LIMIT}`;
+      let url = `/api/videos/search?sort=${sort}&page=${pageNum}&limit=${LIMIT}`;
       if (category !== 'All') url += `&category=${category}`;
       if (search.trim())      url += `&q=${encodeURIComponent(search.trim())}`;
 

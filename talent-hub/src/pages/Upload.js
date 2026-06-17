@@ -2,7 +2,7 @@ import './Upload.css';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API = 'https://talenthub-w1cc.onrender.com';
+const API = '';
 
 function Upload() {
   const [title, setTitle]       = useState('');
