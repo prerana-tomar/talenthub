@@ -35,6 +35,14 @@ app.use(express.json());
 
 
 
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  next();
+});
+
+
+
+
 
 // Routes
 app.use('/api/auth',         require('./routes/auth'));
@@ -156,9 +164,11 @@ function getLiveRoomsList() {
   }));
 }
 
-app.get('/api/live/rooms', (req, res) => {
-  res.json(getLiveRoomsList());
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
 });
+
+
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
