@@ -29,7 +29,12 @@ const io = new Server(server, {
 });
 
 app.use(cors({ origin: allowedOrigins }));
+app.options('*', cors({ origin: allowedOrigins }));
 app.use(express.json());
+
+
+
+
 
 // Routes
 app.use('/api/auth',         require('./routes/auth'));
