@@ -38,7 +38,7 @@ const Categories = () => {
   const fetchVideosByCategory = async (cat) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/videos?category=${cat}`);
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos?category=${cat}`);
       const data = await res.json();
       setVideos(data.videos || data || []);
     } catch (err) {

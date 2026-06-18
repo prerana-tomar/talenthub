@@ -33,7 +33,7 @@ export default function MyUploads() {
     if (!window.confirm('Permanently delete this video?')) return;
     setDeletingId(id);
     try {
-      const res = await fetch(`/api/videos/${id}`, {
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

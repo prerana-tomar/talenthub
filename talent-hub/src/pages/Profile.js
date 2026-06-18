@@ -112,7 +112,7 @@ export default function Profile() {
   const handleDeleteVideo = async (videoId) => {
     if (!window.confirm('Delete this video?')) return;
     try {
-      const res = await fetch(`/api/videos/${videoId}`, {
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${videoId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

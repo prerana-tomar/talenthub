@@ -75,7 +75,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
     if (!uploaderId) return;
     setFollowLoad(true);
     try {
-      const res  = await fetch(`/api/auth/follow/${uploaderId}`, {
+      const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/auth/follow/${uploaderId}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -102,7 +102,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
     e.stopPropagation();
     if (!token) { navigate('/login'); return; }
     try {
-      const res = await fetch(`/api/videos/${video._id}/like`, {
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${video._id}/like`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -118,7 +118,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
     if (!token) { navigate('/login'); return; }
     setSavingVid(true);
     try {
-      const res  = await fetch(`/api/saved/video/${video._id}`, {
+      const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/saved/video/${video._id}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -186,7 +186,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/videos/${video._id}`, {
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${video._id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -154,7 +154,7 @@ const Settings = () => {
     if (!window.confirm(`Delete "${videoTitle}"?\n\nThis cannot be undone.`)) return;
     setDeleting(videoId);
     try {
-      const res = await fetch(`/api/videos/${videoId}`, {
+      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${videoId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
