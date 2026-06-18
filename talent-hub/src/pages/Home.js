@@ -55,7 +55,7 @@ export default function Home() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('th_user') || 'null');
 
-  const API = '';
+  const API = 'https://talenthub-w1cc.onrender.com';
 
   useEffect(() => {
     fetch(`${API}/api/auth/count`)
