@@ -357,3 +357,107 @@ body.light-mode .cp-search::placeholder { color: #999; }
 body.light-mode .cp-skeleton {
   background: linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 75%);
 }
+
+/* ── Global Mobile Bottom Navigation ─────────────────────── */
+.global-mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .global-mobile-bottom-nav {
+    display: block;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    width: 100%;
+    height: 60px;
+    background: rgba(10, 10, 20, 0.98);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    z-index: 99999;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  body.light-mode .global-mobile-bottom-nav {
+    background: rgba(255, 255, 255, 0.98);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  .global-mobile-bottom-nav-inner {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-around;
+    height: 100%;
+    padding: 0 8px;
+  }
+  .global-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.35);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 12px;
+    transition: all 0.2s;
+    min-width: 52px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  body.light-mode .global-nav-btn {
+    color: rgba(0, 0, 0, 0.4);
+  }
+  .global-nav-btn:hover,
+  .global-nav-btn.active {
+    color: #a78bfa;
+    background: rgba(124, 58, 237, 0.12);
+  }
+  body.light-mode .global-nav-btn:hover,
+  body.light-mode .global-nav-btn.active {
+    color: #7c3aed;
+    background: rgba(124, 58, 237, 0.08);
+  }
+  .global-nav-btn .global-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+  .global-nav-btn .global-label {
+    font-size: 9px;
+    white-space: nowrap;
+  }
+  .global-nav-btn.global-upload {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: #fff !important;
+    border-radius: 16px;
+    padding: 8px 16px;
+    box-shadow: 0 4px 18px rgba(124, 58, 237, 0.45);
+    margin-top: -10px;
+  }
+  .global-nav-btn.global-upload:hover {
+    background: linear-gradient(135deg, #6d28d9, #9333ea);
+  }
+  
+  /* Prevent horizontal scrolling globally on mobile and add padding-bottom for the global bottom nav */
+  body, html {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  .main-content, .th-main, .vp-page, .live-page, .cp-page, .explore-page, .categories-page, .leaderboard-page, .fw-page, .cs-container, .hs-page {
+    padding-bottom: 76px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .global-nav-btn {
+    min-width: 44px;
+    padding: 5px 7px;
+  }
+  .global-nav-btn .global-icon {
+    font-size: 18px;
+  }
+  .global-nav-btn .global-label {
+    font-size: 8px;
+  }
+}

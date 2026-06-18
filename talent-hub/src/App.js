@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import './App.css';
 
 import Navbar from './components/Navbar';
@@ -52,6 +52,52 @@ const WithNavbar = ({ children }) => (
     <main className="main-content">{children}</main>
   </>
 );
+
+// ── Global Mobile Bottom Navigation ───────────────────────
+function MobileBottomNav() {
+  const location = useLocation();
+  const path = location.pathname;
+
+  if (path === '/login' || path === '/register') return null;
+
+  const getActivePage = () => {
+    if (path === '/') return 'home';
+    if (path.includes('/explore')) return 'explore';
+    if (path.includes('/upload')) return 'upload';
+    if (path.includes('/thoughts')) return 'thoughts';
+    if (path.includes('/profile')) return 'profile';
+    return '';
+  };
+
+  const activePage = getActivePage();
+
+  return (
+    <nav className="global-mobile-bottom-nav">
+      <div className="global-mobile-bottom-nav-inner">
+        <Link to="/" className={`global-nav-btn ${activePage === 'home' ? 'active' : ''}`}>
+          <span className="global-icon">🏠</span>
+          <span className="global-label">Home</span>
+        </Link>
+        <Link to="/explore" className={`global-nav-btn ${activePage === 'explore' ? 'active' : ''}`}>
+          <span className="global-icon">🔍</span>
+          <span className="global-label">Explore</span>
+        </Link>
+        <Link to="/upload" className="global-nav-btn global-upload">
+          <span className="global-icon">⬆</span>
+          <span className="global-label">Upload</span>
+        </Link>
+        <Link to="/thoughts" className={`global-nav-btn ${activePage === 'thoughts' ? 'active' : ''}`}>
+          <span className="global-icon">💭</span>
+          <span className="global-label">Thoughts</span>
+        </Link>
+        <Link to="/profile" className={`global-nav-btn ${activePage === 'profile' ? 'active' : ''}`}>
+          <span className="global-icon">👤</span>
+          <span className="global-label">Profile</span>
+        </Link>
+      </div>
+    </nav>
+  );
+}
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -108,6 +154,7 @@ function App() {
 
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
+        <MobileBottomNav />
       </Router>
     </ThemeContext.Provider>
   );

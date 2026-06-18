@@ -441,22 +441,15 @@
 .navbar-dropdown-logout:hover        { background: rgba(248,113,113,0.1); color: #f87171; }
 
 /* ════════════════════════════════════════════════════
-   MOBILE BOTTOM NAV — yahi main fix hai!
+   MOBILE BOTTOM NAV — hide since we use global nav!
    ════════════════════════════════════════════════════ */
 .nb-bottom-nav {
-  display: none; /* desktop pe hide */
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  height: 62px;
-  background: rgba(10, 10, 20, 0.98);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(20px);
-  z-index: 1000;
-  padding-bottom: env(safe-area-inset-bottom);
+  display: none !important;
 }
 
 .nb-bottom-nav-inner {
   display: flex;
+  width: 100%;
   align-items: center;
   justify-content: space-around;
   height: 100%;
@@ -521,11 +514,43 @@
 /* ── MOBILE (≤768px) — poora fix ────────────────────────── */
 @media (max-width: 768px) {
 
+  /* Two-row layout for header */
+  .navbar {
+    padding: 10px 14px;
+    gap: 8px;
+    height: auto;
+    flex-wrap: wrap;
+  }
+
+  .navbar-brand {
+    order: 1;
+    margin-right: auto;
+  }
+
+  .navbar-actions {
+    order: 2;
+    margin-left: 0;
+  }
+
+  /* Search full width row 2 */
+  .navbar-search-wrap {
+    display: block !important;
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    margin: 4px 0 2px;
+  }
+  
+  .navbar-search-dropdown {
+    width: 100%;
+    min-width: unset;
+  }
+
   /* Navbar links — hamburger menu mein */
   .navbar-links {
     display: none;
     position: absolute;
-    top: 64px; left: 0; right: 0;
+    top: 100%; left: 0; right: 0;
     flex-direction: column;
     align-items: flex-start;
     background: rgba(10, 10, 15, 0.98);
@@ -538,31 +563,19 @@
   .nav-link   { width: 100%; padding: 10px 12px; font-size: 14px; }
   .hamburger  { display: flex; }
 
-  /* Search full width */
-  .navbar-search-wrap { display: none !important; }
-  .navbar-search-dropdown { min-width: unset; }
-
   /* Username hide, sirf avatar */
   .navbar-username { display: none; }
 
   /* Notification + message icons chhote */
   .icon-btn { width: 32px; height: 32px; }
 
-  /* ✅ Bottom nav SHOW karo */
-  .nb-bottom-nav { display: block; }
-
   /* Main content ke neeche bottom nav ke liye space */
-  .main-content { padding-bottom: 62px; }
+  .main-content { padding-bottom: 76px; }
 
-  /* Navbar padding kam karo */
-  .navbar { padding: 0 14px; gap: 10px; height: 56px; }
   .brand-talent, .brand-hub { font-size: 19px; }
 }
 
 @media (max-width: 480px) {
-  .navbar { padding: 0 12px; gap: 8px; }
+  .navbar { padding: 8px 12px; gap: 6px; }
   .brand-talent, .brand-hub { font-size: 17px; }
-  .nb-nav-btn { min-width: 44px; padding: 5px 7px; }
-  .nb-nav-btn .nb-icon  { font-size: 19px; }
-  .nb-nav-btn .nb-label { font-size: 8px; }
 }

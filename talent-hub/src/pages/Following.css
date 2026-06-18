@@ -315,7 +315,35 @@ body.light-mode .fw-skeleton   { background: linear-gradient(90deg, rgba(0,0,0,0
 body.light-mode .fw-follow-btn.following { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #555; }
 
 @media (max-width: 600px) {
-  .fw-page { padding: 20px 16px 40px; }
+  .fw-page { padding: 20px 16px 76px; }
   .fw-user-card { flex-wrap: wrap; }
   .fw-user-actions { width: 100%; justify-content: flex-end; }
+}
+
+@media (max-width: 480px) {
+  .fw-stats { grid-template-columns: 1fr; }
+  .fw-tabs {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .fw-tabs::-webkit-scrollbar {
+    display: none !important;
+  }
+  .fw-tab {
+    flex-shrink: 0 !important;
+  }
+  .fw-user-card {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 10px !important;
+  }
+  .fw-user-meta {
+    justify-content: center !important;
+  }
+  .fw-user-actions {
+    width: 100% !important;
+    justify-content: center !important;
+  }
 }

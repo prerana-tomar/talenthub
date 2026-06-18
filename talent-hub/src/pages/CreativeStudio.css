@@ -158,11 +158,13 @@
 /* Responsive */
 @media (max-width: 900px) {
   .cs-container { grid-template-columns: 1fr; }
-  .cs-sidebar { order: -1; }
+  .cs-sidebar { order: 1; }
   .cs-type-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 600px) {
   .cs-hero-title { font-size: 26px; }
-  .cs-type-grid { grid-template-columns: repeat(2, 1fr); }
-  .cs-container { padding: 16px 14px 80px; }
+  .cs-container { padding: 16px 14px 76px; }
+}
+@media (max-width: 480px) {
+  .cs-type-grid { grid-template-columns: 1fr; }
 }

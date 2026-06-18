@@ -269,5 +269,6 @@
 
 @media (max-width: 480px) {
   .categories-grid { grid-template-columns: 1fr; }
-  .video-grid { grid-template-columns: 1fr 1fr; }
+  .video-grid { grid-template-columns: 1fr; }
+  .categories-page { padding: 16px 14px 76px; }
 }

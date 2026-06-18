@@ -547,6 +547,17 @@
   .live-stream-layout { flex-direction: column; height: auto; }
   .live-chat { width: 100%; height: 300px; border-left: none; border-top: 1px solid rgba(255,255,255,0.07); }
   .live-rooms-grid { grid-template-columns: 1fr; }
+  
+  .live-topbar { padding: 0 12px; gap: 8px; }
+  .live-topbar-user span { display: none !important; }
+  .live-go-live-card { padding: 24px 20px !important; }
+  .live-browse { padding: 20px 14px 76px !important; }
+}
+
+@media (max-width: 480px) {
+  .live-topbar-logo { font-size: 16px !important; }
+  .live-topbar-badge { font-size: 10px !important; padding: 3px 8px !important; }
+  .live-back-btn { padding: 5px 10px !important; font-size: 11px !important; }
 }
 
 

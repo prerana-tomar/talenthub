@@ -350,8 +350,51 @@
 .leaderboard-empty p { margin: 0; }
 
 @media (max-width: 600px) {
-  .performer-stats { display: none; }
   .podium-section { padding: 16px 8px; }
-  .leaderboard-row { padding: 12px; }
+  .leaderboard-row { padding: 12px; flex-wrap: wrap; gap: 10px; }
   .leaderboard-header { flex-direction: column; }
+  .performer-stats {
+    width: 100% !important;
+    order: 3 !important;
+    margin-top: 6px !important;
+    margin-left: 58px !important;
+    gap: 16px !important;
+  }
+  .performer-stats .stat {
+    flex-direction: row !important;
+    gap: 4px !important;
+    min-width: auto !important;
+    align-items: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard-page { padding: 16px 14px 76px; }
+  .podium-avatar {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.1rem !important;
+  }
+  .podium-avatar.large {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 1.3rem !important;
+  }
+  .podium-rank {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 0.8rem !important;
+    bottom: -4px !important;
+    right: -4px !important;
+  }
+  .podium-name {
+    font-size: 0.8rem !important;
+  }
+  .podium-followers {
+    font-size: 0.7rem !important;
+  }
+  .podium-section {
+    padding: 12px 8px !important;
+    gap: 8px !important;
+  }
 }

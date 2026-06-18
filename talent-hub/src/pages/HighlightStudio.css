@@ -666,7 +666,12 @@
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-  .hs-body { flex-direction: column; }
+  .hs-body { flex-direction: column-reverse; }
   .hs-left { width: 100%; }
   .hs-reels-grid { grid-template-columns: repeat(2, 1fr); }
+  .hs-page { padding: 16px 14px 76px; }
+}
+
+@media (max-width: 480px) {
+  .hs-reels-grid { grid-template-columns: 1fr; }
 }

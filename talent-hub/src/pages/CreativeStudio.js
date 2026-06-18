@@ -51,15 +51,11 @@ Rules:
 Write now:`;
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1000,
-          messages: [{ role: 'user', content: prompt }],
-        }),
-      });
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/creative/generate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ prompt }),
+});
 
       const data = await res.json();
       const text = data.content?.[0]?.text || '';
