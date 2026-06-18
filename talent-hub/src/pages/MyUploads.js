@@ -20,7 +20,7 @@ export default function MyUploads() {
   const fetchMyVideos = async () => {
     setLoading(true);
     try {
-      const res  = await fetch('/api/videos/my', {
+      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/videos/my', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();

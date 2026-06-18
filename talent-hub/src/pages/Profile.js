@@ -37,7 +37,7 @@ export default function Profile() {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('/api/auth/me', {
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -65,7 +65,7 @@ export default function Profile() {
   const fetchVideos = async () => {
     setVideoLoad(true);
     try {
-      const res = await fetch('/api/videos/my', {
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/videos/my', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -90,7 +90,7 @@ export default function Profile() {
     if (!editUsername.trim()) { showToast('❌ Username required!'); return; }
     setSaving(true);
     try {
-      const res = await fetch('/api/auth/update', {
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/auth/update', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

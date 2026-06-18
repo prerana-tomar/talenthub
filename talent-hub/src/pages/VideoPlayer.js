@@ -37,7 +37,7 @@ export default function VideoPlayer() {
         await fetch(`/api/videos/${id}/view`, { method: 'POST' });
 
         // Related videos
-        const relRes  = await fetch('/api/videos');
+        const relRes  = await fetch('https://talenthub-w1cc.onrender.com/api/videos');
         const relData = await relRes.json();
         setRelated(
           Array.isArray(relData)

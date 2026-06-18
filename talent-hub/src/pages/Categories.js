@@ -26,7 +26,7 @@ const Categories = () => {
 
   const fetchCategoryStats = async () => {
     try {
-      const res = await fetch('/api/videos/category-stats');
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/videos/category-stats');
       const data = await res.json();
       // Expect: { Music: 12, Dance: 8, ... }
       setStats(data || {});

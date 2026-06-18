@@ -37,7 +37,7 @@ const Settings = () => {
   const fetchMyVideos = async () => {
     setVideoLoad(true);
     try {
-      const res  = await fetch('/api/videos/my', {
+      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/videos/my', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -62,7 +62,7 @@ const Settings = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res  = await fetch('/api/auth/update-profile', {
+      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/auth/update-profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ const Settings = () => {
     }
     setLoading(true);
     try {
-      const res  = await fetch('/api/auth/change-password', {
+      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/auth/change-password', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ const Settings = () => {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/delete-account', {
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/auth/delete-account', {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

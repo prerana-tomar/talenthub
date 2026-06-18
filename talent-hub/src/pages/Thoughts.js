@@ -91,14 +91,14 @@ export default function Thoughts() {
         formData.append('category', category === 'All' ? 'General' : category);
         selectedImages.forEach(img => formData.append('images', img));
 
-        res  = await fetch('/api/thoughts', {
+        res  = await fetch('https://talenthub-w1cc.onrender.com/api/thoughts', {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
         });
       } else {
         // No images — send JSON as before
-        res  = await fetch('/api/thoughts', {
+        res  = await fetch('https://talenthub-w1cc.onrender.com/api/thoughts', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

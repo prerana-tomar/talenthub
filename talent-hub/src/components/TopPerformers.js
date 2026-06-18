@@ -11,7 +11,7 @@ const TopPerformers = () => {
 
   const fetchTopPerformers = async () => {
     try {
-      const res = await fetch('/api/users/top-performers');
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/users/top-performers');
       const data = await res.json();
       // Support both array and { users: [] } response shapes
       setPerformers(Array.isArray(data) ? data.slice(0, 5) : (data.users || data.performers || []).slice(0, 5));
