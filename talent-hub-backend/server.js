@@ -53,6 +53,7 @@ app.use('/api/competitions', require('./routes/competitions'));
 app.use('/api/messages',     require('./routes/messages'));
 app.use('/api/saved',        require('./routes/saved'));
 app.use('/api/highlights',   highlightRoutes);
+app.use('/api/creative', require('./routes/creative'));
 
 // MongoDB
 mongoose.connect(process.env.MONGO_URI)
