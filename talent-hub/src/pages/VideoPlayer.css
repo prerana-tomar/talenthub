@@ -323,12 +323,17 @@
 /* ══ RESPONSIVE ════════════════════════════════════════════ */
 @media (max-width: 900px) {
   .vp-layout { grid-template-columns: 1fr; }
-  .vp-sidebar { display: none; }
+  .vp-sidebar {
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding-top: 24px;
+    margin-top: 16px;
+  }
 }
 
 @media (max-width: 600px) {
   .vp-layout  { padding: 16px; }
   .vp-topbar  { padding: 0 16px; }
   .vp-title   { font-size: 16px; }
-  .vp-meta-row { flex-direction: column; align-items: flex-start; }
+  .vp-meta-row { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .vp-actions { width: 100%; justify-content: flex-start; }
 }

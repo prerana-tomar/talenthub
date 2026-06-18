@@ -396,8 +396,16 @@
 .profile-badge-desc  { font-size: 11px; color: #64748b; line-height: 1.4; }
 
 @media (max-width: 640px) {
-  .profile-top { flex-direction: column; align-items: center; text-align: center; margin-top: -50px; flex-wrap: wrap; 
-  -direction: column; align-items: center; text-align: center; margin-top: -50px; }
+  .profile-top {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: -50px;
+    flex-wrap: wrap;
+  }
+  .profile-info {
+    padding-top: 0;
+  }
   .profile-name-row { justify-content: center; }
   .profile-stats { gap: 8px; }
   .profile-stat-box { min-width: 60px; padding: 12px 8px; }

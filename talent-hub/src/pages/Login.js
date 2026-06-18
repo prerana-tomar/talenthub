@@ -118,7 +118,7 @@ function Login() {
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => setError('Google login failed. Please try again.')}
-            useOneTap
+            useOneTap={false}
             theme="filled_black"
             shape="rectangular"
             size="large"

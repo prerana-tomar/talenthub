@@ -407,3 +407,17 @@ body.light-mode .delete-modal     { background: #fff; border-color: rgba(239,68,
 body.light-mode .delete-modal h3  { color: #0f0f1a; }
 body.light-mode .cancel-btn       { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #555; }
 body.light-mode .vc-toast         { background: rgba(255,255,255,0.95); color: #7c3aed; border-color: rgba(124,58,237,0.3); }
+
+/* ── RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .video-actions {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  .action-btn span {
+    display: none !important;
+  }
+  .action-btn {
+    padding: 0 !important;
+    font-size: 14px !important;
+  }
+}

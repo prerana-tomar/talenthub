@@ -265,7 +265,7 @@ export default function Messages() {
     <div className="msg-page">
 
       {/* ── LEFT: Conversations ── */}
-      <div className="msg-sidebar">
+      <div className={`msg-sidebar ${!activeConv ? 'show' : ''}`}>
         <div className="msg-sidebar-header">
           <h2 className="msg-sidebar-title">💬 Messages</h2>
           <span className="msg-conv-count">{conversations.length}</span>
@@ -344,7 +344,7 @@ export default function Messages() {
       </div>
 
       {/* ── RIGHT: Chat window ── */}
-      <div className="msg-chat">
+      <div className={`msg-chat ${activeConv ? 'show' : ''}`}>
         {!activeConv ? (
           <div className="msg-no-chat">
             <div className="msg-no-chat-icon">💬</div>

@@ -248,6 +248,7 @@
 }
 
 .msg-back-btn {
+  display: none;
   background: transparent; border: none;
   color: var(--text-secondary, #aaa);
   font-size: 20px; cursor: pointer;
