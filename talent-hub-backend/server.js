@@ -19,6 +19,7 @@ const allowedOrigins = [
   'https://talenthub-mn78.vercel.app',
   'https://talenthub-ochre.vercel.app',
   'https://talenthub-git-main-prerana-tomars-projects.vercel.app',
+  'https://talenthub-apkpz4nc7-prerana-tomars-projects.vercel.app',
 ];
 
 const io = new Server(server, {
