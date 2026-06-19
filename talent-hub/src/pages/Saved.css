@@ -272,3 +272,19 @@ body.light-mode .sv-tab.active  { color: #7c3aed; }
   .sv-page { padding: 20px 16px 40px; }
   .sv-grid { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 480px) {
+  .sv-performer-card {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 12px !important;
+  }
+  .sv-perf-bio {
+    margin-top: 4px;
+  }
+  .sv-perf-actions {
+    width: 100% !important;
+    justify-content: center !important;
+    margin-top: 4px;
+  }
+}
