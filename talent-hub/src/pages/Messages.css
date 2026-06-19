@@ -440,7 +440,7 @@ body.light-mode .msg-online-indicator { border-color: #fff; }
 body.light-mode .msg-conv-skeleton { background: linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 75%); }
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .msg-sidebar {
     width: 100%;
     display: none;

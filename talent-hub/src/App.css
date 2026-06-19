@@ -363,13 +363,13 @@ body.light-mode .cp-skeleton {
   display: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .global-mobile-bottom-nav {
     display: block;
     position: fixed;
     bottom: 0; left: 0; right: 0;
     width: 100%;
-    height: 60px;
+    height: calc(60px + env(safe-area-inset-bottom, 0px));
     background: rgba(10, 10, 20, 0.98);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(20px);
@@ -445,7 +445,7 @@ body.light-mode .cp-skeleton {
     width: 100%;
   }
   .main-content, .th-main, .vp-page, .live-page, .cp-page, .explore-page, .categories-page, .leaderboard-page, .fw-page, .cs-container, .hs-page {
-    padding-bottom: 76px !important;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 

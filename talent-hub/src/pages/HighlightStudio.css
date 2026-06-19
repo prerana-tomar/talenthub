@@ -665,11 +665,11 @@
 
 
 /* RESPONSIVE */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .hs-body { flex-direction: column-reverse; }
   .hs-left { width: 100%; }
   .hs-reels-grid { grid-template-columns: repeat(2, 1fr); }
-  .hs-page { padding: 16px 14px 76px; }
+  .hs-page { padding: 16px 14px calc(76px + env(safe-area-inset-bottom, 0px)) !important; }
 }
 
 @media (max-width: 480px) {

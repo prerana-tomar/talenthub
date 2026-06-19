@@ -511,8 +511,8 @@
   .brand-tagline { display: none; }
 }
 
-/* ── MOBILE (≤768px) — poora fix ────────────────────────── */
-@media (max-width: 768px) {
+/* ── MOBILE (≤992px) — poora fix ────────────────────────── */
+@media (max-width: 992px) {
 
   /* Two-row layout for header */
   .navbar {
@@ -570,7 +570,7 @@
   .icon-btn { width: 32px; height: 32px; }
 
   /* Main content ke neeche bottom nav ke liye space */
-  .main-content { padding-bottom: 76px; }
+  .main-content { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important; }
 
   .brand-talent, .brand-hub { font-size: 19px; }
 }
