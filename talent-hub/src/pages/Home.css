@@ -366,6 +366,95 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
   .th-hero-title { font-size: 36px; }
   .th-two-col { grid-template-columns: 1fr 200px; }
 }
+/* ══ MOBILE DRAWER ═════════════════════════════════════════ */
+.th-mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 280px;
+  height: 100vh;
+  background: #0d0d1a;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  overflow-y: auto;
+  transition: left 0.3s ease-in-out;
+  box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+}
+
+.th-mobile-drawer.open {
+  left: 0;
+}
+
+.th-mobile-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 12px;
+}
+
+.th-mobile-drawer-header .th-sidebar-logo {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.th-drawer-close {
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.th-drawer-close:hover {
+  color: #fff;
+}
+
+.th-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.th-hamburger-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  order: 0;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.th-hamburger-btn span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.light-mode .th-hamburger-btn span {
+  background: #333 !important;
+}
+
 /* ══ MOBILE (≤992px) — SINGLE CLEAN BLOCK ═════════════════ */
 @media (max-width: 992px) {
 
@@ -376,16 +465,45 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
     width: 100vw !important;
     overflow-x: hidden !important;
     background: #0a0a0f !important;
-    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: 70px !important; /* Fixed bottom padding 70px as requested */
   }
-  .th-sidebar,
-  .th-right-panel,
-  .th-performers-panel { display: none !important; }
+  .th-sidebar { display: none !important; }
+  
+  .th-right-panel {
+    display: flex !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    border-left: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: transparent !important;
+    padding: 18px 14px 20px !important;
+    position: relative !important;
+    flex-shrink: unset !important;
+    box-sizing: border-box !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .th-performers-panel {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 24px !important;
+    box-sizing: border-box !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+  }
+
   .th-main {
     width: 100vw !important;
     max-width: 100vw !important;
     overflow-x: hidden !important;
     flex: 1 !important;
+  }
+
+  .th-hamburger-btn {
+    display: flex !important;
   }
 
   /* Topbar Two-row layout */
@@ -450,6 +568,7 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
     order: 1 !important;
     flex-shrink: unset !important;
     position: relative !important;
+    overflow: visible !important;
   }
   .th-hero-img { width: 100% !important; height: 200px !important; border-radius: 0 !important; object-fit: cover !important; }
   .th-hero-img-overlay {
@@ -526,7 +645,8 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
 /* ══ SMALL PHONES (≤480px) ════════════════════════════════ */
 @media (max-width: 480px) {
   .th-hero-title { font-size: 26px !important; }
-  .th-hero-img-wrap, .th-hero-img { height: 180px !important; }
+  .th-hero-img { height: 180px !important; }
+  .th-hero-img-wrap { height: auto !important; overflow: visible !important; }
   .th-hero-btns {
     flex-direction: column !important;
     width: 100% !important;

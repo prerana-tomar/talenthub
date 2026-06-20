@@ -50,6 +50,7 @@ export default function Home() {
   const [searchResults, setSearchResults]   = useState([]);
   const [searchOpen,    setSearchOpen]      = useState(false);
   const [searching,     setSearching]       = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const searchRef = useRef(null);
 
   const navigate = useNavigate();
@@ -232,6 +233,17 @@ export default function Home() {
 
         {/* ══ TOPBAR ══ */}
         <header className="th-topbar">
+
+          {/* Hamburger button for mobile menu drawer */}
+          <button
+            className="th-hamburger-btn"
+            onClick={() => setMobileMenuOpen(prev => !prev)}
+            aria-label="Open menu"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
 
           {/* ✅ Mobile pe logo dikhega — desktop pe CSS se hide hoga */}
           <div className="th-mobile-logo" onClick={() => navigate('/')}>
@@ -579,6 +591,67 @@ export default function Home() {
           onClick={() => { setSearchOpen(false); setSearchQuery(''); setSearchResults([]); }}
         />
       )}
+
+      {/* ══ MOBILE DRAWER ══ */}
+      {mobileMenuOpen && (
+        <div className="th-drawer-backdrop" onClick={() => setMobileMenuOpen(false)} />
+      )}
+      <div className={`th-mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
+        <div className="th-mobile-drawer-header">
+          <div className="th-sidebar-logo" onClick={() => { navigate('/'); setMobileMenuOpen(false); }}>
+            <span className="th-logo-text">TALENT<span className="th-logo-accent">HUB</span></span>
+            <span className="th-logo-sub">India's Talent Stage</span>
+          </div>
+          <button className="th-drawer-close" onClick={() => setMobileMenuOpen(false)}>✕</button>
+        </div>
+
+        <button className="th-upload-btn" onClick={() => { navigate('/upload'); setMobileMenuOpen(false); }}>
+          <span>⬆</span> Upload Performance
+        </button>
+
+        <nav className="th-sidenav">
+          {NAV_ITEMS.map(item => (
+            <Link
+              key={item.label}
+              to={item.path}
+              className={`th-sidenav-item${activePage === item.label ? ' active' : ''}`}
+              onClick={() => { setActivePage(item.label); setMobileMenuOpen(false); }}
+            >
+              <span className="th-nav-icon">{item.icon}</span>
+              <span>{item.label}</span>
+              {item.live && <span className="th-live-pill">LIVE</span>}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="th-sidebar-divider" />
+
+        <nav className="th-sidenav">
+          {BOTTOM_NAV.map(item => (
+            <Link key={item.label} to={item.path} className="th-sidenav-item" onClick={() => setMobileMenuOpen(false)}>
+              <span className="th-nav-icon">{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </nav>
+
+        <div className="th-premium-card">
+          <div className="th-premium-icon">👑</div>
+          <div className="th-premium-text">
+            <strong>Go Premium</strong>
+            <span>Unlock exclusive features and get more visibility.</span>
+          </div>
+          <button className="th-premium-btn">Upgrade Now</button>
+        </div>
+
+        <div className="th-darkmode-row" style={{ marginTop: 'auto', padding: '16px 16px 24px' }}>
+          <span className="th-nav-icon">{darkMode ? '🌙' : '☀️'}</span>
+          <span>{darkMode ? 'Dark Mode' : 'Light Mode'}</span>
+          <div className={`th-toggle${darkMode ? ' on' : ''}`} onClick={() => setDarkMode(d => !d)}>
+            <div className="th-toggle-thumb" />
+          </div>
+        </div>
+      </div>
 
       {/* ══ MOBILE BOTTOM NAV ══ */}
       <nav className="th-mobile-bottom-nav">
