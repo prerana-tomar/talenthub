@@ -455,8 +455,8 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
   background: #333 !important;
 }
 
-/* ══ MOBILE (≤992px) — SINGLE CLEAN BLOCK ═════════════════ */
-@media (max-width: 992px) {
+/* ══ MOBILE (≤768px) — SINGLE CLEAN BLOCK ═════════════════ */
+@media (max-width: 768px) {
 
   /* Layout */
   .th-app {
@@ -465,7 +465,7 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
     width: 100vw !important;
     overflow-x: hidden !important;
     background: #0a0a0f !important;
-    padding-bottom: 70px !important; /* Fixed bottom padding 70px as requested */
+    padding-bottom: 80px !important; /* Bottom padding 80px as requested */
   }
   .th-sidebar { display: none !important; }
   
@@ -479,7 +479,7 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
     border-left: none !important;
     border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
     background: transparent !important;
-    padding: 18px 14px 20px !important;
+    padding: 18px 16px 20px !important;
     position: relative !important;
     flex-shrink: unset !important;
     box-sizing: border-box !important;
@@ -570,7 +570,7 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
     position: relative !important;
     overflow: visible !important;
   }
-  .th-hero-img { width: 100% !important; height: 200px !important; border-radius: 0 !important; object-fit: cover !important; }
+  .th-hero-img { width: 100% !important; height: 220px !important; border-radius: 0 !important; object-fit: cover !important; } /* Height 220px */
   .th-hero-img-overlay {
     position: absolute !important;
     inset: 0 !important;
@@ -586,54 +586,69 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
     padding: 8px 10px !important;
     background: rgba(8,8,18,0.9) !important;
   }
-  .th-hero-text { order: 2 !important; padding: 14px 14px 0 !important; }
+  .th-hero-text { order: 2 !important; padding: 16px 16px 0 !important; } /* Padding 16px */
   .th-hero-badge { font-size: 9px !important; padding: 3px 10px !important; margin-bottom: 8px !important; }
-  .th-hero-title { font-size: 30px !important; margin-bottom: 8px !important; }
-  .th-hero-desc { font-size: 12px !important; line-height: 1.6 !important; margin-bottom: 12px !important; max-width: 100% !important; }
-  .th-hero-btns { gap: 8px !important; margin-bottom: 12px !important; flex-direction: column !important; }
-  .th-btn-primary, .th-btn-outline {
-    flex: none !important;
+  .th-hero-title { font-size: 28px !important; font-weight: 700 !important; margin-bottom: 8px !important; } /* Large bold 28px */
+  .th-hero-desc { font-size: 11px !important; line-height: 1.7 !important; margin-bottom: 12px !important; max-width: 100% !important; } /* Smaller 11px, good line height */
+  
+  /* Side by side buttons with 12px gap */
+  .th-hero-btns {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 12px !important;
+    margin-bottom: 12px !important;
     width: 100% !important;
+  }
+  .th-btn-primary, .th-btn-outline {
+    flex: 1 !important;
+    width: auto !important;
     justify-content: center !important;
-    padding: 10px 10px !important; font-size: 12px !important; border-radius: 9px !important;
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+    border-radius: 9px !important;
   }
 
-  /* Stats 2x2 */
+  /* Stats 2x2 with 10px gap and 16px page padding */
   .th-stats-row {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
-    padding: 12px 14px 0 !important;
+    gap: 10px !important;
+    padding: 12px 16px 0 !important;
     margin-top: 0 !important;
   }
-  .th-stat-box { border-radius: 12px !important; padding: 12px 10px !important; }
-  .th-stat-val { font-size: 21px !important; }
-  .th-stat-label { font-size: 9px !important; }
+  .th-stat-box { border-radius: 14px !important; padding: 14px !important; } /* Rounded 14px, proper padding 14px */
+  .th-stat-val { font-size: 22px !important; } /* Large 22px */
+  .th-stat-label { font-size: 9px !important; } /* Small 9px */
 
-  /* Sections */
-  .th-section { padding: 16px 14px 0 !important; }
+  /* Sections: spacious padding and bottom margin */
+  .th-section {
+    padding: 18px 16px 0 !important;
+    margin-bottom: 20px !important;
+  }
   .th-section-title { font-size: 14px !important; }
 
-  /* Category pills scroll */
+  /* Category pills scroll with 10px gap and 7px 16px padding */
   .th-category-row {
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
     scrollbar-width: none !important;
-    gap: 7px !important;
+    gap: 10px !important;
     padding-bottom: 4px !important;
     -webkit-overflow-scrolling: touch !important;
   }
   .th-category-row::-webkit-scrollbar { display: none !important; }
   .th-cat-pill {
-    flex-shrink: 0 !important; font-size: 11px !important;
-    padding: 5px 13px !important; white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    font-size: 11px !important;
+    padding: 7px 16px !important;
+    white-space: nowrap !important;
   }
 
   /* Two col → single */
   .th-two-col { grid-template-columns: 1fr !important; gap: 0 !important; padding-bottom: 14px !important; }
 
-  /* Video grid 2 col */
-  .th-video-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 9px !important; }
-  .th-loading-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 9px !important; }
+  /* Video grid 2 col with 10px gap */
+  .th-video-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+  .th-loading-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
   .th-skeleton { height: 160px !important; border-radius: 12px !important; }
 
   /* Bottom nav — hide since we use global nav! */
@@ -644,21 +659,6 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
 
 /* ══ SMALL PHONES (≤480px) ════════════════════════════════ */
 @media (max-width: 480px) {
-  .th-hero-title { font-size: 26px !important; }
-  .th-hero-img { height: 180px !important; }
-  .th-hero-img-wrap { height: auto !important; overflow: visible !important; }
-  .th-hero-btns {
-    flex-direction: column !important;
-    width: 100% !important;
-    gap: 8px !important;
-  }
-  .th-btn-primary, .th-btn-outline {
-    width: 100% !important;
-    flex: none !important;
-    justify-content: center !important;
-  }
-  .th-stats-row { gap: 7px !important; }
-  .th-stat-val  { font-size: 19px !important; }
   .th-mobile-nav-btn { min-width: 42px !important; padding: 5px 5px !important; }
   .th-mobile-nav-btn .mob-icon  { font-size: 19px !important; }
   .th-mobile-nav-btn .mob-label { font-size: 8px !important; }
@@ -666,9 +666,7 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
 
 /* ══ VERY SMALL (≤360px) ══════════════════════════════════ */
 @media (max-width: 360px) {
-  .th-hero-title { font-size: 22px !important; }
   .th-topbar { padding: 0 10px !important; gap: 6px !important; }
-  .th-video-grid { grid-template-columns: 1fr !important; }
 }
 
 /* ══ LIGHT MODE ════════════════════════════════════════════ */
