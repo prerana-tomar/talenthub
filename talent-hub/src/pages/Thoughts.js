@@ -36,8 +36,8 @@ export default function Thoughts() {
     setLoading(true);
     try {
       const url = category === 'All'
-        ? '/api/thoughts'
-        : `/api/thoughts?category=${category}`;
+  ? 'https://talenthub-w1cc.onrender.com/api/thoughts'
+  : `https://talenthub-w1cc.onrender.com/api/thoughts?category=${category}`;
       const res  = await fetch(url);
       const data = await res.json();
       setThoughts(data.thoughts || data || []);
