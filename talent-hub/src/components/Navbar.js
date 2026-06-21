@@ -164,6 +164,7 @@ function Navbar() {
         <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
           <Link to="/"                  className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('home'); }}>Home</Link>
           <Link to="/explore"           className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('explore'); }}>Explore</Link>
+          <Link to="/collab"            className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('collab'); }}>Collab Hub</Link>
           <Link to="/upload"            className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('upload'); }}>Upload</Link>
           <NavLink to="/highlight-studio" className="nav-link" onClick={() => setMenuOpen(false)}>✦ AI Highlights</NavLink>
           <Link to="/competitions"      className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('compete'); }}>

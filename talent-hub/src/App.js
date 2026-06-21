@@ -22,6 +22,7 @@ import Saved    from './pages/Saved';
 import Messages from './pages/Messages';
 import HighlightStudio from './pages/HighlightStudio';
 import CreativeStudio from './pages/CreativeStudio';
+import CollabHub from './pages/CollabHub';
 
 
 
@@ -133,6 +134,7 @@ function App() {
           <Route path="/messages" element={<WithNavbar><ProtectedRoute><Messages /></ProtectedRoute></WithNavbar>} />
           <Route path="/highlight-studio" element={<WithNavbar><ProtectedRoute><HighlightStudio /></ProtectedRoute></WithNavbar>} />
           <Route path="/creative-studio" element={<WithNavbar><CreativeStudio /></WithNavbar>} />
+          <Route path="/collab" element={<WithNavbar><CollabHub /></WithNavbar>} />
           
 
           

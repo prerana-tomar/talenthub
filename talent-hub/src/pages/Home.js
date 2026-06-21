@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { icon:'🏠', label:'Home',              path:'/' },
   { icon:'🔍', label:'Explore',           path:'/explore' },
   { icon:'📂', label:'Categories',        path:'/categories' },
+  { icon:'🤝', label:'Collab Hub',         path:'/collab' },
   { icon:'🔴', label:'Live Performances', path:'/live', live:true },
   { icon:'🏆', label:'Competitions',      path:'/competitions' },
   { icon:'⭐', label:'Top Performers',    path:'/top' },
