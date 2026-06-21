@@ -1,2 +1,2 @@
-const API = 'https://talenthub-w1cc.onrender.com';
+const API = 'http://localhost:5000';
 export default API;
