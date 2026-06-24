@@ -9,6 +9,7 @@ require('dotenv').config();
 const app    = express();
 const server = http.createServer(app);
 const highlightRoutes = require('./routes/highlights');
+const creativeRoutes  = require('./routes/creative');
 
 // ✅ Uploads folder serve karo — SIRF EK BAAR
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -53,7 +54,7 @@ app.use('/api/competitions', require('./routes/competitions'));
 app.use('/api/messages',     require('./routes/messages'));
 app.use('/api/saved',        require('./routes/saved'));
 app.use('/api/highlights',   highlightRoutes);
-app.use('/api/creative', require('./routes/creative'));
+app.use('/api/creative',     creativeRoutes);
 app.use('/api/collab', require('./routes/collab'));
 
 // MongoDB
