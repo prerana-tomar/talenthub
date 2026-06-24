@@ -116,7 +116,7 @@ export default function CreativeStudio() {
     setResult(null);
 
     try {
-      const res = await fetch(`${API}/api/creative/assist`, {
+      const res = await fetch(`${API}/api/creative/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
