@@ -135,7 +135,7 @@ export default function CreativeStudio() {
         throw new Error(data.message || 'AI request failed');
       }
 
-      setResult(data);
+      setResult({ completedWriting: data.text });
 
       // Save to recent history
       const newHistoryItem = {
