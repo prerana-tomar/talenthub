@@ -145,7 +145,7 @@ export default function CreativeStudio() {
         mood,
         writing,
         context,
-        completedWriting: data.completedWriting,
+        completedWriting: data.text,
         tips: data.tips || []
       };
 
