@@ -12,8 +12,8 @@ router.post('/generate', async (req, res) => {
       }),
     });
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    res.json({ content: [{ text }] });
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Generation failed';
+    res.json({ text });
   } catch (err) {
     res.status(500).json({ message: 'Generation failed', error: err.message });
   }
