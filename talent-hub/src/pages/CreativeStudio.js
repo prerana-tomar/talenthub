@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import API from '../config';
 import './CreativeStudio.css';
 
@@ -25,7 +26,7 @@ const MOODS = [
 const LOADING_STEPS = [
   "Reading your writing... 📖",
   "Analyzing style... 🧠",
-  "Completing it... ✨"
+  "Submitting help request... ✨"
 ];
 
 const INSPIRATIONS = [
@@ -72,26 +73,16 @@ const INSPIRATIONS = [
 ];
 
 export default function CreativeStudio() {
+  const navigate = useNavigate();
   const [type, setType] = useState('Poem');
   const [language, setLanguage] = useState('Hinglish');
   const [mood, setMood] = useState('Romantic');
   const [writing, setWriting] = useState('');
   const [context, setContext] = useState('');
-  const [result, setResult] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [error, setError] = useState('');
-  const [copied, setCopied] = useState(false);
-
-  // Load history from localStorage
-  const [history, setHistory] = useState(() => {
-    try {
-      const saved = localStorage.getItem('creative_studio_history');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      return [];
-    }
-  });
 
   // Clear localStorage on mount to avoid historical schema issues
   useEffect(() => {
@@ -105,94 +96,57 @@ export default function CreativeStudio() {
       setLoadingStep(0);
       interval = setInterval(() => {
         setLoadingStep(prev => (prev < 2 ? prev + 1 : prev));
-      }, 3500);
+      }, 2000);
     }
     return () => clearInterval(interval);
   }, [loading]);
 
-  const handleAssist = async (e) => {
+  const handleHelpSubmit = async (e) => {
     if (e) e.preventDefault();
     if (!writing.trim()) {
       setError("Apni adhuri writing yahan paste kijiye!");
       return;
     }
+
+    const token = localStorage.getItem('th_token');
+    if (!token) {
+      setError("Please login first to submit a help request!");
+      navigate('/login');
+      return;
+    }
+
     setLoading(true);
     setError("");
-    setResult(null);
+    setSubmitted(false);
 
     try {
-      const res = await fetch(`${API}/api/creative/generate`, {
+      const res = await fetch(`${API}/api/help-requests`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           type,
           language,
           mood,
-          writing,
-          context
+          writing: writing.trim(),
+          context: context.trim()
         })
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.message || 'AI request failed');
+        throw new Error(data.message || 'Help request submission failed');
       }
 
-      setResult({ completedWriting: data.text, tips: [] });
-
-      // Save to recent history
-      const newHistoryItem = {
-        id: Date.now(),
-        type,
-        language,
-        mood,
-        writing,
-        context,
-        completedWriting: data.text,
-        tips: data.tips || []
-      };
-
-      setHistory(prev => {
-        const updated = [newHistoryItem, ...prev].slice(0, 3);
-        localStorage.setItem('creative_studio_history', JSON.stringify(updated));
-        return updated;
-      });
-
+      setSubmitted(true);
     } catch (err) {
-      console.error('Assist API Error:', err);
-      setError(err.message || 'Generation failed. Please try again!');
+      console.error('Help Request submission error:', err);
+      setError(err.message || 'Failed to submit help request. Please try again!');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCopy = () => {
-    if (!result) return;
-    navigator.clipboard.writeText(result.completedWriting);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleShare = () => {
-    if (!result) return;
-    if (navigator.share) {
-      navigator.share({
-        title: `My Completed ${type}`,
-        text: result.completedWriting
-      }).catch(err => console.log('Share error:', err));
-    } else {
-      handleCopy();
-      alert('Content copied to clipboard for sharing!');
-    }
-  };
-
-  const handleTryAgain = () => {
-    setResult(null);
-    setError("");
-    setWriting("");
-    setContext("");
   };
 
   const applyInspiration = (ins) => {
@@ -202,29 +156,11 @@ export default function CreativeStudio() {
     setWriting(ins.writing);
     setContext(ins.context);
     setError("");
-    setResult(null);
+    setSubmitted(false);
     // Smooth scroll to form inputs
     const formElement = document.getElementById('cs-form-section');
     if (formElement) {
       formElement.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const loadHistoryItem = (item) => {
-    setType(item.type);
-    setLanguage(item.language);
-    setMood(item.mood);
-    setWriting(item.writing);
-    setContext(item.context);
-    setResult({
-      completedWriting: item.completedWriting,
-      tips: item.tips
-    });
-    setError("");
-    // Smooth scroll to results
-    const resultElement = document.getElementById('cs-result-section');
-    if (resultElement) {
-      resultElement.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -236,22 +172,21 @@ export default function CreativeStudio() {
 
       {/* HERO SECTION */}
       <div className="cs-hero">
-        <div className="cs-hero-badge">✨ Creative Studio</div>
+        <div className="cs-hero-badge">✨ Help Request</div>
         <h1 className="cs-hero-title">Creative Studio</h1>
-        <p className="cs-hero-sub">Apni adhuri writing complete karwao AI se</p>
+        <p className="cs-hero-sub">Apni adhuri writing complete karwao Owner se</p>
       </div>
 
       <div className="cs-container">
         <div className="cs-main" id="cs-form-section">
           
-          {/* If result is ready, display it, otherwise display form or loading */}
           {loading ? (
             /* LOADING STATE */
             <div className="cs-card cs-loading-card">
               <div className="cs-spinner-container">
                 <div className="cs-glow-spinner"></div>
               </div>
-              <h3 className="cs-loading-title">AI aapki writing dekh rahi hai...</h3>
+              <h3 className="cs-loading-title">AI aur Owner aapki writing dekh rahe hai...</h3>
               
               <div className="cs-progress-steps">
                 {LOADING_STEPS.map((step, idx) => (
@@ -265,59 +200,30 @@ export default function CreativeStudio() {
                 ))}
               </div>
             </div>
-          ) : result ? (
-            /* RESULT SECTION */
-            <div className="cs-result-wrapper" id="cs-result-section">
-              <div className="cs-card cs-result-card">
-                <div className="cs-result-header">
-                  <span className="cs-result-tag">✨ Completed Writing ({type})</span>
-                  <div className="cs-result-actions">
-                    <button className="cs-action-btn cs-copy-btn" onClick={handleCopy}>
-                      {copied ? '✅ Copied!' : '📋 Copy'}
-                    </button>
-                    <button className="cs-action-btn" onClick={handleShare}>
-                      📤 Share
-                    </button>
-                    <button className="cs-action-btn" onClick={() => handleAssist()}>
-                      🔄 Regenerate
-                    </button>
-                  </div>
-                </div>
-                <div className="cs-result-text-area">
-                  <p className="cs-completed-text">{result.completedWriting}</p>
-                </div>
-                
-                <div className="cs-result-meta">
-                  <span>Language: <strong>{language}</strong></span>
-                  <span>•</span>
-                  <span>Mood: <strong>{mood}</strong></span>
+          ) : submitted ? (
+            /* SUCCESS CONFIRMATION STATE */
+            <div className="cs-result-wrapper">
+              <div className="cs-card cs-result-card cs-success-card" style={{ textAlign: 'center', padding: '50px 24px' }}>
+                <div style={{ fontSize: '54px', marginBottom: '20px' }}>🙏</div>
+                <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '14px', color: '#c084fc' }}>
+                  Aapki request submit ho gayi!
+                </h2>
+                <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.75)', marginBottom: '32px', lineHeight: '1.6' }}>
+                  Owner jald hi aapki help karega 🙏
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '350px', margin: '0 auto' }}>
+                  <button className="cs-submit-btn" style={{ marginTop: 0 }} onClick={() => navigate('/my-requests')}>
+                    📋 View My Requests
+                  </button>
+                  <button className="cs-try-again-btn" style={{ marginTop: 0 }} onClick={() => { setSubmitted(false); setWriting(''); setContext(''); }}>
+                    ✍️ Submit Another Request
+                  </button>
                 </div>
               </div>
-
-              {/* TIPS SECTION */}
-              <div className="cs-card cs-tips-card">
-                <h3 className="cs-tips-title">💡 Writing Tips</h3>
-                <div className="cs-tips-list">
-                  {result.tips && result.tips.length > 0 ? (
-                    result.tips.map((tip, index) => (
-                      <div key={index} className="cs-tip-item">
-                        <span className="cs-tip-num">0{index + 1}</span>
-                        <p className="cs-tip-body">{tip}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="cs-no-tips">AI has finished completing your writing. Keep practicing!</p>
-                  )}
-                </div>
-              </div>
-
-              <button className="cs-try-again-btn" onClick={handleTryAgain}>
-                ✍️ Try with New Writing
-              </button>
             </div>
           ) : (
             /* INPUT FORM */
-            <form className="cs-form" onSubmit={handleAssist}>
+            <form className="cs-form" onSubmit={handleHelpSubmit}>
               {/* Type selector */}
               <div className="cs-card">
                 <label className="cs-input-label">📝 Kya likhna chahte ho? (Writing Type)</label>
@@ -382,7 +288,7 @@ export default function CreativeStudio() {
                 <textarea
                   id="writing-input"
                   className="cs-main-textarea"
-                  placeholder="Apni adhuri shayari, geet, rap ya kahani likho... AI aage poora karega."
+                  placeholder="Apni adhuri shayari, geet, rap ya kahani likho... Owner aage poora karega."
                   rows="6"
                   value={writing}
                   onChange={(e) => {
@@ -407,7 +313,7 @@ export default function CreativeStudio() {
                 {error && <div className="cs-error-msg">⚠️ {error}</div>}
 
                 <button type="submit" className="cs-submit-btn">
-                  ✨ Complete My Writing
+                  ✨ Submit Help Request
                 </button>
               </div>
             </form>
@@ -431,37 +337,27 @@ export default function CreativeStudio() {
               <div className="cs-step-item">
                 <div className="cs-step-badge">2</div>
                 <div className="cs-step-info">
-                  <h4>AI Analyzes</h4>
-                  <p>AI scans style, meter & context clues</p>
+                  <h4>Submit Request</h4>
+                  <p>Click submit to send your writing to the Owner</p>
                 </div>
               </div>
               <div className="cs-step-item">
                 <div className="cs-step-badge">3</div>
                 <div className="cs-step-info">
-                  <h4>Get Results</h4>
-                  <p>Receive your completed draft + tips</p>
+                  <h4>Get Help</h4>
+                  <p>View owner's custom response on My Requests</p>
                 </div>
               </div>
             </div>
+            
+            <button 
+              className="cs-try-again-btn" 
+              style={{ width: '100%', marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              onClick={() => navigate('/my-requests')}
+            >
+              📋 View My Requests
+            </button>
           </div>
-
-          {/* Recent History */}
-          {history.length > 0 && (
-            <div className="cs-card cs-sidebar-card">
-              <h3 className="cs-sidebar-title">📚 Recent History</h3>
-              <div className="cs-history-list">
-                {history.map(item => (
-                  <div key={item.id} className="cs-history-card-item" onClick={() => loadHistoryItem(item)}>
-                    <div className="cs-hist-top">
-                      <span className="cs-hist-type">{item.type}</span>
-                      <span className="cs-hist-mood">{item.mood}</span>
-                    </div>
-                    <p className="cs-hist-preview">{(item.completedWriting || '').slice(0, 75)}...</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Inspiration Examples */}
           <div className="cs-card cs-sidebar-card">

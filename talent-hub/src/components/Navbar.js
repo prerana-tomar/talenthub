@@ -212,6 +212,7 @@ function Navbar() {
                   <button className="navbar-dropdown-item" onClick={() => { navigate('/uploads');  setDropdownOpen(false); }}>📤 My Uploads</button>
                   <button className="navbar-dropdown-item" onClick={() => { navigate('/thoughts'); setDropdownOpen(false); }}>💭 Thoughts</button>
                   <button className="navbar-dropdown-item" onClick={() => { navigate('/saved');    setDropdownOpen(false); }}>🔖 Saved</button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/my-requests'); setDropdownOpen(false); }}>📋 My Requests</button>
                   <button className="navbar-dropdown-item" onClick={() => { navigate('/settings'); setDropdownOpen(false); }}>⚙️ Settings</button>
                   <div className="navbar-dropdown-divider" />
                   <button className="navbar-dropdown-item navbar-dropdown-logout" onClick={handleLogout}>↩ Logout</button>
