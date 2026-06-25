@@ -93,6 +93,11 @@ export default function CreativeStudio() {
     }
   });
 
+  // Clear localStorage on mount to avoid historical schema issues
+  useEffect(() => {
+    localStorage.removeItem('creative_studio_history');
+  }, []);
+
   // Loading steps rotation
   useEffect(() => {
     let interval;
@@ -135,7 +140,7 @@ export default function CreativeStudio() {
         throw new Error(data.message || 'AI request failed');
       }
 
-      setResult({ completedWriting: data.text });
+      setResult({ completedWriting: data.text, tips: [] });
 
       // Save to recent history
       const newHistoryItem = {
