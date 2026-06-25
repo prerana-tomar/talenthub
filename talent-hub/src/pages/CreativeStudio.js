@@ -451,7 +451,7 @@ export default function CreativeStudio() {
                       <span className="cs-hist-type">{item.type}</span>
                       <span className="cs-hist-mood">{item.mood}</span>
                     </div>
-                    <p className="cs-hist-preview">{item.completedWriting.slice(0, 75)}...</p>
+                    <p className="cs-hist-preview">{(item.completedWriting || '').slice(0, 75)}...</p>
                   </div>
                 ))}
               </div>
