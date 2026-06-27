@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import API from "../config";
 
 // ── constants ────────────────────────────────────────────────────────────────
 const ACCENT = {
@@ -18,222 +20,37 @@ const PLATFORM_ICON = {
   youtube: "🎬", instagram: "📸", twitter: "🐦",
 };
 
-function futureMs(days, hours = 0, mins = 0, secs = 0) {
-  return Date.now() + ((days * 86400) + (hours * 3600) + (mins * 60) + secs) * 1000;
-}
-function pastMs(days) {
-  return Date.now() - days * 86400 * 1000;
-}
-
-const COMPETITIONS = [
-  {
-    id: "comp_1", color: "orange", emoji: "🎸",
-    title: "Instrumental Showdown", status: "upcoming", level: "Open",
-    tags: ["Any Instrument", "Any Genre", "2–5 min"], tagColor: "orange",
-    desc: "Any instrument, any genre. Classical sitar to electric guitar — express yourself without words.",
-    targetMs: futureMs(43, 5, 43, 32), cdLabel: "STARTS IN", total: 60,
-    btnLabel: "🔔 Coming Soon", btnColor: "#ff6b35", btnTxt: "#fff",
-    emptyQuotes: [
-      "Abhi stage khali hai — pehla kadam aapka intezaar kar raha hai.",
-      "Pehla performer legend ban jaata hai. Kya aap taiyaar hain?",
-      "History yaad karti hai unhe jo pehle uthte hain. 🎸",
-    ],
-  },
-  {
-    id: "comp_2", color: "green", emoji: "🎤",
-    title: "Singing Sensation", status: "active", level: "Open",
-    tags: ["Solo/Duet", "Any Language", "3–5 min"], tagColor: "green",
-    desc: "Sing your heart out — any language, any style. Bollywood, classical, folk, or original. Soul wins.",
-    targetMs: futureMs(6, 14, 22, 8), cdLabel: "ENDS IN", total: 200,
-    btnLabel: "✨ Join Now", btnColor: "#00c896", btnTxt: "#fff",
-    emptyQuotes: [
-      "Duniya sunna chahti hai aapki awaaz. Sirf enter karo.",
-      "Pehla participant hamesha yaad kiya jaata hai. 🎤",
-    ],
-  },
-  {
-    id: "comp_3", color: "blue", emoji: "🎭",
-    title: "Acting Arena", status: "ended", level: "Intermediate",
-    tags: ["Monologue/Scene", "Any Theme", "3–6 min"], tagColor: "blue",
-    desc: "Monologue, scene, or dialogue — bring your character to life. Emotional depth wins.",
-    targetMs: pastMs(5), cdLabel: "", total: 200,
-    btnLabel: "🏆 See Winners", btnColor: "#4facfe", btnTxt: "#fff",
-    emptyQuotes: [
-      "Is competition ke winners abhi announce nahi hue.",
-      "Results bahut jaldi aayenge — bane rahe!",
-    ],
-  },
-  {
-    id: "comp_4", color: "gold", emoji: "😂",
-    title: "Comedy Night", status: "upcoming", level: "Open",
-    tags: ["Stand-up/Skit", "Clean Content", "2–5 min"], tagColor: "gold",
-    desc: "Make India laugh! Stand-up, skit, or improvised comedy. Keep it clean and creative.",
-    targetMs: futureMs(28, 5, 43, 32), cdLabel: "STARTS IN", total: 80,
-    btnLabel: "🔔 Coming Soon", btnColor: "#f5a623", btnTxt: "#1a1000",
-    emptyQuotes: [
-      "Yahan abhi koi nahi hansa — pehle aap hasaao!",
-      "Empty leaderboard = pehla spot guarantee. 😂",
-    ],
-  },
-  {
-    id: "comp_5", color: "pink", emoji: "💃",
-    title: "Dance Battle", status: "active", level: "Open",
-    tags: ["Solo/Group", "Any Style", "1–3 min"], tagColor: "pink",
-    desc: "Hip-hop to Kathak — let your feet do the talking. Any style, any energy. Own the stage.",
-    targetMs: futureMs(2, 18, 5, 44), cdLabel: "ENDS IN", total: 150,
-    btnLabel: "✨ Join Now", btnColor: "#f472b6", btnTxt: "#fff",
-    emptyQuotes: ["Dance floor khali hai — pehla move aapka hai! 💃"],
-  },
-  {
-    id: "comp_6", color: "red", emoji: "🎙️",
-    title: "Rap Cypher", status: "upcoming", level: "Open",
-    tags: ["Original Lyrics", "Hindi/English", "1–3 min"], tagColor: "red",
-    desc: "Spit bars, tell your story. Original lyrics only. Hindi, English, or both — desi rap ki asli takkar.",
-    targetMs: futureMs(15, 9, 30, 17), cdLabel: "STARTS IN", total: 100,
-    btnLabel: "🔔 Coming Soon", btnColor: "#ff4d6d", btnTxt: "#fff",
-    emptyQuotes: [
-      "Teri awaaz ka intezaar hai — stage khula hai. 🎙️",
-      "Desi rap ka pehla naam aap ho sakte ho is competition mein.",
-    ],
-  },
-];
-
-// ── REAL BACKEND API ─────────────────────────────────────────────────────────
-// Replace BASE_URL with your actual backend URL
-const BASE_URL = "";
-
-async function fetchStats() {
-  try {
-    const [userRes, vidRes] = await Promise.all([
-      fetch(`${BASE_URL}/api/auth/count`),
-      fetch(`${BASE_URL}/api/videos`),
-    ]);
-    const userData = await userRes.json();
-    const vidData  = await vidRes.json();
-
-    return {
-      total_participants: userData.count || 0,
-      active_count: 2,
-      competitions: {
-        comp_1: { joined: 120 },
-        comp_2: { joined: 340 },
-        comp_3: { joined: 500 },
-        comp_4: { joined: 45  },
-        comp_5: { joined: 280 },
-        comp_6: { joined: 60  },
-      }
-    };
-  } catch {
-    return {
-      total_participants: 0,
-      active_count: 0,
-      competitions: {}
-    };
-  }
-}
-
-async function fetchPerformers(compId) {
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 400,
-        messages: [{
-          role: 'user',
-          content: `Return ONLY a JSON array of top 3 performers for competition "${compId}".
-Rules:
-- comp_1 (upcoming): return []
-- comp_2 (active singing): return 3 Indian performers
-- comp_3 (ended acting): return 3 Indian performers
-- comp_4 (upcoming comedy): return []
-- comp_5 (active dance): return 3 Indian performers
-- comp_6 (upcoming rap): return []
-Each object: {"name":"Full Name","channel":"@handle","platform":"youtube","score":4.8,"channelUrl":"#"}
-Return ONLY the JSON array, no markdown.`
-        }]
-      })
-    });
-    const data  = await res.json();
-    const text  = data.content?.map(b => b.type === 'text' ? b.text : '').join('') || '[]';
-    const clean = text.replace(/```json|```/g, '').trim();
-    return JSON.parse(clean);
-  } catch {
-    return [];
-  }
-}
-
 // ── helpers ──────────────────────────────────────────────────────────────────
-function pad(n) { return String(n).padStart(2, "0"); }
+const formatDate = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+};
 
-function calcCountdown(targetMs) {
-  const diff = Math.max(0, targetMs - Date.now());
-  const totalSec = Math.floor(diff / 1000);
-  return {
-    d: Math.floor(totalSec / 86400),
-    h: Math.floor((totalSec % 86400) / 3600),
-    m: Math.floor((totalSec % 3600) / 60),
-    s: totalSec % 60,
+const getEmptyQuote = (category) => {
+  const quotes = {
+    Singing: "Duniya sunna chahti hai aapki awaaz. Pehle enter karo. 🎤",
+    Dance: "Dance floor khali hai — pehla move aapka hai! 💃",
+    Rap: "Desi rap ka pehla naam aap ho sakte ho. 🎙️",
+    Comedy: "Yahan abhi koi nahi hansa — pehle aap hasaao! 😂",
+    Acting: "Acting Arena mein abhi tak koi audition nahi hua. 🎭",
+    Instrumental: "Abhi stage khali hai — pehla kadam aapka intezaar kar raha hai. 🎸",
+    Poetry: "Alfaaz aapke, awaz aapki, stage khali hai. ✍️"
   };
-}
+  return quotes[category] || "Be the first to join this competition and make history! 🏆";
+};
 
 // ── sub-components ───────────────────────────────────────────────────────────
-function Countdown({ comp }) {
-  const [cd, setCd] = useState(calcCountdown(comp.targetMs));
-  useEffect(() => {
-    if (comp.status === "ended") return;
-    const id = setInterval(() => setCd(calcCountdown(comp.targetMs)), 1000);
-    return () => clearInterval(id);
-  }, [comp]);
-  if (comp.status === "ended") return null;
-  const col = ACCENT[comp.color];
-  return (
-    <div>
-      <div style={styles.cdLabel}>⏱ {comp.cdLabel}</div>
-      <div style={styles.countdown}>
-        {[["d","Days"],["h","Hrs"],["m","Mins"],["s","Secs"]].map(([k, label]) => (
-          <div key={k} style={styles.cBox}>
-            <div style={{ ...styles.cNum, color: col }}>{pad(cd[k])}</div>
-            <div style={styles.cUnit}>{label}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
-function SkeletonTP() {
-  return (
-    <div style={styles.tpBox}>
-      <div style={styles.tpHeader}>⭐ Top Performers</div>
-      {[0,1,2].map(i => (
-        <div key={i} style={{ ...styles.skRow, borderBottom: i < 2 ? "1px solid #2e2a45" : "none" }}>
-          <div style={styles.skCircle} />
-          <div style={{ flex: 1 }}>
-            <div style={{ ...styles.skLine, width: "70%", marginBottom: 5 }} />
-            <div style={{ ...styles.skLine, width: "50%" }} />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-
-function EmptyTP({ quotes, color, isEnded }) {
-  const safeQuotes = Array.isArray(quotes) ? quotes : [];
-  const q = safeQuotes.length ? safeQuotes[Math.floor(Math.random() * safeQuotes.length)] : "";
-
-
+function EmptyTP({ quote, color, isEnded }) {
   return (
     <div style={styles.tpBox}>
       <div style={styles.tpHeader}>{isEnded ? "🏆 Final Winners" : "⭐ Top Performers"}</div>
       <div style={styles.emptyState}>
-        <div style={{ fontSize: 26, marginBottom: 8, opacity: 0.6 }}>{isEnded ? "🏁" : "🌟"}</div>
-        <div style={styles.emptyQuote}>"{q}"</div>
+        <div style={{ fontSize: 24, marginBottom: 8, opacity: 0.6 }}>{isEnded ? "🏁" : "🌟"}</div>
+        <div style={styles.emptyQuote}>"{quote}"</div>
         {!isEnded && (
-          <div style={{ fontSize: 11, fontWeight: 600, color: ACCENT[color] || "#ff6b35" }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: ACCENT[color] || color || "#ff6b35" }}>
             Pehle bano — leaderboard aapka intezaar kar raha hai!
           </div>
         )}
@@ -243,26 +60,27 @@ function EmptyTP({ quotes, color, isEnded }) {
 }
 
 function PerformersList({ performers, color, isEnded }) {
+  const accentColor = ACCENT[color] || color || "#ff6b35";
   return (
     <div style={styles.tpBox}>
       <div style={styles.tpHeader}>{isEnded ? "🏆 Final Winners" : "⭐ Top Performers"}</div>
       {performers.slice(0, 3).map((p, i) => {
-        const bg = (AVATAR_BG[color] || AVATAR_BG.blue)[i];
+        const bg = (AVATAR_BG[color] || AVATAR_BG.blue)[i] || "#7c3aed";
         const initials = p.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
         const icon = PLATFORM_ICON[p.platform] || "🎬";
-        const label = isEnded ? ["Winner","2nd","3rd"][i] : p.score + " ★";
-        const scoreCol = i === 0 ? ACCENT[color] : "#8b87a8";
+        const label = isEnded ? ["🥇 Winner", "🥈 2nd", "🥉 3rd"][i] : (p.score ? p.score + " ★" : "Joined");
+        const scoreCol = i === 0 ? accentColor : "#8b87a8";
         return (
           <div key={i} style={{ ...styles.performerRow, borderBottom: i < performers.length - 1 ? "1px solid #2e2a45" : "none" }}>
-            <span style={{ fontSize: 14, width: 18, textAlign: "center", flexShrink: 0 }}>{RANKS[i]}</span>
-            <div style={{ ...styles.pAvatar, background: bg }}>{initials}</div>
+            <span style={{ fontSize: 14, width: 18, textAlign: "center", flexShrink: 0 }}>{RANKS[i] || "•"}</span>
+            <div style={{ ...styles.pAvatar, background: bg }}>{initials || "P"}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={styles.pName}>{p.name}</div>
-              <a href={p.channelUrl || "#"} target="_blank" rel="noreferrer" style={styles.pChannel}>
-                {icon} {p.channel}
-              </a>
+              <div style={styles.pChannel}>
+                {icon} {p.channel || `@${p.name.replace(/\s+/g, '').toLowerCase()}`}
+              </div>
             </div>
-            <span style={{ fontSize: 12, fontWeight: 600, color: scoreCol, flexShrink: 0 }}>{label}</span>
+            <span style={{ fontSize: 11, fontWeight: 600, color: scoreCol, flexShrink: 0 }}>{label}</span>
           </div>
         );
       })}
@@ -271,42 +89,40 @@ function PerformersList({ performers, color, isEnded }) {
 }
 
 function TopPerformers({ comp }) {
-  const [state, setState] = useState("loading");
-  const [performers, setPerformers] = useState([]);
+  if (comp.status === "ended") {
+    if (comp.winners && comp.winners.length > 0) {
+      return <PerformersList performers={comp.winners} color={comp.color} isEnded={true} />;
+    }
+    return <EmptyTP quote="Is competition ke winners abhi announce nahi hue." color={comp.color} isEnded={true} />;
+  }
 
-  useEffect(() => {
-    fetchPerformers(comp.id)
-      .then(data => {
-        if (!data || data.length === 0) setState("empty");
-        else { setPerformers(data); setState("data"); }
-      })
-      .catch(() => setState("empty"));
-  }, [comp.id]);
+  if (comp.status === "active") {
+    if (!comp.participants || comp.participants.length === 0) {
+      return <EmptyTP quote={getEmptyQuote(comp.category)} color={comp.color} isEnded={false} />;
+    }
 
-  if (state === "loading") return <SkeletonTP />;
-  if (state === "empty") return <EmptyTP quotes={comp.emptyQuotes} color={comp.color} isEnded={comp.status === "ended"} />;
-  return <PerformersList performers={performers} color={comp.color} isEnded={comp.status === "ended"} />;
+    const performers = comp.participants.map((p, idx) => ({
+      name: p.username || "User",
+      channel: `@${p.username || "user"}`,
+      platform: "youtube",
+      score: (4.9 - idx * 0.1).toFixed(1),
+      channelUrl: "#"
+    }));
+    return <PerformersList performers={performers} color={comp.color} isEnded={false} />;
+  }
+
+  return <EmptyTP quote={getEmptyQuote(comp.category)} color={comp.color} isEnded={false} />;
 }
 
 function ProgressBar({ comp, joined }) {
-  if (joined === null) {
-    return (
-      <div style={{ marginBottom: 14 }}>
-        <div style={styles.progressMeta}>
-          <span style={{ ...styles.skLine, width: 80, display: "inline-block" }} />
-          <span style={{ ...styles.skLine, width: 32, display: "inline-block" }} />
-        </div>
-        <div style={{ height: 5, borderRadius: 99, background: "#2e2a45", animation: "shimmer 1.4s infinite" }} />
-      </div>
-    );
-  }
-  const pct = comp.total > 0 ? Math.round((joined / comp.total) * 100) : 0;
+  const maxParts = comp.maxParticipants || comp.total || 100;
+  const pct = maxParts > 0 ? Math.min(100, Math.round((joined / maxParts) * 100)) : 0;
   const isFull = pct === 100;
-  const col = ACCENT[comp.color];
+  const col = ACCENT[comp.color] || comp.color || "#ff6b35";
   return (
     <div style={{ marginBottom: 14 }}>
       <div style={styles.progressMeta}>
-        <span style={{ fontSize: 12, color: "#8b87a8" }}>{joined}/{comp.total} joined</span>
+        <span style={{ fontSize: 12, color: "#8b87a8" }}>{joined}/{maxParts} joined</span>
         <span style={{ fontSize: 12, fontWeight: 600, color: isFull ? col : "#f0edf8" }}>
           {isFull ? "Full" : pct + "%"}
         </span>
@@ -318,8 +134,8 @@ function ProgressBar({ comp, joined }) {
   );
 }
 
-function CompCard({ comp, joined }) {
-  const accentColor = ACCENT[comp.color];
+function CompCard({ comp, joined, onRegister, registeringId }) {
+  const accentColor = ACCENT[comp.color] || comp.color || "#ff6b35";
 
   const statusBadge =
     comp.status === "active" ? (
@@ -330,41 +146,81 @@ function CompCard({ comp, joined }) {
       <span style={{ ...styles.badge, background: "rgba(255,107,53,.15)", color: "#ff6b35", border: "1px solid rgba(255,107,53,.3)" }}>⏳ Upcoming</span>
     );
 
-  const levelBadge =
-    comp.status === "ended" ? (
-      <span style={{ ...styles.badge, background: "#231f35", color: "#8b87a8", border: "1px solid #2e2a45" }}>{comp.level}</span>
-    ) : (
-      <span style={{ ...styles.badge, background: "rgba(79,172,254,.15)", color: "#4facfe", border: "1px solid rgba(79,172,254,.3)" }}>Open</span>
-    );
+  const levelBadge = (
+    <span style={{ ...styles.badge, background: "rgba(79,172,254,.15)", color: "#4facfe", border: "1px solid rgba(79,172,254,.3)" }}>
+      {comp.difficulty || "Open"}
+    </span>
+  );
 
-  const calLabel = comp.status === "ended" ? "Ended" : comp.cdLabel === "ENDS IN" ? "Ends in" : "Starts in";
+  const calLabel = comp.status === "ended" ? "Ended" : comp.status === "active" ? "Ends" : "Starts";
+  const displayDate = comp.status === "upcoming" ? comp.startDate : comp.deadline;
+
+  // Set action button fields dynamically
+  let btnLabel = "🔔 Coming Soon";
+  let btnColor = accentColor;
+  let btnTxt = "#fff";
+  let isActionEnabled = false;
+
+  if (comp.status === "active") {
+    btnLabel = "✨ Join Now";
+    btnColor = "#00c896";
+    isActionEnabled = true;
+  } else if (comp.status === "ended") {
+    btnLabel = "🏆 See Winners";
+    btnColor = "#4facfe";
+  }
+
+  // Check if current user is registered
+  const user = JSON.parse(localStorage.getItem("th_user") || "null");
+  const myId = user?.id || user?._id;
+  const isRegistered = comp.participants?.some(p => {
+    const id = p._id || p;
+    return id.toString() === (myId || "").toString();
+  });
+
+  if (comp.status === "active" && isRegistered) {
+    btnLabel = "✅ Registered";
+    btnColor = "#10b981";
+    isActionEnabled = false;
+  }
 
   return (
     <div style={styles.card} className={`comp-card comp-card-${comp.color}`}>
       <div style={styles.cardHeader}>
-        <div style={styles.cardEmoji}>{comp.emoji}</div>
+        <div style={styles.cardEmoji}>{comp.icon || "🏆"}</div>
         <div style={{ flex: 1 }}>
           <div style={styles.cardBadges}>{statusBadge}{levelBadge}</div>
-          <div style={styles.cardTitle}>{comp.title}</div>
+          <div style={styles.cardTitle}>{comp.name || comp.title}</div>
         </div>
-        <div style={{ fontSize: 12, color: "#8b87a8", whiteSpace: "nowrap" }}>📅 {calLabel}</div>
+        <div style={{ fontSize: 11, color: "#8b87a8", whiteSpace: "nowrap" }}>
+          📅 {calLabel}: {formatDate(displayDate)}
+        </div>
       </div>
       <div style={styles.cardMeta}>
-        {comp.tags.map(t => (
+        {(comp.tags || []).map(t => (
           <span key={t} style={{ ...styles.metaTag, borderColor: accentColor + "66", color: accentColor }}>{t}</span>
         ))}
       </div>
-      <p style={styles.cardDesc}>{comp.desc}</p>
+      <p style={styles.cardDesc}>{comp.description || comp.desc}</p>
+      
       <TopPerformers comp={comp} />
-      <Countdown comp={comp} />
+      
       {comp.status === "ended" && (
         <div style={{ fontSize: 10, fontWeight: 600, color: "#8b87a8", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>
           👥 PARTICIPATION
         </div>
       )}
+      
       <ProgressBar comp={comp} joined={joined} />
+      
       <div style={styles.cardActions}>
-        <button style={{ ...styles.btnP, background: comp.btnColor, color: comp.btnTxt }}>{comp.btnLabel}</button>
+        <button 
+          style={{ ...styles.btnP, background: btnColor, color: btnTxt }} 
+          disabled={!isActionEnabled || registeringId === comp._id}
+          onClick={() => isActionEnabled && onRegister(comp._id)}
+        >
+          {registeringId === comp._id ? "Joining..." : btnLabel}
+        </button>
         <button style={styles.btnS}>Details →</button>
       </div>
     </div>
@@ -373,33 +229,97 @@ function CompCard({ comp, joined }) {
 
 // ── main page ────────────────────────────────────────────────────────────────
 export default function CompetitionsPage() {
-  const [stats, setStats] = useState(null);
+  const navigate = useNavigate();
+  const token = localStorage.getItem("th_token");
+
+  const [competitions, setCompetitions] = useState([]);
+  const [stats, setStats] = useState({ total_participants: 0, active_count: 0 });
   const [activeFilter, setActiveFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [search, setSearch] = useState("");
+  const [registeringId, setRegisteringId] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCompetitions = async () => {
+    try {
+      const res = await fetch(`${API}/api/competitions`);
+      const data = await res.json();
+      if (res.ok && Array.isArray(data)) {
+        setCompetitions(data);
+      }
+    } catch (err) {
+      console.error("Error fetching competitions:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch(`${API}/api/auth/count`);
+      const data = await res.json();
+      if (res.ok) {
+        setStats(prev => ({
+          ...prev,
+          total_participants: data.count || 0
+        }));
+      }
+    } catch (err) {
+      console.error("Error fetching stats:", err);
+    }
+  };
 
   useEffect(() => {
-    fetchStats()
-      .then(setStats)
-      .catch(() =>
-        setStats({ total_participants: null, active_count: null, competitions: {} })
-      );
+    fetchCompetitions();
+    fetchStats();
   }, []);
 
-  const totalParticipants = stats?.total_participants;
-  const activeCount = stats?.active_count;
+  const handleRegister = async (compId) => {
+    if (!token) {
+      alert("Please login first to participate in competitions!");
+      navigate("/login");
+      return;
+    }
 
-  const filtered = COMPETITIONS.filter(c => {
+    setRegisteringId(compId);
+    try {
+      const res = await fetch(`${API}/api/competitions/${compId}/register`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || "Registered successfully!");
+        fetchCompetitions(); // Reload to refresh progress fills and lists
+      } else {
+        alert(data.error || data.message || "Failed to register.");
+      }
+    } catch (err) {
+      console.error("Register error:", err);
+      alert("Error occurred. Please try again.");
+    } finally {
+      setRegisteringId(null);
+    }
+  };
+
+  const totalParticipants = stats.total_participants;
+  const activeCount = competitions.filter(c => c.status === "active").length;
+
+  const filtered = competitions.filter(c => {
     const matchCat =
       activeFilter === "All" ||
-      c.title.toLowerCase().includes(activeFilter.toLowerCase()) ||
+      c.name.toLowerCase().includes(activeFilter.toLowerCase()) ||
+      c.category.toLowerCase().includes(activeFilter.toLowerCase()) ||
       c.tags.some(t => t.toLowerCase().includes(activeFilter.toLowerCase()));
     const matchStatus =
       statusFilter === "All" ||
       (statusFilter === "Active" && c.status === "active") ||
       (statusFilter === "Upcoming" && c.status === "upcoming") ||
       (statusFilter === "Ended" && c.status === "ended");
-    const matchSearch = !search || c.title.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchStatus && matchSearch;
   });
 
@@ -437,10 +357,10 @@ export default function CompetitionsPage() {
         <div style={styles.navRight}>
           <div style={styles.liveBadge}>
             <span style={styles.liveDot} />
-            {activeCount != null ? activeCount : "…"} Active Now
+            {activeCount} Active Now
           </div>
           <div style={styles.statChip}>
-            👥 {totalParticipants != null ? totalParticipants.toLocaleString() : "…"} Participants
+            👥 {totalParticipants.toLocaleString()} Participants
           </div>
           <div style={styles.notifBtn}>🔔</div>
           <div style={styles.avatarNav}>AK</div>
@@ -461,11 +381,11 @@ export default function CompetitionsPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 500 }}>
               <span style={styles.liveDot} />
               <span style={{ color: "#00c896" }}>
-                {activeCount != null ? activeCount : "…"} Active
+                {activeCount} Active
               </span>
             </div>
             <div style={{ fontSize: 13, color: "#8b87a8" }}>
-              👥 {totalParticipants != null ? totalParticipants.toLocaleString() : "…"} Participants
+              👥 {totalParticipants.toLocaleString()} Participants
             </div>
           </div>
         </div>
@@ -483,7 +403,7 @@ export default function CompetitionsPage() {
           </div>
           <span style={styles.filterLabel}>Category:</span>
           <div style={styles.filterGroup}>
-            {["All","Singing","Dance","Rap","Comedy","Acting","Instrumental"].map(f => (
+            {["All","Singing","Dance","Rap","Comedy","Acting","Instrumental","Poetry"].map(f => (
               <button key={f}
                 style={{ ...styles.fb, ...(activeFilter === f ? styles.fbActive : {}) }}
                 onClick={() => setActiveFilter(f)}>{f}</button>
@@ -501,15 +421,24 @@ export default function CompetitionsPage() {
         </div>
 
         {/* CARDS */}
-        <div style={styles.cardsGrid}>
-          {filtered.map(comp => (
-            <CompCard
-              key={comp.id}
-              comp={comp}
-              joined={stats?.competitions?.[comp.id]?.joined ?? null}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "80px 20px" }}>
+            <div className="admin-spinner" style={{ width: 40, height: 40, border: "3px solid rgba(167, 139, 250, 0.15)", borderLeftColor: "#a78bfa", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+            <p style={{ color: "#8b87a8" }}>Loading competitions...</p>
+          </div>
+        ) : (
+          <div style={styles.cardsGrid}>
+            {filtered.map(comp => (
+              <CompCard
+                key={comp._id}
+                comp={comp}
+                joined={comp.participants?.length || 0}
+                onRegister={handleRegister}
+                registeringId={registeringId}
+              />
+            ))}
+          </div>
+        )}
 
         {/* FOOTER */}
         <div style={styles.footerStrip}>
@@ -582,11 +511,6 @@ const styles = {
   pAvatar:      { width: 30, height: 30, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0, color: "#fff" },
   pName:        { fontSize: 12, fontWeight: 600, color: "#f0edf8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
   pChannel:     { fontSize: 11, color: "#4facfe", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "flex", alignItems: "center", gap: 3, textDecoration: "none" },
-  cdLabel:      { fontSize: 10, fontWeight: 600, color: "#8b87a8", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 },
-  countdown:    { display: "flex", gap: 8, marginBottom: 14 },
-  cBox:         { background: "#231f35", border: "1px solid #2e2a45", borderRadius: 8, padding: "6px 10px", textAlign: "center", minWidth: 48 },
-  cNum:         { fontFamily: "'Baloo 2', cursive", fontSize: 18, fontWeight: 800, lineHeight: 1 },
-  cUnit:        { fontSize: 9, color: "#8b87a8", letterSpacing: 0.5, textTransform: "uppercase", marginTop: 2 },
   progressMeta: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
   progressBar:  { height: 5, background: "#1a1826", borderRadius: 99, overflow: "hidden" },
   progressFill: { height: "100%", borderRadius: 99, transition: "width .6s ease" },

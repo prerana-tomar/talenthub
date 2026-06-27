@@ -2,7 +2,7 @@ import './Upload.css';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API = '';
+const API = 'https://talenthub-w1cc.onrender.com';
 
 function Upload() {
   const [title, setTitle]       = useState('');
@@ -133,7 +133,7 @@ function Upload() {
             color: '#7a7f94',
             marginBottom: '6px',
           }}>
-            <span>Uploading...</span>
+            <span>Uploading to Cloudinary...</span>
             <span>{progress}%</span>
           </div>
           <div style={{
