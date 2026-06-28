@@ -210,6 +210,14 @@ router.post('/follow/:id', auth, async (req, res) => {
     } else {
       await User.findByIdAndUpdate(myId,     { $addToSet: { following: targetId } });
       await User.findByIdAndUpdate(targetId, { $addToSet: { followers: myId } });
+      const Notification = require('../models/Notification');
+      await Notification.create({
+        recipient: targetId,
+        sender: myId,
+        type: 'follow',
+        message: 'started following you',
+        link: `/profile/${myId}`
+      });
       return res.json({ following: true, message: 'Followed' });
     }
   } catch (err) {

@@ -54,6 +54,7 @@ app.use('/api/thoughts',     require('./routes/thoughts'));
 app.use('/api/competitions', require('./routes/competitions'));
 app.use('/api/messages',     require('./routes/messages'));
 app.use('/api/saved',        require('./routes/saved'));
+app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/highlights',   highlightRoutes);
 app.use('/api/creative',     creativeRoutes);
 app.use('/api/collab', require('./routes/collab'));

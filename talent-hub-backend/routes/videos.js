@@ -127,6 +127,18 @@ router.post('/:id/like', protect, async (req, res) => {
     }
     video.likes.push(req.user._id);
     await video.save();
+
+    const Notification = require('../models/Notification');
+    if (video.uploader.toString() !== userId) {
+      await Notification.create({
+        recipient: video.uploader,
+        sender: req.user._id,
+        type: 'like',
+        message: `liked your video "${video.title}"`,
+        link: `/video/${video._id}`
+      });
+    }
+
     res.json({ alreadyLiked: true, likes: video.likes.length });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
