@@ -25,6 +25,7 @@ import CreativeStudio from './pages/CreativeStudio';
 import CollabHub from './pages/CollabHub';
 import AdminRequests from './pages/AdminRequests';
 import MyRequests from './pages/MyRequests';
+import Notifications from './pages/Notifications';
 
 
 
@@ -139,6 +140,7 @@ function App() {
           <Route path="/collab" element={<WithNavbar><CollabHub /></WithNavbar>} />
           <Route path="/admin/requests" element={<WithNavbar><AdminRequests /></WithNavbar>} />
           <Route path="/my-requests" element={<WithNavbar><ProtectedRoute><MyRequests /></ProtectedRoute></WithNavbar>} />
+          <Route path="/notifications" element={<WithNavbar><ProtectedRoute><Notifications /></ProtectedRoute></WithNavbar>} />
           
 
           

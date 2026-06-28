@@ -14,7 +14,95 @@ function Navbar() {
   const dropdownRef = useRef(null);
   const navigate   = useNavigate();
 
+  // Notification States
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const notifDropdownRef = useRef(null);
+
   const user = JSON.parse(localStorage.getItem('th_user') || 'null');
+
+  const fetchNotifications = async () => {
+    const token = localStorage.getItem('th_token');
+    if (!token) return;
+    try {
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/notifications', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+        setUnreadCount(data.filter(n => !n.isRead).length);
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  const markAllRead = async (e) => {
+    if (e) e.stopPropagation();
+    const token = localStorage.getItem('th_token');
+    if (!token) return;
+    try {
+      const res = await fetch('https://talenthub-w1cc.onrender.com/api/notifications/read-all', {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        setUnreadCount(0);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    const token = localStorage.getItem('th_token');
+    if (!token) return;
+    try {
+      await fetch(`https://talenthub-w1cc.onrender.com/api/notifications/${id}/read`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleNotificationClick = async (n) => {
+    setNotifDropdownOpen(false);
+    if (!n.isRead) {
+      await markAsRead(n._id);
+    }
+    navigate(n.link);
+  };
+
+  const timeAgo = (dateString) => {
+    const now = new Date();
+    const past = new Date(dateString);
+    const ms = now - past;
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (seconds < 60) return 'just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 30000);
+      return () => clearInterval(interval);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Set active page on load
   useEffect(() => {
@@ -31,6 +119,7 @@ function Navbar() {
     localStorage.removeItem('th_token');
     localStorage.removeItem('th_user');
     setDropdownOpen(false);
+    setNotifDropdownOpen(false);
     navigate('/login');
     window.location.reload();
   };
@@ -46,6 +135,7 @@ function Navbar() {
         setSearchQuery('');
         setSearchResults([]);
         setDropdownOpen(false);
+        setNotifDropdownOpen(false);
       }
     };
     window.addEventListener('keydown', handleKey);
@@ -56,6 +146,9 @@ function Navbar() {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
+      }
+      if (notifDropdownRef.current && !notifDropdownRef.current.contains(e.target)) {
+        setNotifDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -174,13 +267,61 @@ function Navbar() {
 
         {/* Right Actions */}
         <div className="navbar-actions">
-          <button className="icon-btn" aria-label="Notifications">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-            </svg>
-            <span className="notif-dot" />
-          </button>
+          <div className="navbar-notif-wrap" ref={notifDropdownRef}>
+            <button className="icon-btn" aria-label="Notifications" onClick={() => {
+              if (!user) { navigate('/login'); }
+              else { setNotifDropdownOpen(!notifDropdownOpen); }
+            }}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              {unreadCount > 0 && <span className="notif-dot">{unreadCount}</span>}
+            </button>
+
+            {notifDropdownOpen && (
+              <div className="navbar-notif-dropdown">
+                <div className="notif-dropdown-header">
+                  <span className="notif-dropdown-title">Notifications</span>
+                  {unreadCount > 0 && (
+                    <button className="notif-mark-all-btn" onClick={markAllRead}>Mark all read</button>
+                  )}
+                </div>
+                <div className="notif-dropdown-list">
+                  {notifications.length === 0 ? (
+                    <div className="notif-dropdown-empty">No notifications yet</div>
+                  ) : (
+                    notifications.map(n => {
+                      const senderName = n.sender?.username || 'Someone';
+                      const senderInitial = senderName[0]?.toUpperCase() || 'U';
+                      return (
+                        <div
+                          key={n._id}
+                          className={`notif-dropdown-item ${!n.isRead ? 'unread' : ''}`}
+                          onClick={() => handleNotificationClick(n)}
+                        >
+                          <div className="notif-item-avatar">
+                            {senderInitial}
+                          </div>
+                          <div className="notif-item-content">
+                            <span className="notif-item-text">
+                              <strong>{senderName}</strong> {n.message}
+                            </span>
+                            <span className="notif-item-time">{timeAgo(n.createdAt)}</span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+                <div className="notif-dropdown-footer">
+                  <Link to="/notifications" className="notif-view-all-btn" onClick={() => setNotifDropdownOpen(false)}>
+                    View all notifications
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
 
           <button className="icon-btn" aria-label="Messages" onClick={() => navigate('/messages')}>
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
