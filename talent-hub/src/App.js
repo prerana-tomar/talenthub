@@ -151,6 +151,11 @@ function App() {
           <Route path="/upload" element={
             <WithNavbar><ProtectedRoute><Upload /></ProtectedRoute></WithNavbar>
           } />
+         
+          <Route path="/profile/:id" element={
+          <WithNavbar><Profile /></WithNavbar>
+          } />
+
           <Route path="/profile" element={
             <WithNavbar><ProtectedRoute><Profile /></ProtectedRoute></WithNavbar>
           } />
