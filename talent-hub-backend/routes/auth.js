@@ -8,7 +8,6 @@ const User    = require('../models/User');
 const Video   = require('../models/Video');
 const { OAuth2Client } = require('google-auth-library');
 
-// ── Google Client — .env se aayega ──
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // ── Inline auth middleware ──
@@ -68,21 +67,17 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// POST /api/auth/google — Google Login
+// POST /api/auth/google
 router.post('/google', async (req, res) => {
   try {
     const { token } = req.body;
     if (!token) return res.status(400).json({ message: 'Token required' });
-
     const ticket = await googleClient.verifyIdToken({
       idToken:  token,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-
     const { email, name, picture, sub: googleId } = ticket.getPayload();
-
     let user = await User.findOne({ email });
-
     if (!user) {
       user = await User.create({
         username:     name.replace(/\s+/g, '').toLowerCase() + Math.floor(Math.random() * 999),
@@ -93,22 +88,19 @@ router.post('/google', async (req, res) => {
         isGoogleUser: true,
       });
     } else {
-      if (!user.googleId)               user.googleId   = googleId;
-      if (!user.profilePic && picture)  user.profilePic = picture;
+      if (!user.googleId)              user.googleId   = googleId;
+      if (!user.profilePic && picture) user.profilePic = picture;
       await user.save();
     }
-
     const jwtToken = jwt.sign(
       { id: user._id, username: user.username },
       process.env.JWT_SECRET,
       { expiresIn: '30d' }
     );
-
     res.json({
       token: jwtToken,
       user:  { _id: user._id, username: user.username, email: user.email, profilePic: user.profilePic || '' },
     });
-
   } catch (err) {
     console.error('Google auth error:', err);
     res.status(500).json({ message: 'Google authentication failed', error: err.message });
@@ -140,6 +132,47 @@ router.get('/top-performers', async (req, res) => {
     );
     usersWithStats.sort((a, b) => (b.followers?.length || 0) - (a.followers?.length || 0));
     res.json(usersWithStats.slice(0, 5));
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// GET /api/auth/user/:id — Kisi bhi user ka profile
+router.get('/user/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select('username email bio category profilePic followers following')
+      .lean();
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// GET /api/auth/me — Apna profile
+router.get('/me', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .select('username email bio category profilePic followers following')
+      .lean();
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// PUT /api/auth/update — Profile update
+router.put('/update', auth, async (req, res) => {
+  try {
+    const { username, bio, category } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { username, bio, category },
+      { new: true }
+    ).select('username email bio category profilePic');
+    res.json(user);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
