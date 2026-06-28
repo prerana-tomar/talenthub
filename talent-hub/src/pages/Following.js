@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Following.css';
 
-const API = '/api/auth';
+const API = 'https://talenthub-w1cc.onrender.com/api/auth';
 
 export default function Following() {
   const navigate = useNavigate();
