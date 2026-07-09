@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API from '../config';
 import './Settings.css';
 
 const Settings = () => {
@@ -14,20 +15,23 @@ const Settings = () => {
   });
   const [message, setMessage]   = useState({ text: '', type: '' });
   const [loading, setLoading]   = useState(false);
+  const [uploadingPic, setUploadingPic] = useState(false);
   const [videos, setVideos]     = useState([]);
   const [videoLoad, setVideoLoad] = useState(false);
   const [deleting, setDeleting] = useState(null); // video id being deleted
 
   const token = localStorage.getItem('th_token');
-  const user  = JSON.parse(localStorage.getItem('th_user') || '{}');
+  const [currentUser, setCurrentUser] = useState(() => {
+    return JSON.parse(localStorage.getItem('th_user') || '{}');
+  });
 
   useEffect(() => {
     setFormData(prev => ({
       ...prev,
-      username: user.username || '',
-      email:    user.email    || '',
+      username: currentUser.username || '',
+      email:    currentUser.email    || '',
     }));
-  }, []);
+  }, [currentUser]);
 
   // Fetch uploaded videos when tab opens
   useEffect(() => {
@@ -37,7 +41,7 @@ const Settings = () => {
   const fetchMyVideos = async () => {
     setVideoLoad(true);
     try {
-      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/videos/my', {
+      const res  = await fetch(`${API}/api/videos/my`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -58,11 +62,58 @@ const Settings = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleAvatarClick = () => {
+    document.getElementById('avatar-file-input').click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showMsg('❌ Please select a valid image file.', 'error');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showMsg('❌ Image size should be less than 5MB.', 'error');
+      return;
+    }
+
+    const fileData = new FormData();
+    fileData.append('profilePic', file);
+
+    setUploadingPic(true);
+    try {
+      const res = await fetch(`${API}/api/auth/upload-pic`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: fileData
+      });
+      const data = await res.json();
+      if (res.ok && data.user) {
+        const updated = { ...currentUser, profilePic: data.user.profilePic };
+        localStorage.setItem('th_user', JSON.stringify(updated));
+        setCurrentUser(updated);
+        showMsg('✅ Profile picture updated successfully!');
+        // Dispatch event for other components like Navbar to update immediately
+        window.dispatchEvent(new Event('storage'));
+      } else {
+        showMsg(data.message || '❌ Upload failed.', 'error');
+      }
+    } catch {
+      showMsg('❌ Cannot connect to server.', 'error');
+    } finally {
+      setUploadingPic(false);
+    }
+  };
+
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/auth/update-profile', {
+      const res  = await fetch(`${API}/api/auth/update-profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -72,8 +123,11 @@ const Settings = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        localStorage.setItem('th_user', JSON.stringify(data.user || { ...user, username: formData.username }));
+        const updated = data.user || { ...currentUser, username: formData.username, email: formData.email };
+        localStorage.setItem('th_user', JSON.stringify(updated));
+        setCurrentUser(updated);
         showMsg('✅ Profile updated successfully!');
+        window.dispatchEvent(new Event('storage'));
       } else {
         showMsg(data.message || 'Update failed', 'error');
       }
@@ -94,7 +148,7 @@ const Settings = () => {
     }
     setLoading(true);
     try {
-      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/auth/change-password', {
+      const res  = await fetch(`${API}/api/auth/change-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +185,7 @@ const Settings = () => {
 
     setLoading(true);
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/auth/delete-account', {
+      const res = await fetch(`${API}/api/auth/delete-account`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -154,7 +208,7 @@ const Settings = () => {
     if (!window.confirm(`Delete "${videoTitle}"?\n\nThis cannot be undone.`)) return;
     setDeleting(videoId);
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${videoId}`, {
+      const res = await fetch(`${API}/api/videos/${videoId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -216,12 +270,37 @@ const Settings = () => {
         {activeTab === 'account' && (
           <div className="settings-card">
             <div className="settings-avatar-row">
-              <div className="settings-avatar-circle">
-                {user.username?.[0]?.toUpperCase() || 'U'}
+              <div className="settings-avatar-circle" onClick={handleAvatarClick} title="Click to upload profile picture">
+                {currentUser.profilePic ? (
+                  <img src={currentUser.profilePic} alt={currentUser.username} className="settings-avatar-img" />
+                ) : (
+                  currentUser.username?.[0]?.toUpperCase() || 'U'
+                )}
+                
+                {uploadingPic ? (
+                  <div className="settings-avatar-uploading">
+                    <div className="settings-avatar-uploading-spinner" />
+                    <span>Uploading...</span>
+                  </div>
+                ) : (
+                  <div className="settings-avatar-overlay">Change</div>
+                )}
               </div>
               <div>
-                <div className="settings-avatar-name">{user.username || 'User'}</div>
-                <div className="settings-avatar-email">{user.email || ''}</div>
+                <div className="settings-avatar-name">{currentUser.username || 'User'}</div>
+                <div className="settings-avatar-email">{currentUser.email || ''}</div>
+                <input
+                  type="file"
+                  id="avatar-file-input"
+                  style={{ display: 'none' }}
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+                <div className="avatar-upload-btn-row">
+                  <label htmlFor="avatar-file-input" className="avatar-upload-label">
+                    Upload Picture
+                  </label>
+                </div>
               </div>
             </div>
 

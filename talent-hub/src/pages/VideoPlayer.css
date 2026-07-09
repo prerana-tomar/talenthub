@@ -337,3 +337,11 @@
   .vp-meta-row { flex-direction: column; align-items: flex-start; gap: 14px; }
   .vp-actions { width: 100%; justify-content: flex-start; }
 }
+
+.vp-topbar-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}

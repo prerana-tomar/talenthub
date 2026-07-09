@@ -740,3 +740,30 @@
   .navbar { padding: 8px 12px; gap: 6px; }
   .brand-talent, .brand-hub { font-size: 17px; }
 }
+
+/* User Avatar & Dropdown Images */
+.navbar-avatar-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar-dropdown-avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(139, 92, 246, 0.2);
+}
+
+.notif-item-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}

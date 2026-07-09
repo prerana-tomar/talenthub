@@ -39,7 +39,7 @@ router.get('/search', async (req, res) => {
     const sortMap = { newest: { createdAt: -1 }, popular: { views: -1 }, trending: { views: -1 }, likes: { likes: -1 } };
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const [videos, total] = await Promise.all([
-      Video.find(filter).populate('uploader', 'username email').sort(sortMap[sort] || { createdAt: -1 }).skip(skip).limit(parseInt(limit)),
+      Video.find(filter).populate('uploader', 'username email profilePic').sort(sortMap[sort] || { createdAt: -1 }).skip(skip).limit(parseInt(limit)),
       Video.countDocuments(filter),
     ]);
     res.json({ videos, total, page: parseInt(page) });
@@ -63,7 +63,7 @@ router.get('/', async (req, res) => {
   try {
     const { category } = req.query;
     const filter = category && category !== 'All' ? { category } : {};
-    const videos = await Video.find(filter).populate('uploader', 'username email').sort({ createdAt: -1 });
+    const videos = await Video.find(filter).populate('uploader', 'username email profilePic').sort({ createdAt: -1 });
     res.json(videos);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });

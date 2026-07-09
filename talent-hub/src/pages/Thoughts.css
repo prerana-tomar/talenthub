@@ -727,3 +727,12 @@
   .thought-form { flex-direction: column; }
   .form-category-row { flex-direction: column; align-items: flex-start; }
 }
+
+.thought-avatar-img,
+.comment-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}

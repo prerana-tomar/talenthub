@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import API from '../config';
 import './VideoPlayer.css';
 
 export default function VideoPlayer() {
@@ -25,7 +26,7 @@ export default function VideoPlayer() {
     const fetchVideo = async () => {
       setLoading(true);
       try {
-        const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${id}`);
+        const res  = await fetch(`${API}/api/videos/${id}`);
         const data = await res.json();
         if (!data || !data._id) { setLoading(false); return; }
         setVideo(data);
@@ -34,10 +35,10 @@ export default function VideoPlayer() {
         setLiked(user ? arr.includes(user._id) : false);
 
         // View increment
-        await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${id}/view`, { method: 'POST' });
+        await fetch(`${API}/api/videos/${id}/view`, { method: 'POST' });
 
         // Related videos
-        const relRes  = await fetch('https://talenthub-w1cc.onrender.com/api/videos');
+        const relRes  = await fetch(`${API}/api/videos`);
         const relData = await relRes.json();
         setRelated(
           Array.isArray(relData)
@@ -56,7 +57,7 @@ export default function VideoPlayer() {
   const handleLike = async () => {
     if (!token) { navigate('/login'); return; }
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${id}/like`, {
+      const res = await fetch(`${API}/api/videos/${id}/like`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -121,7 +122,11 @@ export default function VideoPlayer() {
         {user ? (
           <div className="vp-topbar-user">
             <div className="vp-topbar-avatar">
-              {user.username?.[0]?.toUpperCase() || 'U'}
+              {user.profilePic ? (
+                <img src={user.profilePic} alt={user.username} className="vp-topbar-avatar-img" />
+              ) : (
+                user.username?.[0]?.toUpperCase() || 'U'
+              )}
             </div>
             <span>{user.username}</span>
           </div>

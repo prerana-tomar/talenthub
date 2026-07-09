@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
     }
     const thoughts = await Thought.find(filter)
       .populate('author', 'username profilePic')
-      .populate('comments.author', 'username')
+      .populate('comments.author', 'username profilePic')
       .sort({ createdAt: -1 })
       .lean();
     res.json(thoughts);
@@ -157,7 +157,7 @@ router.post('/:id/comments', authMiddleware, async (req, res) => {
       text:   text.trim(),
     });
     await thought.save();
-    await thought.populate('comments.author', 'username');
+    await thought.populate('comments.author', 'username profilePic');
 
     res.json({ comments: thought.comments });
   } catch (err) {

@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   bio:      { type: String, default: '' },
   category: { type: String, default: '' },
+  profilePic: { type: String, default: '' },
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
   

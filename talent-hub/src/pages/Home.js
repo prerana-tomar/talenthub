@@ -336,7 +336,13 @@ export default function Home() {
 
             {user ? (
               <div className="th-user-pill">
-                <div className="th-user-avatar">{user.username?.[0]?.toUpperCase() || 'U'}</div>
+                <div className="th-user-avatar">
+                  {user.profilePic ? (
+                    <img src={user.profilePic} alt={user.username} className="th-user-avatar-img" />
+                  ) : (
+                    user.username?.[0]?.toUpperCase() || 'U'
+                  )}
+                </div>
                 <span className="th-user-name">{user.username}</span>
                 <button className="th-logout-btn" onClick={handleLogout}>↩</button>
               </div>
@@ -497,7 +503,11 @@ export default function Home() {
                   >
                     <div className={`th-rank th-rank-${i+1}`}>{i+1}</div>
                     <div className="th-perf-avatar-initial">
-                      {p.username?.[0]?.toUpperCase() || 'U'}
+                      {p.profilePic ? (
+                        <img src={p.profilePic} alt={p.username} className="th-perf-avatar-img" />
+                      ) : (
+                        p.username?.[0]?.toUpperCase() || 'U'
+                      )}
                     </div>
                     <div className="th-perf-info">
                       <div className="th-perf-name">{p.username}</div>
@@ -565,7 +575,11 @@ export default function Home() {
               {recentThoughts.slice(0, 3).map(t => (
                 <div key={t._id} className="th-thought-item" onClick={() => navigate('/thoughts')}>
                   <div className="th-thought-item-avatar">
-                    {t.author?.username?.[0]?.toUpperCase() || 'U'}
+                    {t.author?.profilePic ? (
+                      <img src={t.author.profilePic} alt={t.author.username} className="th-user-avatar-img" />
+                    ) : (
+                      t.author?.username?.[0]?.toUpperCase() || 'U'
+                    )}
                   </div>
                   <div className="th-thought-item-content">
                     <div className="th-thought-item-author">{t.author?.username}</div>

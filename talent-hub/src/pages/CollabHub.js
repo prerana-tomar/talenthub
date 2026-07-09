@@ -311,7 +311,11 @@ export default function CollabHub() {
                   <div className="collab-card-header">
                     <div className="collab-user-info">
                       <div className="collab-avatar">
-                        {uploader.username?.[0]?.toUpperCase() || '?'}
+                        {uploader.profilePic ? (
+                          <img src={uploader.profilePic} alt={uploader.username} className="collab-avatar-img" />
+                        ) : (
+                          uploader.username?.[0]?.toUpperCase() || '?'
+                        )}
                       </div>
                       <div>
                         <div className="collab-username">{uploader.username || 'Creator'}</div>

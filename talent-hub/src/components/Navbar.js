@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, NavLink } from 'react-router-dom';
+import API from '../config';
 import './Navbar.css';
 
 function Navbar() {
@@ -20,13 +21,23 @@ function Navbar() {
   const [unreadCount, setUnreadCount] = useState(0);
   const notifDropdownRef = useRef(null);
 
-  const user = JSON.parse(localStorage.getItem('th_user') || 'null');
+  const [currentUser, setCurrentUser] = useState(() => {
+    return JSON.parse(localStorage.getItem('th_user') || 'null');
+  });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setCurrentUser(JSON.parse(localStorage.getItem('th_user') || 'null'));
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   const fetchNotifications = async () => {
     const token = localStorage.getItem('th_token');
     if (!token) return;
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/notifications', {
+      const res = await fetch(`${API}/api/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -44,7 +55,7 @@ function Navbar() {
     const token = localStorage.getItem('th_token');
     if (!token) return;
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/notifications/read-all', {
+      const res = await fetch(`${API}/api/notifications/read-all`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -61,7 +72,7 @@ function Navbar() {
     const token = localStorage.getItem('th_token');
     if (!token) return;
     try {
-      await fetch(`https://talenthub-w1cc.onrender.com/api/notifications/${id}/read`, {
+      await fetch(`${API}/api/notifications/${id}/read`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -96,13 +107,13 @@ function Navbar() {
   };
 
   useEffect(() => {
-    if (user) {
+    if (currentUser) {
       fetchNotifications();
       const interval = setInterval(fetchNotifications, 30000);
       return () => clearInterval(interval);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentUser]);
 
   // Set active page on load
   useEffect(() => {
@@ -160,7 +171,7 @@ function Navbar() {
     if (query.trim().length < 2) { setSearchResults([]); return; }
     setSearching(true);
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`${API}/api/videos/search?q=${encodeURIComponent(query)}`);
       if (res.ok) {
         const data = await res.json();
         setSearchResults(data.slice(0, 6));
@@ -269,7 +280,7 @@ function Navbar() {
         <div className="navbar-actions">
           <div className="navbar-notif-wrap" ref={notifDropdownRef}>
             <button className="icon-btn" aria-label="Notifications" onClick={() => {
-              if (!user) { navigate('/login'); }
+              if (!currentUser) { navigate('/login'); }
               else { setNotifDropdownOpen(!notifDropdownOpen); }
             }}>
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -301,7 +312,11 @@ function Navbar() {
                           onClick={() => handleNotificationClick(n)}
                         >
                           <div className="notif-item-avatar">
-                            {senderInitial}
+                            {n.sender?.profilePic ? (
+                              <img src={n.sender.profilePic} alt={senderName} className="notif-item-avatar-img" />
+                            ) : (
+                              senderInitial
+                            )}
                           </div>
                           <div className="notif-item-content">
                             <span className="notif-item-text">
@@ -329,11 +344,15 @@ function Navbar() {
             </svg>
           </button>
 
-          {user ? (
+          {currentUser ? (
             <div className="navbar-user-wrap" ref={dropdownRef}>
               <button className="navbar-avatar-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
-                <div className="navbar-avatar">{user.username?.[0]?.toUpperCase() || 'U'}</div>
-                <span className="navbar-username">{user.username}</span>
+                {currentUser.profilePic ? (
+                  <img src={currentUser.profilePic} alt={currentUser.username} className="navbar-avatar-img" />
+                ) : (
+                  <div className="navbar-avatar">{currentUser.username?.[0]?.toUpperCase() || 'U'}</div>
+                )}
+                <span className="navbar-username">{currentUser.username}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
@@ -342,10 +361,14 @@ function Navbar() {
               {dropdownOpen && (
                 <div className="navbar-dropdown">
                   <div className="navbar-dropdown-header">
-                    <div className="navbar-dropdown-avatar">{user.username?.[0]?.toUpperCase() || 'U'}</div>
+                    {currentUser.profilePic ? (
+                      <img src={currentUser.profilePic} alt={currentUser.username} className="navbar-dropdown-avatar-img" />
+                    ) : (
+                      <div className="navbar-dropdown-avatar">{currentUser.username?.[0]?.toUpperCase() || 'U'}</div>
+                    )}
                     <div>
-                      <div className="navbar-dropdown-name">{user.username}</div>
-                      <div className="navbar-dropdown-email">{user.email}</div>
+                      <div className="navbar-dropdown-name">{currentUser.username}</div>
+                      <div className="navbar-dropdown-email">{currentUser.email}</div>
                     </div>
                   </div>
                   <div className="navbar-dropdown-divider" />

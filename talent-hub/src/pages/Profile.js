@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import API from '../config';
 import './Profile.css';
-
-const API = 'https://talenthub-w1cc.onrender.com';
 
 const BADGES = [
   { icon: '🔥', label: 'Trending',     desc: 'Video trended in top 10',  color: '#f97316' },
@@ -40,6 +39,50 @@ export default function Profile() {
   const [editUsername, setEditUsername] = useState('');
   const [editBio,      setEditBio]      = useState('');
   const [editCategory, setEditCategory] = useState('');
+  const [uploadingPic, setUploadingPic] = useState(false);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('❌ Please select an image.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('❌ Max size is 5MB.');
+      return;
+    }
+
+    const fileData = new FormData();
+    fileData.append('profilePic', file);
+
+    setUploadingPic(true);
+    try {
+      const res = await fetch(`${API}/api/auth/upload-pic`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: fileData
+      });
+      const data = await res.json();
+      if (res.ok && data.user) {
+        const currentUserObj = JSON.parse(localStorage.getItem('th_user') || 'null') || {};
+        const updatedUser = { ...currentUserObj, profilePic: data.user.profilePic };
+        localStorage.setItem('th_user', JSON.stringify(updatedUser));
+        setProfile(prev => ({ ...prev, profilePic: data.user.profilePic }));
+        showToast('✅ Profile picture updated!');
+        window.dispatchEvent(new Event('storage'));
+      } else {
+        showToast(data.message || '❌ Upload failed.');
+      }
+    } catch {
+      showToast('❌ Server error.');
+    } finally {
+      setUploadingPic(false);
+    }
+  };
 
   useEffect(() => {
     if (isOwnProfile && !token) { navigate('/login'); return; }
@@ -137,11 +180,13 @@ export default function Profile() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ username: editUsername, bio: editBio, category: editCategory })
       });
-      const updated = { ...user, username: editUsername, bio: editBio, category: editCategory };
+      const currentUserObj = JSON.parse(localStorage.getItem('th_user') || 'null') || {};
+      const updated = { ...currentUserObj, username: editUsername, bio: editBio, category: editCategory };
       localStorage.setItem('th_user', JSON.stringify(updated));
       setProfile(prev => ({ ...prev, username: editUsername, bio: editBio, category: editCategory }));
       setEditMode(false);
       showToast('✅ Profile updated!');
+      window.dispatchEvent(new Event('storage'));
     } catch { showToast('❌ Update failed!'); }
     setSaving(false);
   };
@@ -193,13 +238,32 @@ export default function Profile() {
       <div className="profile-main">
         <div className="profile-top">
           <div className="profile-avatar-wrap">
-            <div className="profile-avatar">{displayName[0]?.toUpperCase() || 'U'}</div>
+            <div className="profile-avatar">
+              {profile?.profilePic ? (
+                <img src={profile.profilePic} alt={displayName} className="profile-avatar-img" />
+              ) : (
+                displayName[0]?.toUpperCase() || 'U'
+              )}
+            </div>
             <div className="profile-avatar-ring" />
           </div>
 
           <div className="profile-info">
             {editMode && isOwnProfile ? (
               <div className="profile-edit-form">
+                <div className="profile-edit-avatar-upload">
+                  <label className="profile-upload-pic-label" htmlFor="profile-avatar-file">
+                    {uploadingPic ? 'Uploading...' : '📷 Change Profile Picture'}
+                  </label>
+                  <input
+                    type="file"
+                    id="profile-avatar-file"
+                    style={{ display: 'none' }}
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    disabled={uploadingPic}
+                  />
+                </div>
                 <input className="profile-edit-input" value={editUsername}
                   onChange={e => setEditUsername(e.target.value)} placeholder="Username" />
                 <textarea className="profile-edit-textarea" value={editBio}

@@ -10,9 +10,9 @@ router.get('/', protect, async (req, res) => {
     const user = await User.findById(req.user._id)
       .populate({
         path: 'savedVideos',
-        populate: { path: 'uploader', select: 'username' }
+        populate: { path: 'uploader', select: 'username profilePic' }
       })
-      .populate('savedPerformers', 'username bio category');
+      .populate('savedPerformers', 'username bio category profilePic');
 
     res.json({
       videos:     user.savedVideos     || [],

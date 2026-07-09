@@ -14,8 +14,8 @@ router.get('/conversations', protect, async (req, res) => {
       participants: userId
     })
     .sort({ createdAt: -1 })
-    .populate('sender',   'username')
-    .populate('receiver', 'username');
+    .populate('sender',   'username profilePic')
+    .populate('receiver', 'username profilePic');
 
     // Build unique conversations
     const convMap = new Map();
@@ -39,6 +39,7 @@ router.get('/conversations', protect, async (req, res) => {
         convMap.set(otherId, {
           userId:     otherId,
           username:   otherUser.username,
+          profilePic: otherUser.profilePic,
           lastMsg:    msg.text,
           lastTime:   msg.createdAt,
           unread,
@@ -65,8 +66,8 @@ router.get('/:userId', protect, async (req, res) => {
       ]
     })
     .sort({ createdAt: 1 })
-    .populate('sender',   'username')
-    .populate('receiver', 'username');
+    .populate('sender',   'username profilePic')
+    .populate('receiver', 'username profilePic');
 
     // Mark as read
     await Message.updateMany(
@@ -97,8 +98,8 @@ router.post('/send', protect, async (req, res) => {
       text:     text.trim(),
     });
 
-    await msg.populate('sender',   'username');
-    await msg.populate('receiver', 'username');
+    await msg.populate('sender',   'username profilePic');
+    await msg.populate('receiver', 'username profilePic');
 
     res.json(msg);
   } catch (err) {
@@ -115,7 +116,7 @@ router.get('/users/search', protect, async (req, res) => {
     const users = await User.find({
       _id:      { $ne: req.user._id },
       username: { $regex: q, $options: 'i' },
-    }).select('username').limit(8);
+    }).select('username profilePic').limit(8);
 
     res.json(users);
   } catch (err) {

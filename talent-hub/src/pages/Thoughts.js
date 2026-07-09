@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import API from '../config';
 import './Thoughts.css';
 
 const CATEGORIES = ['All', 'General', 'Music', 'Dance', 'Poetry', 'Comedy', 'Art'];
@@ -36,8 +37,8 @@ export default function Thoughts() {
     setLoading(true);
     try {
       const url = category === 'All'
-  ? 'https://talenthub-w1cc.onrender.com/api/thoughts'
-  : `https://talenthub-w1cc.onrender.com/api/thoughts?category=${category}`;
+  ? `${API}/api/thoughts`
+  : `${API}/api/thoughts?category=${category}`;
       const res  = await fetch(url);
       const data = await res.json();
       setThoughts(data.thoughts || data || []);
@@ -91,14 +92,14 @@ export default function Thoughts() {
         formData.append('category', category === 'All' ? 'General' : category);
         selectedImages.forEach(img => formData.append('images', img));
 
-        res  = await fetch('https://talenthub-w1cc.onrender.com/api/thoughts', {
+        res  = await fetch(`${API}/api/thoughts`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
         });
       } else {
         // No images — send JSON as before
-        res  = await fetch('https://talenthub-w1cc.onrender.com/api/thoughts', {
+        res  = await fetch(`${API}/api/thoughts`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -123,7 +124,7 @@ export default function Thoughts() {
   const handleLike = async (id) => {
     if (!token) return alert('Login karo pehle!');
     try {
-      const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/thoughts/${id}/like`, {
+      const res  = await fetch(`${API}/api/thoughts/${id}/like`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -140,7 +141,7 @@ export default function Thoughts() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this thought?')) return;
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/thoughts/${id}`, {
+      const res = await fetch(`${API}/api/thoughts/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -156,7 +157,7 @@ export default function Thoughts() {
     if (!editText.trim()) return;
     setEditSaving(true);
     try {
-      const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/thoughts/${id}`, {
+      const res  = await fetch(`${API}/api/thoughts/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ text: editText }),
@@ -178,7 +179,7 @@ export default function Thoughts() {
     if (!commentText || !token) return;
     setPostingComment(true);
     try {
-      const res  = await fetch(`https://talenthub-w1cc.onrender.com/api/thoughts/${thoughtId}/comments`, {
+      const res  = await fetch(`${API}/api/thoughts/${thoughtId}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ text: commentText }),
@@ -236,7 +237,11 @@ export default function Thoughts() {
       {showForm && token && (
         <div className="thought-form">
           <div className="thought-form-avatar">
-            {user?.username?.[0]?.toUpperCase() || 'U'}
+            {user?.profilePic ? (
+              <img src={user.profilePic} alt={user.username} className="thought-avatar-img" />
+            ) : (
+              user?.username?.[0]?.toUpperCase() || 'U'
+            )}
           </div>
           <div className="thought-form-right">
 
@@ -340,7 +345,11 @@ export default function Thoughts() {
               {/* Card Header */}
               <div className="thought-card-header">
                 <div className="thought-avatar">
-                  {thought.author?.username?.[0]?.toUpperCase() || 'U'}
+                  {thought.author?.profilePic ? (
+                    <img src={thought.author.profilePic} alt={thought.author.username} className="thought-avatar-img" />
+                  ) : (
+                    thought.author?.username?.[0]?.toUpperCase() || 'U'
+                  )}
                 </div>
                 <div className="thought-meta">
                   <span className="thought-author">{thought.author?.username || 'Unknown'}</span>
@@ -427,7 +436,11 @@ export default function Thoughts() {
                       {thought.comments.map((comment, idx) => (
                         <div key={comment._id || idx} className="comment-item">
                           <div className="comment-avatar">
-                            {comment.author?.username?.[0]?.toUpperCase() || 'U'}
+                            {comment.author?.profilePic ? (
+                              <img src={comment.author.profilePic} alt={comment.author.username} className="comment-avatar-img" />
+                            ) : (
+                              comment.author?.username?.[0]?.toUpperCase() || 'U'
+                            )}
                           </div>
                           <div className="comment-body">
                             <span className="comment-author">{comment.author?.username || 'Unknown'}</span>
@@ -442,7 +455,11 @@ export default function Thoughts() {
                   {token && (
                     <div className="comment-input-row">
                       <div className="comment-input-avatar">
-                        {user?.username?.[0]?.toUpperCase() || 'U'}
+                        {user?.profilePic ? (
+                          <img src={user.profilePic} alt={user?.username} className="comment-avatar-img" />
+                        ) : (
+                          user?.username?.[0]?.toUpperCase() || 'U'
+                        )}
                       </div>
                       <input
                         className="comment-input"

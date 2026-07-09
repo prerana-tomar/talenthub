@@ -7,6 +7,25 @@ const fs      = require('fs');
 const User    = require('../models/User');
 const Video   = require('../models/Video');
 const { OAuth2Client } = require('google-auth-library');
+const multer   = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const profileStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder:        'talenthub_profiles',
+    resource_type: 'image',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+  },
+});
+const uploadProfilePic = multer({ storage: profileStorage });
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -40,7 +59,7 @@ router.post('/register', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-    res.status(201).json({ token, user: { id: user._id, username, email } });
+    res.status(201).json({ token, user: { id: user._id, username, email, profilePic: user.profilePic || '' } });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
@@ -61,7 +80,7 @@ router.post('/login', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-    res.json({ token, user: { id: user._id, username: user.username, email } });
+    res.json({ token, user: { id: user._id, username: user.username, email, profilePic: user.profilePic || '' } });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
@@ -267,6 +286,49 @@ router.delete('/delete-account', auth, async (req, res) => {
     return res.status(200).json({ message: 'Account deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Server error while deleting account' });
+  }
+});
+
+// PUT /api/auth/update-profile — Update username and email from Settings
+router.put('/update-profile', auth, async (req, res) => {
+  try {
+    const { username, email } = req.body;
+    if (email) {
+      const existing = await User.findOne({ email, _id: { $ne: req.user._id } });
+      if (existing) {
+        return res.status(409).json({ message: 'Email already registered.' });
+      }
+    }
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { username, email },
+      { new: true }
+    ).select('username email bio category profilePic');
+    res.json({ user });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// POST /api/auth/upload-pic — Upload profile picture
+router.post('/upload-pic', auth, uploadProfilePic.single('profilePic'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No image file provided.' });
+    }
+    const profilePicUrl = req.file.path;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { profilePic: profilePicUrl },
+      { new: true }
+    ).select('username email bio category profilePic');
+
+    res.json({
+      message: 'Profile picture uploaded successfully',
+      user
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 

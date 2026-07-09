@@ -98,12 +98,92 @@
   border: 1px solid #1e1e2e;
 }
 .settings-avatar-circle {
-  width: 56px; height: 56px;
+  width: 64px; height: 64px;
   border-radius: 50%;
   background: linear-gradient(135deg, #7c3aed, #ec4899);
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px; font-weight: 800; color: #fff;
+  font-size: 24px; font-weight: 800; color: #fff;
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  transition: border-color 0.3s ease, transform 0.2s ease;
+}
+.settings-avatar-circle:hover {
+  border-color: #a78bfa;
+  transform: scale(1.03);
+}
+
+.settings-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.settings-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.settings-avatar-circle:hover .settings-avatar-overlay {
+  opacity: 1;
+}
+
+.settings-avatar-uploading {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 9px;
+  color: #a78bfa;
+}
+
+.settings-avatar-uploading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #a78bfa;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.avatar-upload-btn-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.avatar-upload-label {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+  user-select: none;
+}
+.avatar-upload-label:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }
 .settings-avatar-name  { font-size: 16px; font-weight: 700; color: #fff; }
 .settings-avatar-email { font-size: 13px; color: #64748b; margin-top: 2px; }
