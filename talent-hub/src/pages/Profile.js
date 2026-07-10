@@ -40,6 +40,7 @@ export default function Profile() {
   const [editBio,      setEditBio]      = useState('');
   const [editCategory, setEditCategory] = useState('');
   const [uploadingPic, setUploadingPic] = useState(false);
+  const [viewPic,      setViewPic]      = useState(false);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -237,7 +238,12 @@ export default function Profile() {
 
       <div className="profile-main">
         <div className="profile-top">
-          <div className="profile-avatar-wrap">
+          <div 
+            className="profile-avatar-wrap" 
+            onClick={() => profile?.profilePic && setViewPic(true)} 
+            style={{ cursor: profile?.profilePic ? 'pointer' : 'default' }}
+            title={profile?.profilePic ? 'Click to view profile picture' : ''}
+          >
             <div className="profile-avatar">
               {profile?.profilePic ? (
                 <img src={profile.profilePic} alt={displayName} className="profile-avatar-img" />
@@ -246,6 +252,11 @@ export default function Profile() {
               )}
             </div>
             <div className="profile-avatar-ring" />
+            {profile?.profilePic && (
+              <div className="profile-avatar-hover-eye">
+                <span>👁️</span>
+              </div>
+            )}
           </div>
 
           <div className="profile-info">
@@ -430,6 +441,16 @@ export default function Profile() {
           )}
         </div>
       </div>
+
+      {/* ── PROFILE PIC LIGHTBOX MODAL ── */}
+      {viewPic && profile?.profilePic && (
+        <div className="profile-pic-modal" onClick={() => setViewPic(false)}>
+          <div className="profile-pic-modal-content" onClick={e => e.stopPropagation()}>
+            <button className="profile-pic-modal-close" onClick={() => setViewPic(false)}>✕</button>
+            <img src={profile.profilePic} alt={displayName} className="profile-pic-modal-img" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
