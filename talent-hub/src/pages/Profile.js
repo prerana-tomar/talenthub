@@ -41,6 +41,7 @@ export default function Profile() {
   const [editCategory, setEditCategory] = useState('');
   const [uploadingPic, setUploadingPic] = useState(false);
   const [viewPic,      setViewPic]      = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -82,6 +83,49 @@ export default function Profile() {
       showToast('❌ Server error.');
     } finally {
       setUploadingPic(false);
+    }
+  };
+
+  const handleCoverFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('❌ Please select an image.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('❌ Max size is 5MB.');
+      return;
+    }
+
+    const fileData = new FormData();
+    fileData.append('coverPic', file);
+
+    setUploadingCover(true);
+    try {
+      const res = await fetch(`${API}/api/auth/upload-cover`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: fileData
+      });
+      const data = await res.json();
+      if (res.ok && data.user) {
+        const currentUserObj = JSON.parse(localStorage.getItem('th_user') || 'null') || {};
+        const updatedUser = { ...currentUserObj, coverPic: data.user.coverPic };
+        localStorage.setItem('th_user', JSON.stringify(updatedUser));
+        setProfile(prev => ({ ...prev, coverPic: data.user.coverPic }));
+        showToast('✅ Cover picture updated!');
+        window.dispatchEvent(new Event('storage'));
+      } else {
+        showToast(data.message || '❌ Upload failed.');
+      }
+    } catch {
+      showToast('❌ Server error.');
+    } finally {
+      setUploadingCover(false);
     }
   };
 
@@ -232,8 +276,31 @@ export default function Profile() {
       {toast && <div className="profile-toast">{toast}</div>}
 
       <div className="profile-cover">
-        <div className="profile-cover-gradient" />
-        <div className="profile-cover-pattern" />
+        {profile?.coverPic ? (
+          <img src={profile.coverPic} alt="Cover" className="profile-cover-img" />
+        ) : (
+          <>
+            <div className="profile-cover-gradient" />
+            <div className="profile-cover-pattern" />
+          </>
+        )}
+        
+        {/* Cover Photo Upload Button — only visible if it's own profile */}
+        {isOwnProfile && (
+          <div className="profile-cover-upload-btn-wrap">
+            <label className="profile-cover-upload-label" htmlFor="profile-cover-file">
+              {uploadingCover ? '🔄' : '📷 Edit Cover'}
+            </label>
+            <input
+              type="file"
+              id="profile-cover-file"
+              style={{ display: 'none' }}
+              accept="image/*"
+              onChange={handleCoverFileChange}
+              disabled={uploadingCover}
+            />
+          </div>
+        )}
       </div>
 
       <div className="profile-main">

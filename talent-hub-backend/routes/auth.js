@@ -27,6 +27,16 @@ const profileStorage = new CloudinaryStorage({
 });
 const uploadProfilePic = multer({ storage: profileStorage });
 
+const coverStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder:        'talenthub_covers',
+    resource_type: 'image',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+  },
+});
+const uploadCoverPic = multer({ storage: coverStorage });
+
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // ── Inline auth middleware ──
@@ -59,7 +69,7 @@ router.post('/register', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-    res.status(201).json({ token, user: { id: user._id, username, email, profilePic: user.profilePic || '' } });
+    res.status(201).json({ token, user: { id: user._id, username, email, profilePic: user.profilePic || '', coverPic: user.coverPic || '' } });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
@@ -80,7 +90,7 @@ router.post('/login', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-    res.json({ token, user: { id: user._id, username: user.username, email, profilePic: user.profilePic || '' } });
+    res.json({ token, user: { id: user._id, username: user.username, email, profilePic: user.profilePic || '', coverPic: user.coverPic || '' } });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
@@ -118,7 +128,7 @@ router.post('/google', async (req, res) => {
     );
     res.json({
       token: jwtToken,
-      user:  { _id: user._id, username: user.username, email: user.email, profilePic: user.profilePic || '' },
+      user:  { _id: user._id, username: user.username, email: user.email, profilePic: user.profilePic || '', coverPic: user.coverPic || '' },
     });
   } catch (err) {
     console.error('Google auth error:', err);
@@ -160,7 +170,7 @@ router.get('/top-performers', async (req, res) => {
 router.get('/user/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
-      .select('username email bio category profilePic followers following')
+      .select('username email bio category profilePic coverPic followers following')
       .lean();
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
@@ -173,7 +183,7 @@ router.get('/user/:id', async (req, res) => {
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-      .select('username email bio category profilePic followers following')
+      .select('username email bio category profilePic coverPic followers following')
       .lean();
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
@@ -190,7 +200,7 @@ router.put('/update', auth, async (req, res) => {
       req.user._id,
       { username, bio, category },
       { new: true }
-    ).select('username email bio category profilePic');
+    ).select('username email bio category profilePic coverPic');
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -303,7 +313,7 @@ router.put('/update-profile', auth, async (req, res) => {
       req.user._id,
       { username, email },
       { new: true }
-    ).select('username email bio category profilePic');
+    ).select('username email bio category profilePic coverPic');
     res.json({ user });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -321,10 +331,32 @@ router.post('/upload-pic', auth, uploadProfilePic.single('profilePic'), async (r
       req.user._id,
       { profilePic: profilePicUrl },
       { new: true }
-    ).select('username email bio category profilePic');
+    ).select('username email bio category profilePic coverPic');
 
     res.json({
       message: 'Profile picture uploaded successfully',
+      user
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// POST /api/auth/upload-cover — Upload cover picture
+router.post('/upload-cover', auth, uploadCoverPic.single('coverPic'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No image file provided.' });
+    }
+    const coverPicUrl = req.file.path;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { coverPic: coverPicUrl },
+      { new: true }
+    ).select('username email bio category profilePic coverPic');
+
+    res.json({
+      message: 'Cover picture uploaded successfully',
       user
     });
   } catch (err) {
