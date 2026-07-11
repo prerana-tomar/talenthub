@@ -111,8 +111,16 @@ button { font-family: 'Poppins', sans-serif; cursor: pointer; }
 .th-sidenav-item {
   color: var(--text-secondary);
 }
-.th-sidenav-item:hover  { background: var(--bg-card-hover); color: var(--text-primary); }
-.th-sidenav-item.active { background: rgba(124,58,237,0.15); color: var(--accent-light); }
+.th-sidenav-item:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: rgba(124, 58, 237, 0.2);
+}
+.th-sidenav-item.active {
+  background: linear-gradient(90deg, rgba(124, 58, 237, 0.18) 0%, rgba(168, 85, 247, 0.06) 100%);
+  color: var(--accent-light);
+  border-color: rgba(124, 58, 237, 0.35);
+}
 
 .th-sidebar-divider { background: var(--border); }
 
