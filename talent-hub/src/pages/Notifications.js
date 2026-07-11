@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API from '../config';
 import './Notifications.css';
 
 export default function Notifications() {
@@ -26,7 +27,7 @@ export default function Notifications() {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/notifications', {
+      const res = await fetch(`${API}/api/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -41,7 +42,7 @@ export default function Notifications() {
 
   const markAllRead = async () => {
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/notifications/read-all', {
+      const res = await fetch(`${API}/api/notifications/read-all`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -56,7 +57,7 @@ export default function Notifications() {
 
   const markAsRead = async (id) => {
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/notifications/${id}/read`, {
+      const res = await fetch(`${API}/api/notifications/${id}/read`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -71,7 +72,7 @@ export default function Notifications() {
   const deleteNotification = async (id, e) => {
     e.stopPropagation(); // Avoid triggering list item click
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/notifications/${id}`, {
+      const res = await fetch(`${API}/api/notifications/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

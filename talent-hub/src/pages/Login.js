@@ -2,6 +2,7 @@ import './Login.css';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
+import API from '../config';
 
 function Login() {
   const [email, setEmail]       = useState('');
@@ -22,7 +23,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/auth/google', {
+      const res = await fetch(`${API}/api/auth/login`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ email, password }),
@@ -47,7 +48,7 @@ function Login() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/auth/google', {
+      const res = await fetch(`${API}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credentialResponse.credential }),

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import VideoCard from '../components/VideoCard';
+import API from '../config';
 import './Explore.css';
 
 const CATEGORIES = ['All', 'Music', 'Dance', 'Singing', 'Rap', 'Comedy', 'Acting', 'Instrumental', 'Poetry', 'Other'];
@@ -40,7 +41,7 @@ export default function Explore() {
   const fetchVideos = async (pageNum = 1, reset = false) => {
     setLoading(true);
     try {
-      let url = `https://talenthub-w1cc.onrender.com/api/videos/search?sort=${sort}&page=${pageNum}&limit=${LIMIT}`;
+      let url = `${API}/api/videos/search?sort=${sort}&page=${pageNum}&limit=${LIMIT}`;
       if (category !== 'All') url += `&category=${category}`;
       if (search.trim())      url += `&q=${encodeURIComponent(search.trim())}`;
 

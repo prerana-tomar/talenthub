@@ -73,7 +73,9 @@ router.get('/', async (req, res) => {
 // GET /api/videos/:id
 router.get('/:id', async (req, res) => {
   try {
-    const video = await Video.findById(req.params.id).populate('uploader', 'username email profilePic');
+    const video = await Video.findById(req.params.id)
+      .populate('uploader', 'username email profilePic')
+      .populate('comments.author', 'username profilePic');
     if (!video) return res.status(404).json({ message: 'Video not found' });
     res.json(video);
   } catch (err) {
@@ -159,6 +161,47 @@ router.delete('/:id', protect, async (req, res) => {
     }
     await video.deleteOne();
     res.json({ message: 'Video deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// POST /api/videos/:id/comments
+router.post('/:id/comments', protect, async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || !text.trim()) {
+      return res.status(400).json({ message: 'Comment text is required.' });
+    }
+    const video = await Video.findById(req.params.id);
+    if (!video) return res.status(404).json({ message: 'Video not found.' });
+
+    const newComment = {
+      author: req.user._id,
+      text: text.trim(),
+    };
+
+    video.comments.push(newComment);
+    await video.save();
+
+    // Populate comments.author to send back
+    const populatedVideo = await Video.findById(video._id).populate('comments.author', 'username profilePic');
+
+    // Create Notification
+    const Notification = require('../models/Notification');
+    const uploaderId = video.uploader.toString();
+    const commenterId = req.user._id.toString();
+    if (uploaderId !== commenterId) {
+      await Notification.create({
+        recipient: video.uploader,
+        sender: req.user._id,
+        type: 'comment',
+        message: `commented on your video "${video.title}"`,
+        link: `/video/${video._id}`
+      });
+    }
+
+    res.json({ comments: populatedVideo.comments });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }

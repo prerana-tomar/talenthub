@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API from '../config';
 import './TopPerformers.css';
 
 const TopPerformers = () => {
@@ -11,7 +12,7 @@ const TopPerformers = () => {
 
   const fetchTopPerformers = async () => {
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/auth/top-performers');
+      const res = await fetch(`${API}/api/auth/top-performers`);
       const data = await res.json();
       // Support both array and { users: [] } response shapes
       setPerformers(Array.isArray(data) ? data.slice(0, 5) : (data.users || data.performers || []).slice(0, 5));

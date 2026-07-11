@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API from '../config';
 import './Categories.css';
 
 const CATEGORY_META = {
@@ -26,7 +27,7 @@ const Categories = () => {
 
   const fetchCategoryStats = async () => {
     try {
-      const res = await fetch('https://talenthub-w1cc.onrender.com/api/videos/category-stats');
+      const res = await fetch(`${API}/api/videos/category-stats`);
       const data = await res.json();
       // Expect: { Music: 12, Dance: 8, ... }
       setStats(data || {});
@@ -38,7 +39,7 @@ const Categories = () => {
   const fetchVideosByCategory = async (cat) => {
     setLoading(true);
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos?category=${cat}`);
+      const res = await fetch(`${API}/api/videos?category=${cat}`);
       const data = await res.json();
       setVideos(data.videos || data || []);
     } catch (err) {

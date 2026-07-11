@@ -12,6 +12,9 @@ export default function VideoPlayer() {
   const [likeCount, setLikeCount] = useState(0);
   const [related, setRelated] = useState([]);
   const [toast, setToast] = useState('');
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [postingComment, setPostingComment] = useState(false);
   const videoRef = useRef(null);
 
   const user  = JSON.parse(localStorage.getItem('th_user') || 'null');
@@ -33,6 +36,7 @@ export default function VideoPlayer() {
         const arr = Array.isArray(data.likes) ? data.likes : [];
         setLikeCount(arr.length);
         setLiked(user ? arr.includes(user._id) : false);
+        setComments(Array.isArray(data.comments) ? data.comments : []);
 
         // View increment
         await fetch(`${API}/api/videos/${id}/view`, { method: 'POST' });
@@ -67,6 +71,34 @@ export default function VideoPlayer() {
         showToast(liked ? '💔 Unliked' : '❤️ Liked!');
       }
     } catch {}
+  };
+
+  const handleCommentSubmit = async (e) => {
+    if (e) e.preventDefault();
+    const commentText = newComment.trim();
+    if (!commentText || !token) return;
+    setPostingComment(true);
+    try {
+      const res = await fetch(`${API}/api/videos/${id}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ text: commentText })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setComments(data.comments || []);
+        setNewComment('');
+        showToast('💬 Comment posted!');
+      } else {
+        showToast(`❌ ${data.message}`);
+      }
+    } catch {
+      showToast('❌ Network error');
+    }
+    setPostingComment(false);
   };
 
   const handleShare = () => {
@@ -197,6 +229,78 @@ export default function VideoPlayer() {
               <p>{video.description}</p>
             </div>
           )}
+
+          {/* Comments Section */}
+          <div className="vp-comments-section">
+            <h3 className="vp-comments-title">
+              💬 Comments ({comments.length})
+            </h3>
+
+            {/* Comment Form */}
+            {token ? (
+              <form onSubmit={handleCommentSubmit} className="vp-comment-form">
+                <div className="vp-comment-input-wrap">
+                  <div className="vp-comment-avatar">
+                    {user?.profilePic ? (
+                      <img src={user.profilePic} alt={user.username} className="vp-comment-avatar-img" />
+                    ) : (
+                      user?.username?.[0]?.toUpperCase() || 'U'
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Add a public comment..."
+                    value={newComment}
+                    onChange={e => setNewComment(e.target.value)}
+                    maxLength={300}
+                    className="vp-comment-input"
+                  />
+                  <button
+                    type="submit"
+                    className="vp-comment-submit-btn"
+                    disabled={postingComment || !newComment.trim()}
+                  >
+                    {postingComment ? '...' : 'Post'}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="vp-comment-login-prompt">
+                <Link to="/login" className="vp-comment-login-link">Login</Link> to join the discussion.
+              </div>
+            )}
+
+            {/* Comments List */}
+            <div className="vp-comments-list">
+              {comments.length === 0 ? (
+                <p className="vp-no-comments">No comments yet. Be the first to share your thoughts!</p>
+              ) : (
+                comments.map((comment, index) => {
+                  const authorName = comment.author?.username || 'Unknown';
+                  return (
+                    <div key={comment._id || index} className="vp-comment-item">
+                      <div className="vp-comment-avatar">
+                        {comment.author?.profilePic ? (
+                          <img src={comment.author.profilePic} alt="" className="vp-comment-avatar-img" />
+                        ) : (
+                          authorName[0]?.toUpperCase() || 'U'
+                        )}
+                      </div>
+                      <div className="vp-comment-content">
+                        <div className="vp-comment-header">
+                          <span className="vp-comment-author">{authorName}</span>
+                          <span className="vp-comment-time">
+                            {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'just now'}
+                          </span>
+                        </div>
+                        <p className="vp-comment-text">{comment.text}</p>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
         </div>
 
         {/* RIGHT — Related Videos */}

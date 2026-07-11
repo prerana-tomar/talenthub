@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import API from '../config';
 
 function Register() {
   const [name, setName]         = useState('');
@@ -23,7 +24,7 @@ function Register() {
 
     setLoading(true);
     try {
-      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/auth/register', {
+      const res  = await fetch(`${API}/api/auth/register`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ username: name, email, password }), // ✅ FIXED

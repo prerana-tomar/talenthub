@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 
+const commentSchema = new mongoose.Schema({
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  text:   { type: String, required: true, maxlength: 300 },
+}, { timestamps: true });
+
 const videoSchema = new mongoose.Schema({
   title:    { type: String, required: true },
   category: { type: String, default: 'Other' },
@@ -12,6 +17,8 @@ const videoSchema = new mongoose.Schema({
 
   // Views count — increments each time video is watched
   views: { type: Number, default: 0 },
+
+  comments: [commentSchema],
 
 }, { timestamps: true });
 

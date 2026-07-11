@@ -133,8 +133,23 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
     const userId = (req.user.id || req.user._id).toString();
     const idx    = thought.likes.findIndex(id => id.toString() === userId);
 
-    if (idx === -1) thought.likes.push(userId);
-    else            thought.likes.splice(idx, 1);
+    if (idx === -1) {
+      thought.likes.push(userId);
+      // Trigger notification for thought like
+      const Notification = require('../models/Notification');
+      const authorId = thought.author.toString();
+      if (authorId !== userId) {
+        await Notification.create({
+          recipient: thought.author,
+          sender: req.user.id || req.user._id,
+          type: 'like',
+          message: `liked your thought: "${thought.text.substring(0, 30)}${thought.text.length > 30 ? '...' : ''}"`,
+          link: '/thoughts'
+        });
+      }
+    } else {
+      thought.likes.splice(idx, 1);
+    }
 
     await thought.save();
     res.json({ likes: thought.likes.length, liked: idx === -1 });
@@ -152,12 +167,26 @@ router.post('/:id/comments', authMiddleware, async (req, res) => {
     const thought = await Thought.findById(req.params.id);
     if (!thought) return res.status(404).json({ message: 'Not found' });
 
+    const commenterId = (req.user.id || req.user._id).toString();
     thought.comments.push({
-      author: req.user.id || req.user._id,
+      author: commenterId,
       text:   text.trim(),
     });
     await thought.save();
     await thought.populate('comments.author', 'username profilePic');
+
+    // Trigger notification for thought comment
+    const Notification = require('../models/Notification');
+    const authorId = thought.author.toString();
+    if (authorId !== commenterId) {
+      await Notification.create({
+        recipient: thought.author,
+        sender: req.user.id || req.user._id,
+        type: 'comment',
+        message: `commented on your thought: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"`,
+        link: '/thoughts'
+      });
+    }
 
     res.json({ comments: thought.comments });
   } catch (err) {

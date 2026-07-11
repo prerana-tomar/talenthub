@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API from '../config';
 import './Following.css';
 
-const API = 'https://talenthub-w1cc.onrender.com/api/auth';
+const API_AUTH = `${API}/api/auth`;
 
 export default function Following() {
   const navigate = useNavigate();
@@ -29,9 +30,9 @@ export default function Following() {
     setLoading(true);
     try {
       const [fwRes, frRes, usRes] = await Promise.all([
-        fetch(`${API}/following`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API}/followers`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API}/users`,     { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_AUTH}/following`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_AUTH}/followers`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_AUTH}/users`,     { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       const fw = await fwRes.json();
       const fr = await frRes.json();
@@ -55,7 +56,7 @@ export default function Following() {
   const handleFollow = async (userId, username) => {
     if (!token) { navigate('/login'); return; }
     try {
-      const res  = await fetch(`${API}/follow/${userId}`, {
+      const res  = await fetch(`${API_AUTH}/follow/${userId}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });

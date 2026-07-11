@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API from '../config';
 import './MyUploads.css';
 
 export default function MyUploads() {
@@ -20,7 +21,7 @@ export default function MyUploads() {
   const fetchMyVideos = async () => {
     setLoading(true);
     try {
-      const res  = await fetch('https://talenthub-w1cc.onrender.com/api/videos/my', {
+      const res  = await fetch(`${API}/api/videos/my`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -33,7 +34,7 @@ export default function MyUploads() {
     if (!window.confirm('Permanently delete this video?')) return;
     setDeletingId(id);
     try {
-      const res = await fetch(`https://talenthub-w1cc.onrender.com/api/videos/${id}`, {
+      const res = await fetch(`${API}/api/videos/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

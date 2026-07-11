@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import VideoCard from '../components/VideoCard';
+import API from '../config';
 import './Home.css';
 
 const CATEGORIES = ['All','Singing','Dance','Rap','Comedy','Acting','Instrumental','Poetry'];
@@ -56,8 +57,6 @@ export default function Home() {
 
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('th_user') || 'null');
-
-  const API = 'https://talenthub-w1cc.onrender.com';
 
   useEffect(() => {
     fetch(`${API}/api/auth/count`)
