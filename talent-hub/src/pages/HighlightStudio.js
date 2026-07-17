@@ -4,7 +4,7 @@ import API from '../config';
 import './HighlightStudio.css';
 
 const VIBES = ['Epic', 'High Energy', 'Emotional', 'Comedy'];
-const REEL_COUNTS = [2, 3, 5];
+const REEL_COUNTS = [1, 2, 3, 5];
 const DURATIONS = [15, 30, 60];
 
 const LOADING_STEPS = [
@@ -26,7 +26,7 @@ const HighlightStudio = () => {
 
   // Parameters
   const [vibe, setVibe] = useState('Epic');
-  const [reelCount, setReelCount] = useState(3);
+  const [reelCount, setReelCount] = useState(1);
   const [clipDuration, setClipDuration] = useState(15);
   const [instructions, setInstructions] = useState('');
 
