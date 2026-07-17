@@ -84,6 +84,72 @@ export default function CreativeStudio() {
   const [loadingStep, setLoadingStep] = useState(0);
   const [error, setError] = useState('');
 
+  // AI Content Generation States
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResponse, setAiResponse] = useState('');
+  const [aiError, setAiError] = useState('');
+
+  const handleAiGenerate = async () => {
+    if (!writing.trim()) {
+      setError("Apni writing yahan paste kijiye pehle!");
+      return;
+    }
+
+    const token = localStorage.getItem('th_token');
+    if (!token) {
+      setError("Please login first to use AI Generator!");
+      navigate('/login');
+      return;
+    }
+
+    setAiLoading(true);
+    setAiError("");
+    setAiResponse("");
+    setError("");
+
+    const promptText = `Provide a creative extension/improvement for my writing.
+Type: ${type}
+Language: ${language}
+Mood: ${mood}
+Current Writing:
+"${writing.trim()}"
+
+Instructions/Context:
+"${context.trim() || 'Improve flow and continue'}"
+
+Return ONLY the completed/extended creative writing content. Do not include introductory notes, explanations, or quotes. Keep it natural and engaging.`;
+
+    try {
+      const res = await fetch(`${API}/api/creative/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ prompt: promptText })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'AI generation failed');
+      }
+
+      setAiResponse(data.text);
+      // Scroll to result
+      setTimeout(() => {
+        const resultElement = document.getElementById('cs-ai-result-section');
+        if (resultElement) {
+          resultElement.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } catch (err) {
+      console.error('Gemini generate error:', err);
+      setAiError(err.message || 'Failed to connect to Gemini. Please verify your API Key.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   // Clear localStorage on mount to avoid historical schema issues
   useEffect(() => {
     localStorage.removeItem('creative_studio_history');
@@ -312,9 +378,128 @@ export default function CreativeStudio() {
 
                 {error && <div className="cs-error-msg">⚠️ {error}</div>}
 
-                <button type="submit" className="cs-submit-btn">
-                  ✨ Submit Help Request
-                </button>
+                {aiLoading && (
+                  <div className="cs-ai-loading-container" style={{ marginTop: '20px', padding: '16px', background: 'rgba(124, 58, 237, 0.05)', border: '1px dashed rgba(124, 58, 237, 0.3)', borderRadius: '8px', textAlign: 'center' }}>
+                    <div className="cs-glow-spinner" style={{ width: '30px', height: '30px', margin: '0 auto 10px', border: '3px solid rgba(124, 58, 237, 0.1)', borderTopColor: '#7c3aed', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                    <span style={{ fontSize: '13px', color: '#a78bfa' }}>🪄 Gemini AI is processing your writing...</span>
+                  </div>
+                )}
+
+                {aiError && (
+                  <div className="cs-error-msg" style={{ marginTop: '16px' }}>
+                    ⚠️ AI Error: {aiError}
+                  </div>
+                )}
+
+                {aiResponse && (
+                  <div id="cs-ai-result-section" className="cs-ai-result-card" style={{
+                    marginTop: '24px',
+                    padding: '20px',
+                    background: 'rgba(124, 58, 237, 0.08)',
+                    border: '1px solid rgba(124, 58, 237, 0.3)',
+                    borderRadius: '12px',
+                    position: 'relative'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                        🪄 Gemini AI Suggestion
+                      </span>
+                      <span style={{ fontSize: '18px' }}>✨</span>
+                    </div>
+                    <p style={{
+                      whiteSpace: 'pre-wrap',
+                      fontSize: '15px',
+                      lineHeight: '1.6',
+                      color: '#f3f4f6',
+                      background: 'rgba(0,0,0,0.2)',
+                      padding: '14px',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255,255,255,0.05)',
+                      fontStyle: 'italic'
+                    }}>
+                      {aiResponse}
+                    </p>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWriting(aiResponse);
+                          setAiResponse('');
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: '10px',
+                          background: '#7c3aed',
+                          border: 'none',
+                          borderRadius: '8px',
+                          color: '#fff',
+                          fontWeight: '700',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s'
+                        }}
+                      >
+                        ✓ Apply to Textbox
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(aiResponse);
+                          alert('Copied to clipboard!');
+                        }}
+                        style={{
+                          padding: '10px 16px',
+                          background: 'rgba(255, 255, 255, 0.06)',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          borderRadius: '8px',
+                          color: '#e5e7eb',
+                          fontSize: '13px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        📋 Copy
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAiResponse('')}
+                        style={{
+                          padding: '10px 16px',
+                          background: 'rgba(239, 68, 68, 0.1)',
+                          border: '1px solid rgba(239, 68, 68, 0.2)',
+                          borderRadius: '8px',
+                          color: '#f87171',
+                          fontSize: '13px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ✕ Dismiss
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+                  <button type="submit" className="cs-submit-btn" style={{ flex: 1, marginTop: 0 }}>
+                    ✨ Submit to Owner
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleAiGenerate}
+                    className="cs-submit-btn"
+                    style={{
+                      flex: 1,
+                      marginTop: 0,
+                      background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    disabled={aiLoading}
+                  >
+                    {aiLoading ? '🪄 Generating...' : '🪄 Generate with AI'}
+                  </button>
+                </div>
               </div>
             </form>
           )}

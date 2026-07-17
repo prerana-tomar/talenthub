@@ -528,8 +528,8 @@ body.light-mode .th-sidenav-item.active .th-nav-icon {
   background: #333 !important;
 }
 
-/* ══ MOBILE (≤768px) — SINGLE CLEAN BLOCK ═════════════════ */
-@media (max-width: 768px) {
+/* ══ MOBILE (≤992px) — SINGLE CLEAN BLOCK ═════════════════ */
+@media (max-width: 992px) {
 
   /* Layout */
   .th-app {

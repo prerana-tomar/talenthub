@@ -126,3 +126,44 @@
   cursor: not-allowed;
   transform: none;
 }
+
+/* Thumbnail Upload Styling */
+.th-thumbnail-upload-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.th-thumb-upload-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #9ca3b8;
+  margin-bottom: 10px;
+}
+
+.th-thumb-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.th-thumb-file-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+  width: auto !important;
+}
+
+.th-thumb-selected-name {
+  font-size: 12px;
+  color: #34d399;
+  font-weight: 600;
+}

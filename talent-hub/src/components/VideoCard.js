@@ -220,6 +220,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
               src={videoSrc}
               muted={muted}
               preload="metadata"
+              poster={video.thumbnailUrl || undefined}
               onError={() => setVideoError(true)}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={() => setDuration(videoRef.current?.duration || 0)}

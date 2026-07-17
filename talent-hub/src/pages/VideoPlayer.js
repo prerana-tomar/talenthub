@@ -179,6 +179,7 @@ export default function VideoPlayer() {
               src={video.url}
               controls
               autoPlay
+              poster={video.thumbnailUrl || undefined}
               className="vp-player"
               onError={e => e.target.style.display = 'none'}
             />

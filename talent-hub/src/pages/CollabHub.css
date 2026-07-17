@@ -499,7 +499,7 @@
 /* ════════════════════════════════════════════════════
    RESPONSIVE STYLES (≤768px)
    ════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .collab-hub {
     padding: 20px 16px 80px;
   }

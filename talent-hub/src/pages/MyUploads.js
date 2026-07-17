@@ -145,6 +145,7 @@ export default function MyUploads() {
                 <video
                   src={`${video.videoUrl}`}
                   muted
+                  poster={video.thumbnailUrl || undefined}
                   onMouseEnter={e => e.target.play()}
                   onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }}
                 />

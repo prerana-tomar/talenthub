@@ -19,7 +19,8 @@ const videoSchema = new mongoose.Schema({
   views: { type: Number, default: 0 },
 
   comments: [commentSchema],
-
+  thumbnailUrl: { type: String, default: null },
+  thumbnailFilename: { type: String, default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Video', videoSchema);

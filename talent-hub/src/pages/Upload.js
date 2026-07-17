@@ -8,6 +8,7 @@ function Upload() {
   const [title, setTitle]       = useState('');
   const [category, setCategory] = useState('Music');
   const [file, setFile]         = useState(null);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
   const [progress, setProgress] = useState(0);
@@ -33,13 +34,45 @@ function Upload() {
       return;
     }
 
+    setLoading(true);
+    setProgress(0);
+
+    let thumbnailUrl = '';
+    let thumbnailFilename = '';
+
+    if (thumbnailFile) {
+      try {
+        const thumbFormData = new FormData();
+        thumbFormData.append('thumbnail', thumbnailFile);
+        const thumbRes = await fetch(`${API}/api/videos/upload-thumbnail`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: thumbFormData
+        });
+        const thumbData = await thumbRes.json();
+        if (thumbRes.ok) {
+          thumbnailUrl = thumbData.url;
+          thumbnailFilename = thumbData.filename;
+        } else {
+          setError(thumbData.message || 'Failed to upload thumbnail image.');
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        setError('Thumbnail upload failed.');
+        setLoading(false);
+        return;
+      }
+    }
+
     const formData = new FormData();
     formData.append('video', file);
     formData.append('title', title);
     formData.append('category', category);
-
-    setLoading(true);
-    setProgress(0);
+    if (thumbnailUrl) {
+      formData.append('thumbnailUrl', thumbnailUrl);
+      formData.append('thumbnailFilename', thumbnailFilename);
+    }
 
     try {
       const result = await new Promise((resolve, reject) => {
@@ -122,6 +155,24 @@ function Upload() {
           style={{ display: 'none' }}
           onChange={e => setFile(e.target.files[0])}
         />
+      </div>
+
+      {/* Thumbnail Upload */}
+      <div className="th-thumbnail-upload-box">
+        <label className="th-thumb-upload-label">🖼️ Custom Thumbnail (Optional)</label>
+        <div className="th-thumb-upload-row">
+          <input
+            type="file"
+            accept="image/*"
+            id="thumbnail-input"
+            onChange={e => setThumbnailFile(e.target.files[0])}
+            disabled={loading}
+            className="th-thumb-file-input"
+          />
+          {thumbnailFile && (
+            <span className="th-thumb-selected-name">✓ Selected</span>
+          )}
+        </div>
       </div>
 
       {loading && (

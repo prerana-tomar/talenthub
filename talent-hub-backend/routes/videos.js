@@ -24,6 +24,17 @@ const storage = new CloudinaryStorage({
 });
 const upload = multer({ storage });
 
+// ── Multer + Cloudinary Thumbnail Storage ──
+const thumbnailStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder:        'talenthub_thumbnails',
+    resource_type: 'image',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+  },
+});
+const uploadThumbnail = multer({ storage: thumbnailStorage });
+
 // GET /api/videos/search
 router.get('/search', async (req, res) => {
   try {
@@ -83,11 +94,24 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// POST /api/videos/upload-thumbnail
+router.post('/upload-thumbnail', protect, uploadThumbnail.single('thumbnail'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No image file uploaded.' });
+    res.json({
+      url: req.file.path,
+      filename: req.file.filename || req.file.public_id,
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
 // POST /api/videos — Upload to Cloudinary
 router.post('/', protect, upload.single('video'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'No video file uploaded.' });
-    const { title, category } = req.body;
+    const { title, category, thumbnailUrl, thumbnailFilename } = req.body;
     if (!title) return res.status(400).json({ message: 'Title is required.' });
 
     const video = await Video.create({
@@ -96,6 +120,8 @@ router.post('/', protect, upload.single('video'), async (req, res) => {
       filename: req.file.filename || req.file.public_id,
       url:      req.file.path,
       uploader: req.user._id,
+      thumbnailUrl: thumbnailUrl || null,
+      thumbnailFilename: thumbnailFilename || null,
     });
 
     res.status(201).json(video);
