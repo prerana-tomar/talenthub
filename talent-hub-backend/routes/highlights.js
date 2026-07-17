@@ -86,7 +86,8 @@ The JSON must be an array of objects matching this exact structure:
     "endTime": 30,
     "score": 95,
     "reason": "Why this segment was selected (Hinglish/English mix, encouraging tone)",
-    "gradient": "linear-gradient(135deg, #1a0537, #3b0764)"
+    "gradient": "linear-gradient(135deg, #1a0537, #3b0764)",
+    "ffmpegOptions": ["-vf", "eq=contrast=1.12:saturation=1.25:brightness=0.01"] // Optional: FFmpeg options array to apply visual/audio filters matching the user instructions (e.g. color adjustments, slow-mo). If no changes requested, use empty array.
   }
 ]`;
 
@@ -126,6 +127,7 @@ The JSON must be an array of objects matching this exact structure:
                 score: Number(r.score) || 90,
                 reason: r.reason || `Automatically selected ${vibe} highlight moment.`,
                 gradient: r.gradient || 'linear-gradient(135deg, #1d0f3c, #4c1d95)',
+                ffmpegOptions: Array.isArray(r.ffmpegOptions) ? r.ffmpegOptions : []
               };
             });
           } else {
@@ -174,6 +176,7 @@ The JSON must be an array of objects matching this exact structure:
             'linear-gradient(135deg, #064e3b, #065f46)',
             'linear-gradient(135deg, #451a03, #78350f)'
           ][i % 5],
+          ffmpegOptions: []
         };
       });
     }
@@ -181,6 +184,23 @@ The JSON must be an array of objects matching this exact structure:
     // Slice the video for each reel
     const parentDir = path.join(__dirname, '../uploads/highlights');
     if (!fs.existsSync(parentDir)) fs.mkdirSync(parentDir, { recursive: true });
+
+    // Procedural parsing for FFmpeg styling options in instructions
+    let proceduralFilters = [];
+    const instLower = instructions.toLowerCase();
+    if (instLower.includes('aesthetic') || instLower.includes('filter') || instLower.includes('vibe') || instLower.includes('color')) {
+      proceduralFilters = ['-vf', 'eq=contrast=1.15:saturation=1.3:brightness=0.02'];
+    } else if (instLower.includes('black and white') || instLower.includes('gray') || instLower.includes('grey') || instLower.includes('bw')) {
+      proceduralFilters = ['-vf', 'hue=s=0'];
+    } else if (instLower.includes('slow') || instLower.includes('slomo')) {
+      proceduralFilters = ['-vf', 'setpts=2.0*PTS', '-af', 'atempo=0.5'];
+    } else if (instLower.includes('fast') || instLower.includes('speed')) {
+      proceduralFilters = ['-vf', 'setpts=0.5*PTS', '-af', 'atempo=2.0'];
+    } else if (instLower.includes('mute') || instLower.includes('silent') || instLower.includes('no sound')) {
+      proceduralFilters = ['-an'];
+    } else if (instLower.includes('loud') || instLower.includes('volume') || instLower.includes('voice')) {
+      proceduralFilters = ['-vf', 'eq=contrast=1.12:saturation=1.25:brightness=0.01'];
+    }
 
     for (let i = 0; i < reels.length; i++) {
       const r = reels[i];
@@ -191,14 +211,24 @@ The JSON must be an array of objects matching this exact structure:
       const outputFilename = `reel-${Date.now()}-${r.id}.mp4`;
       const outputPath = path.join(parentDir, outputFilename);
 
+      // Determine filters to apply
+      const filters = (r.ffmpegOptions && r.ffmpegOptions.length > 0) ? r.ffmpegOptions : proceduralFilters;
+
       try {
         await new Promise((resolve, reject) => {
-          ffmpeg(videoPath)
+          let command = ffmpeg(videoPath)
             .setStartTime(start)
-            .setDuration(clipDuration)
-            .output(outputPath)
+            .setDuration(clipDuration);
+
+          if (filters.length > 0) {
+            command.outputOptions(filters);
+          } else {
+            command.videoCodec('copy').audioCodec('copy');
+          }
+
+          command.output(outputPath)
             .on('end', () => {
-              console.log(`Successfully sliced reel clip: ${outputFilename}`);
+              console.log(`Successfully sliced reel clip: ${outputFilename} with filters: ${filters}`);
               resolve();
             })
             .on('error', (err) => {
@@ -212,7 +242,6 @@ The JSON must be an array of objects matching this exact structure:
         r.url = `/uploads/highlights/${outputFilename}`;
       } catch (sliceError) {
         console.error(`Slicing failed for reel ${r.id}, falling back to original:`, sliceError);
-        // Fallback: use original video url if slicing fails
         r.url = `/uploads/highlights/${req.file.filename}`;
       }
     }
