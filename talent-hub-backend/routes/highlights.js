@@ -4,6 +4,10 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const {protect} = require('../middleware/authMiddleware');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('ffmpeg-static');
+
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 
 
@@ -172,6 +176,45 @@ The JSON must be an array of objects matching this exact structure:
           ][i % 5],
         };
       });
+    }
+
+    // Slice the video for each reel
+    const parentDir = path.join(__dirname, '../uploads/highlights');
+    if (!fs.existsSync(parentDir)) fs.mkdirSync(parentDir, { recursive: true });
+
+    for (let i = 0; i < reels.length; i++) {
+      const r = reels[i];
+      const start = r.startTime;
+      const clipDuration = r.endTime - r.startTime;
+
+      // Unique filename for each reel clip
+      const outputFilename = `reel-${Date.now()}-${r.id}.mp4`;
+      const outputPath = path.join(parentDir, outputFilename);
+
+      try {
+        await new Promise((resolve, reject) => {
+          ffmpeg(videoPath)
+            .setStartTime(start)
+            .setDuration(clipDuration)
+            .output(outputPath)
+            .on('end', () => {
+              console.log(`Successfully sliced reel clip: ${outputFilename}`);
+              resolve();
+            })
+            .on('error', (err) => {
+              console.error(`FFmpeg error slicing reel ${r.id}:`, err);
+              reject(err);
+            })
+            .run();
+        });
+
+        // Set the relative URL of the sliced video file
+        r.url = `/uploads/highlights/${outputFilename}`;
+      } catch (sliceError) {
+        console.error(`Slicing failed for reel ${r.id}, falling back to original:`, sliceError);
+        // Fallback: use original video url if slicing fails
+        r.url = `/uploads/highlights/${req.file.filename}`;
+      }
     }
 
     res.json({

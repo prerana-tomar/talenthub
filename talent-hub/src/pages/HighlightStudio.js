@@ -21,6 +21,7 @@ const HighlightStudio = () => {
   // Video source states
   const [videoFile, setVideoFile] = useState(null);
   const [videoUrl, setVideoUrl] = useState('');
+  const [masterVideoUrl, setMasterVideoUrl] = useState('');
   const [duration, setDuration] = useState(0);
 
   // Parameters
@@ -77,6 +78,7 @@ const HighlightStudio = () => {
     setVideoFile(file);
     const localUrl = URL.createObjectURL(file);
     setVideoUrl(localUrl);
+    setMasterVideoUrl(localUrl);
 
     // Extract duration
     const tempVideo = document.createElement('video');
@@ -138,7 +140,9 @@ const HighlightStudio = () => {
       setReels(data.reels);
       // Update video player to point to the server file path for confirmation
       if (data.videoPath) {
-        setVideoUrl(`${API}/uploads/highlights/${data.videoPath}`);
+        const fullServerUrl = `${API}/uploads/highlights/${data.videoPath}`;
+        setVideoUrl(fullServerUrl);
+        setMasterVideoUrl(fullServerUrl);
       }
     } catch (err) {
       console.error('Highlight error:', err);
@@ -148,35 +152,43 @@ const HighlightStudio = () => {
     }
   };
 
-  // Timeline Tracker for Playback
-  const handleTimeUpdate = () => {
-    if (!videoRef.current || !activeReel || !isPlayingHighlight) return;
-    const time = videoRef.current.currentTime;
-    if (time >= activeReel.endTime) {
-      videoRef.current.pause();
-      setIsPlayingHighlight(false);
+  // Auto-play/load when source videoUrl changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.load();
+      if (isPlayingHighlight) {
+        // Delay play briefly to allow media element source buffer binding
+        const playPromise = videoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(e => console.log('Autoplay deferred:', e));
+        }
+      }
     }
-  };
+  }, [videoUrl, isPlayingHighlight]);
 
   const playReel = (reel) => {
     if (!videoRef.current) return;
     setActiveReel(reel);
-    videoRef.current.currentTime = reel.startTime;
-    videoRef.current.play();
     setIsPlayingHighlight(true);
+    // Swap the source url to point to the new physically cut sliced video file!
+    setVideoUrl(`${API}${reel.url}`);
   };
 
   const stopClip = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-    }
     setIsPlayingHighlight(false);
     setActiveReel(null);
+    // Restore the full length master video source url
+    setVideoUrl(masterVideoUrl);
   };
 
   const handleDownload = () => {
-    if (!videoUrl) return;
-    window.open(videoUrl, '_blank');
+    if (activeReel) {
+      // Download the active sliced highlight video file!
+      window.open(`${API}${activeReel.url}`, '_blank');
+    } else if (videoUrl) {
+      // Download the full master video!
+      window.open(videoUrl, '_blank');
+    }
   };
 
   const handleShare = () => {
@@ -346,7 +358,6 @@ const HighlightStudio = () => {
                   src={videoUrl}
                   className="hs-video"
                   controls
-                  onTimeUpdate={handleTimeUpdate}
                   style={{ maxHeight: '420px', width: '100%', objectFit: 'contain' }}
                 />
                 {isPlayingHighlight && activeReel && (
