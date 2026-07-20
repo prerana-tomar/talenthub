@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import API from '../config';
 import './Thoughts.css';
 
@@ -11,6 +12,16 @@ export default function Thoughts() {
   const [text, setText]             = useState('');
   const [posting, setPosting]       = useState(false);
   const [showForm, setShowForm]     = useState(false);
+
+  // Share states
+  const [sharingThought, setSharingThought]   = useState(null);
+  const [shareSearchQuery, setShareSearchQuery] = useState('');
+  const [shareSearchUsers, setShareSearchUsers] = useState([]);
+  const [shareConversations, setShareConversations] = useState([]);
+  const [shareLoadingConvs, setShareLoadingConvs] = useState(false);
+  const [shareSearching, setShareSearching] = useState(false);
+  const [sharedStatus, setSharedStatus]       = useState({});
+  const [toastMessage, setToastMessage]       = useState('');
 
   // Image upload states
   const [selectedImages, setSelectedImages]   = useState([]);
@@ -195,6 +206,121 @@ export default function Thoughts() {
     setPostingComment(false);
   };
 
+  // ── SHARE HANDLERS ──
+  const triggerToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage('');
+    }, 3000);
+  };
+
+  const openShareModal = async (thought) => {
+    setSharingThought(thought);
+    setShareSearchQuery('');
+    setShareSearchUsers([]);
+    setSharedStatus({});
+    if (!token) return;
+    setShareLoadingConvs(true);
+    try {
+      const res = await fetch(`${API}/api/messages/conversations`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setShareConversations(Array.isArray(data) ? data : []);
+    } catch {
+      setShareConversations([]);
+    } finally {
+      setShareLoadingConvs(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!shareSearchQuery.trim()) {
+      setShareSearchUsers([]);
+      return;
+    }
+    const delayDebounce = setTimeout(async () => {
+      setShareSearching(true);
+      try {
+        const res = await fetch(`${API}/api/messages/users/search?q=${shareSearchQuery}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        setShareSearchUsers(Array.isArray(data) ? data : []);
+      } catch {
+        setShareSearchUsers([]);
+      } finally {
+        setShareSearching(false);
+      }
+    }, 350);
+
+    return () => clearTimeout(delayDebounce);
+  }, [shareSearchQuery, token]);
+
+  const handleInternalShare = async (receiverId) => {
+    if (!token) return alert('Login karo pehle!');
+    setSharedStatus(prev => ({ ...prev, [receiverId]: 'Sending...' }));
+    
+    const thoughtUrl = `${window.location.origin}/thoughts?id=${sharingThought._id}`;
+    const shareText = `Look at this thought on Talent Hub by @${sharingThought.author?.username || 'user'}:\n"${sharingThought.text.substring(0, 100)}${sharingThought.text.length > 100 ? '...' : ''}"\n\nLink: ${thoughtUrl}`;
+
+    try {
+      const res = await fetch(`${API}/api/messages/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ receiverId, text: shareText })
+      });
+      if (res.ok) {
+        setSharedStatus(prev => ({ ...prev, [receiverId]: 'Sent!' }));
+      } else {
+        setSharedStatus(prev => ({ ...prev, [receiverId]: 'Failed' }));
+      }
+    } catch {
+      setSharedStatus(prev => ({ ...prev, [receiverId]: 'Failed' }));
+    }
+  };
+
+  const handleCopyLink = (thoughtId) => {
+    const thoughtUrl = `${window.location.origin}/thoughts?id=${thoughtId}`;
+    navigator.clipboard.writeText(thoughtUrl)
+      .then(() => triggerToast('Link copied to clipboard! 📋'))
+      .catch(() => triggerToast('Failed to copy link ✕'));
+  };
+
+  const handleWhatsAppShare = (thought) => {
+    const thoughtUrl = `${window.location.origin}/thoughts?id=${thought._id}`;
+    const text = `Check out this shayari on Talent Hub by @${thought.author?.username || 'user'}:\n\n"${thought.text}"\n\nRead more here: ${thoughtUrl}`;
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  // Handle auto-scroll and highlight for ?id=THOUGHT_ID
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const thoughtId = params.get('id');
+    if (thoughtId && !loading && thoughts.length > 0) {
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`thought-${thoughtId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('highlighted-thought');
+          
+          // Clear query param so reload doesn't trigger scroll again
+          window.history.replaceState(null, '', window.location.pathname);
+
+          setTimeout(() => {
+            element.classList.remove('highlighted-thought');
+          }, 3000);
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [location.search, loading, thoughts]);
+
   // ── HELPERS ──
   const isOwner = (thought) =>
     user && (
@@ -340,7 +466,7 @@ export default function Thoughts() {
       ) : (
         <div className="thoughts-list">
           {thoughts.map(thought => (
-            <div key={thought._id} className="thought-card">
+            <div key={thought._id} id={`thought-${thought._id}`} className="thought-card">
 
               {/* Card Header */}
               <div className="thought-card-header">
@@ -424,6 +550,12 @@ export default function Thoughts() {
                 >
                   💬 {thought.comments?.length || 0} Comments
                 </button>
+                <button
+                  className="thought-share-btn"
+                  onClick={() => openShareModal(thought)}
+                >
+                  🔗 Share
+                </button>
               </div>
 
               {/* ── COMMENTS SECTION ── */}
@@ -485,6 +617,96 @@ export default function Thoughts() {
           ))}
         </div>
       )}
+      {/* ── TOAST NOTIFICATION ── */}
+      {toastMessage && (
+        <div className="toast-notification">
+          {toastMessage}
+        </div>
+      )}
+
+      {/* ── SHARE MODAL ── */}
+      {sharingThought && (
+        <div className="share-modal-overlay" onClick={() => setSharingThought(null)}>
+          <div className="share-modal" onClick={e => e.stopPropagation()}>
+            <div className="share-modal-header">
+              <h3>Share Shayari</h3>
+              <button className="share-modal-close" onClick={() => setSharingThought(null)}>✕</button>
+            </div>
+            
+            <div className="share-modal-body">
+              {/* Thought Preview */}
+              <div className="share-preview-card">
+                <span className="share-preview-author">@{sharingThought.author?.username || 'user'}</span>
+                <p className="share-preview-text">{sharingThought.text.substring(0, 80)}{sharingThought.text.length > 80 ? '...' : ''}</p>
+              </div>
+
+              {/* Quick Share Options */}
+              <div className="quick-share-buttons">
+                <button className="quick-share-opt copy" onClick={() => handleCopyLink(sharingThought._id)}>
+                  <span>🔗</span> Copy Link
+                </button>
+                <button className="quick-share-opt whatsapp" onClick={() => handleWhatsAppShare(sharingThought)}>
+                  <span>💬</span> WhatsApp
+                </button>
+              </div>
+
+              {/* Internal Chat List */}
+              <div className="share-chat-section">
+                <h4>Send to Friends</h4>
+                {!token ? (
+                  <p className="share-login-prompt">Please login to send directly to friends.</p>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      className="share-search-input"
+                      placeholder="Search users..."
+                      value={shareSearchQuery}
+                      onChange={e => setShareSearchQuery(e.target.value)}
+                    />
+
+                    <div className="share-users-list">
+                      {shareSearching || shareLoadingConvs ? (
+                        <div className="share-loading">Loading users...</div>
+                      ) : (shareSearchQuery.trim() ? shareSearchUsers : shareConversations).length === 0 ? (
+                        <div className="share-empty">No users found</div>
+                      ) : (
+                        (shareSearchQuery.trim() ? shareSearchUsers : shareConversations).map(usr => {
+                          const userId = usr.userId || usr._id;
+                          const username = usr.username;
+                          const profilePic = usr.profilePic;
+                          const status = sharedStatus[userId];
+
+                          return (
+                            <div key={userId} className="share-user-item">
+                              <div className="share-user-avatar">
+                                {profilePic ? (
+                                  <img src={profilePic} alt={username} className="share-user-avatar-img" />
+                                ) : (
+                                  username?.[0]?.toUpperCase() || 'U'
+                                )}
+                              </div>
+                              <span className="share-user-name">{username}</span>
+                              <button
+                                className={`share-send-btn ${status === 'Sent!' ? 'sent' : status === 'Sending...' ? 'sending' : ''}`}
+                                onClick={() => handleInternalShare(userId)}
+                                disabled={status === 'Sent!' || status === 'Sending...'}
+                              >
+                                {status || 'Send'}
+                              </button>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
