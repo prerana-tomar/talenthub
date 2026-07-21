@@ -32,9 +32,6 @@ export default function VideoPlayer() {
         const data = await res.json();
         if (!data || !data._id) { setLoading(false); return; }
         setVideo(data);
-        const arr = Array.isArray(data.likes) ? data.likes : [];
-        setLikeCount(arr.length);
-        setLiked(user ? arr.includes(user._id) : false);
         setComments(Array.isArray(data.comments) ? data.comments : []);
 
         // View increment

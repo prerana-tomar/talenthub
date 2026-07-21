@@ -25,12 +25,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
   const token = localStorage.getItem('th_token');
   const me    = JSON.parse(localStorage.getItem('th_user') || 'null');
 
-  useEffect(() => {
-    if (!video) return;
-    const arr = Array.isArray(video.likes) ? video.likes : [];
-    setLikeCount(arr.length);
-    setLiked(currentUserId ? arr.includes(currentUserId) : false);
-  }, [video, currentUserId]);
+
 
   useEffect(() => {
     if (!video || !token || !currentUserId) return;
