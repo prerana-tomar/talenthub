@@ -375,6 +375,12 @@ export default function Home() {
                 {link === 'Competitions' && <span className="th-new-badge">NEW</span>}
               </Link>
             ))}
+            <button
+              className="th-topnav-link th-guide-nav-btn"
+              onClick={() => document.getElementById('guided-tour-section')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Guide 💡
+            </button>
           </nav>
 
           <div className="th-topbar-right">
@@ -485,21 +491,43 @@ export default function Home() {
         </section>
 
         {/* ══ GUIDED TOUR SECTION ══ */}
-        <section className="th-guided-tour-section">
+        <section id="guided-tour-section" className="th-guided-tour-section">
           <div className="th-tour-container">
             <div className="th-tour-text-col">
-              <div className="th-tour-tag">💡 NEW VISITOR GUIDE</div>
-              <h2 className="th-tour-title">Talent Hub Kaise Use Karein?</h2>
+              <div className="th-tour-tag">💡 CREATIVE HUB GUIDE</div>
+              <h2 className="th-tour-title">How to Use Talent Hub? 🚀</h2>
               <p className="th-tour-desc">
-                Agar aap is website par pehli baar aaye hain, toh is short interactive tour/guide ko zaroor dekhein. Isme bataya gaya hai ki:
+                Welcome to India's Talent Stage! Whether you are here to showcase your skills or discover amazing creators, this quick guide will help you get started:
               </p>
-              <ul className="th-tour-features-list">
-                <li><span>📤</span> <strong>Video Kaise Upload Karein</strong> - Apne video talent ko pure India ke samne layein.</li>
-                <li><span>💭</span> <strong>Shayari Aur Thoughts Kaise Share Karein</strong> - Likhe huye posts ko copy link ya direct friends ko chat me bhejein.</li>
-                <li><span>🤝</span> <strong>Active Features (Collab, Competitions)</strong> - Dusre creators ke sath collab karein aur contests me participate karein.</li>
-              </ul>
+              
+              <div className="th-tour-creative-grid">
+                <div className="th-tour-creative-card">
+                  <div className="th-tour-card-icon">📤</div>
+                  <div className="th-tour-card-details">
+                    <h4>Upload Your Videos 🎬</h4>
+                    <p>Publish your performances directly to reach a nationwide audience.</p>
+                  </div>
+                </div>
+
+                <div className="th-tour-creative-card">
+                  <div className="th-tour-card-icon">💭</div>
+                  <div className="th-tour-card-details">
+                    <h4>Share Shayari & Thoughts 💬</h4>
+                    <p>Post written poetry or quotes, and use the new direct share button!</p>
+                  </div>
+                </div>
+
+                <div className="th-tour-creative-card">
+                  <div className="th-tour-card-icon">🤝</div>
+                  <div className="th-tour-card-details">
+                    <h4>Collab & Competitions 🏆</h4>
+                    <p>Partner with other creators and win active contests for recognition.</p>
+                  </div>
+                </div>
+              </div>
+
               <button className="th-tour-start-btn" onClick={() => { setShowTour(true); setTourStep(0); setTourProgress(0); setTourPlaying(true); }}>
-                ✨ Play Tour Guide Video
+                🎬 Play Interactive Video Guide
               </button>
             </div>
 
