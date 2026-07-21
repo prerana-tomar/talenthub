@@ -1494,4 +1494,171 @@ body.light-mode .th-tour-card-details h4 {
 }
 body.light-mode .th-tour-card-details p {
   color: #64748b;
+}
+
+/* ══ ULTRA-PREMIUM GUIDE CARD REDESIGN ════════════════════════════ */
+.th-guided-tour-section {
+  padding: 32px 0;
+}
+
+.th-premium-guide-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(22, 16, 42, 0.95), rgba(12, 10, 24, 0.98));
+  border: 1px solid transparent;
+  background-image: linear-gradient(145deg, rgba(22, 16, 42, 0.95), rgba(12, 10, 24, 0.98)),
+                    linear-gradient(90deg, #7c3aed, #ec4899, #7c3aed);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  border-radius: 28px;
+  padding: 42px 32px;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(124, 58, 237, 0.25);
+  animation: floatGuideCard 6s ease-in-out infinite alternate;
+  transition: all 0.35s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+@keyframes floatGuideCard {
+  0% { transform: translateY(0); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(124, 58, 237, 0.25); }
+  100% { transform: translateY(-8px); box-shadow: 0 28px 60px rgba(0, 0, 0, 0.7), 0 0 50px rgba(236, 72, 153, 0.35); }
+}
+
+.th-premium-guide-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 30px 70px rgba(124, 58, 237, 0.4);
+}
+
+body.light-mode .th-premium-guide-card {
+  background: #ffffff;
+  box-shadow: 0 20px 50px rgba(124, 58, 237, 0.12);
+}
+
+.th-guide-glow-ambient {
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.25) 0%, rgba(236, 72, 153, 0.1) 60%, transparent 80%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.th-guide-particles {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+}
+
+.th-guide-particles .sparkle {
+  position: absolute;
+  font-size: 1.2rem;
+  opacity: 0.7;
+  animation: sparkleFloat 4s ease-in-out infinite alternate;
+}
+
+.sparkle.s1 { top: 15%; left: 10%; animation-delay: 0s; }
+.sparkle.s2 { top: 20%; right: 12%; animation-delay: 1s; }
+.sparkle.s3 { bottom: 20%; left: 15%; animation-delay: 2s; }
+.sparkle.s4 { bottom: 15%; right: 10%; animation-delay: 3s; }
+
+@keyframes sparkleFloat {
+  0% { transform: translateY(0) scale(1); opacity: 0.4; }
+  100% { transform: translateY(-12px) scale(1.3); opacity: 0.9; }
+}
+
+.th-guide-card-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.th-guide-badge {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #a78bfa;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  padding: 6px 16px;
+  border-radius: 50px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+body.light-mode .th-guide-badge {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.08);
+}
+
+.th-guide-title {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #fff;
+  margin: 4px 0;
+  letter-spacing: -0.5px;
+}
+
+body.light-mode .th-guide-title {
+  color: #0f172a;
+}
+
+.th-guide-subtitle {
+  font-size: 0.95rem;
+  color: #cbd5e1;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+body.light-mode .th-guide-subtitle {
+  color: #475569;
+}
+
+.th-guide-cta-btn {
+  position: relative;
+  background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+  color: #fff;
+  border: none;
+  padding: 16px 36px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(124, 58, 237, 0.45);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.3px;
+}
+
+.th-guide-cta-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 12px 40px rgba(124, 58, 237, 0.6);
+}
+
+.th-guide-btn-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-25deg);
+  animation: shineBtn 3s infinite ease-in-out;
+}
+
+@keyframes shineBtn {
+  0% { left: -100%; }
+  30%, 100% { left: 200%; }
+}
+
+.th-guide-btn-text {
+  position: relative;
+  z-index: 1;
 }

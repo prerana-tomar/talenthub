@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import VideoCard from '../components/VideoCard';
+import OnboardingModal from '../components/OnboardingModal';
 import API from '../config';
 import './Home.css';
 
@@ -69,6 +71,7 @@ const TOUR_SLIDES = [
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [activePage, setActivePage]         = useState('Home');
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [videos, setVideos]                 = useState([]);
   const [loading, setLoading]               = useState(true);
   const [darkMode, setDarkMode]             = useState(true);
@@ -492,65 +495,39 @@ export default function Home() {
 
         {/* ══ GUIDED TOUR SECTION ══ */}
         <section id="guided-tour-section" className="th-guided-tour-section">
-          <div className="th-tour-container">
-            <div className="th-tour-text-col">
-              <div className="th-tour-tag">💡 CREATIVE HUB GUIDE</div>
-              <h2 className="th-tour-title">How to Use Talent Hub? 🚀</h2>
-              <p className="th-tour-desc">
-                Welcome to India's Talent Stage! Whether you are here to showcase your skills or discover amazing creators, this quick guide will help you get started:
-              </p>
+          <motion.div
+            className="th-premium-guide-card"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
+          >
+            {/* Ambient Purple Glow */}
+            <div className="th-guide-glow-ambient" />
+            
+            {/* Background Floating Sparkles */}
+            <div className="th-guide-particles">
+              <span className="sparkle s1">✨</span>
+              <span className="sparkle s2">🌟</span>
+              <span className="sparkle s3">💫</span>
+              <span className="sparkle s4">✨</span>
+            </div>
+
+            {/* Main Card Content */}
+            <div className="th-guide-card-content">
+              <div className="th-guide-badge">✨ New User Guide</div>
+              <h2 className="th-guide-title">Getting Started in 60 Seconds</h2>
+              <p className="th-guide-subtitle">Everything you need to start your TalentHub journey.</p>
               
-              <div className="th-tour-creative-grid">
-                <div className="th-tour-creative-card">
-                  <div className="th-tour-card-icon">📤</div>
-                  <div className="th-tour-card-details">
-                    <h4>Upload Your Videos 🎬</h4>
-                    <p>Publish your performances directly to reach a nationwide audience.</p>
-                  </div>
-                </div>
-
-                <div className="th-tour-creative-card">
-                  <div className="th-tour-card-icon">💭</div>
-                  <div className="th-tour-card-details">
-                    <h4>Share Shayari & Thoughts 💬</h4>
-                    <p>Post written poetry or quotes, and use the new direct share button!</p>
-                  </div>
-                </div>
-
-                <div className="th-tour-creative-card">
-                  <div className="th-tour-card-icon">🤝</div>
-                  <div className="th-tour-card-details">
-                    <h4>Collab & Competitions 🏆</h4>
-                    <p>Partner with other creators and win active contests for recognition.</p>
-                  </div>
-                </div>
-              </div>
-
-              <button className="th-tour-start-btn" onClick={() => { setShowTour(true); setTourStep(0); setTourProgress(0); setTourPlaying(true); }}>
-                🎬 Play Interactive Video Guide
+              <button
+                className="th-guide-cta-btn"
+                onClick={() => setShowOnboardingModal(true)}
+              >
+                <span className="th-guide-btn-shine" />
+                <span className="th-guide-btn-text">▶ Start Interactive Guide</span>
               </button>
             </div>
-
-            <div className="th-tour-video-col" onClick={() => { setShowTour(true); setTourStep(0); setTourProgress(0); setTourPlaying(true); }}>
-              <div className="th-tour-video-card">
-                <img
-                  src="/talenthub_tour_thumbnail.png"
-                  alt="Talent Hub Tutorial Guided Tour Thumbnail"
-                  className="th-tour-thumbnail-img"
-                />
-                <div className="th-tour-card-overlay">
-                  <div className="th-tour-play-button">
-                    <span className="th-tour-play-icon">▶</span>
-                  </div>
-                  <span className="th-tour-duration-badge">Interactive Video Guide (2 min)</span>
-                  <div className="th-tour-card-info">
-                    <h3>Interactive Guided Tour 🌟</h3>
-                    <p>Click here to play the video guide and learn how to show your talent!</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          </motion.div>
         </section>
 
         {/* ══ EXPLORE BY CATEGORY ══ */}
@@ -926,6 +903,11 @@ export default function Home() {
         </div>
       )}
 
+      {/* ══ ONBOARDING INTERACTIVE TOUR MODAL ══ */}
+      <OnboardingModal
+        isOpen={showOnboardingModal}
+        onClose={() => setShowOnboardingModal(false)}
+      />
     </div>
   );
 }
