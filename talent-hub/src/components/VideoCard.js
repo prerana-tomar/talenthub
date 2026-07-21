@@ -293,17 +293,19 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
             type="video"
             initialAppreciations={video.appreciations || video.likes}
           />
-          <button
-            className={`action-btn save-btn${saved ? ' saved' : ''}`}
-            onClick={handleSave}
-            disabled={savingVid}
-          >
-            {saved ? '🔖' : '➕'} <span>{saved ? 'Saved' : 'Save'}</span>
-          </button>
-          {!isMyVideo && (
-            <button className="action-btn msg-btn" onClick={handleMessage}>💬</button>
-          )}
-          <button className="action-btn share-btn" onClick={handleShare}>↗</button>
+          <div className="vc-secondary-actions">
+            <button
+              className={`action-btn save-btn${saved ? ' saved' : ''}`}
+              onClick={handleSave}
+              disabled={savingVid}
+            >
+              {saved ? '🔖' : '➕'} <span>{saved ? 'Saved' : 'Save'}</span>
+            </button>
+            {!isMyVideo && (
+              <button className="action-btn msg-btn" onClick={handleMessage}>💬</button>
+            )}
+            <button className="action-btn share-btn" onClick={handleShare}>↗</button>
+          </div>
         </div>
       </div>
 

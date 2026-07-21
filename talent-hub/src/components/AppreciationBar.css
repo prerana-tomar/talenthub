@@ -1,18 +1,19 @@
 .appreciation-bar-wrap {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
   font-family: 'Poppins', sans-serif;
 }
 
 .appreciation-reactions-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(124, 58, 237, 0.15);
-  padding: 4px 6px;
+  padding: 3px 5px;
   border-radius: 50px;
   backdrop-filter: blur(10px);
 }
@@ -25,11 +26,11 @@ body.light-mode .appreciation-reactions-row {
 .appreciation-btn {
   background: transparent;
   border: 1px solid transparent;
-  padding: 4px 10px;
+  padding: 3px 7px;
   border-radius: 50px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   outline: none;
