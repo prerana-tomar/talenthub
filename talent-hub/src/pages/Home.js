@@ -37,36 +37,7 @@ const BOTTOM_NAV = [
   { icon:'⚙️', label:'Settings',      path:'/settings' },
 ];
 
-const TOUR_SLIDES = [
-  {
-    title: "1. Welcome to Talent Hub 🌟",
-    subtitle: "India's premier stage for creators, performers, and artists.",
-    description: "Whether you are a singer, dancer, comedian, rapper, or poet, Talent Hub is your digital stage. Explore performances, support other artists, climb the Leaderboard, and win popular Competitions!",
-    tips: "💡 Browse trending videos in different categories from the Home page.",
-    icon: "🎭"
-  },
-  {
-    title: "2. Upload Your Videos 📤",
-    subtitle: "Showcase your performance in simple steps.",
-    description: "Click on 'Upload' in the navigation bar. Put a catchy Title, select a Category (e.g. Singing, Rap, Art), choose your video file (up to 50MB), and click 'Publish'. Your video will immediately show up on the Explore page!",
-    tips: "💡 Vertical videos are great for mobile viewers. Keep it under 50MB.",
-    icon: "📹"
-  },
-  {
-    title: "3. Post & Share Thoughts 💭",
-    subtitle: "Express yourself and share with others.",
-    description: "Write shayari, poetry, quotes, or post image slides in the Thoughts section. You can now click the 'Share' button to copy a direct link, share on WhatsApp, or send directly to your Talent Hub contacts in chat!",
-    tips: "💡 Use the Share button to get more votes and likes on your posts.",
-    icon: "💬"
-  },
-  {
-    title: "4. Collab & Compete 🏆",
-    subtitle: "Work with creators and win big prizes.",
-    description: "Go to Collab Hub to post collaboration requests or chat with potential partners. Participate in active Competitions by uploading your category video to win titles and shine on India's Stage!",
-    tips: "💡 Top Performers get featured on the main dashboard for maximum reach.",
-    icon: "🤝"
-  }
-];
+
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState('All');
@@ -89,11 +60,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const searchRef = useRef(null);
 
-  // Guided Tour states
-  const [showTour, setShowTour]         = useState(false);
-  const [tourPlaying, setTourPlaying]   = useState(true);
-  const [tourStep, setTourStep]         = useState(0);
-  const [tourProgress, setTourProgress] = useState(0);
+
 
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('th_user') || 'null');
@@ -141,27 +108,7 @@ export default function Home() {
       .catch(() => {});
   }, []);
 
-  // Guided Tour autoplay timeline simulation
-  useEffect(() => {
-    let timer;
-    if (showTour && tourPlaying) {
-      timer = setInterval(() => {
-        setTourProgress(prev => {
-          if (prev >= 100) {
-            setTourStep(s => (s + 1) % 4);
-            return 0;
-          }
-          return prev + 1;
-        });
-      }, 70); // 70ms step updates progress bar smoothly
-    }
-    return () => clearInterval(timer);
-  }, [showTour, tourPlaying]);
 
-  const selectTourStep = (stepIdx) => {
-    setTourStep(stepIdx);
-    setTourProgress(0);
-  };
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -513,12 +460,17 @@ export default function Home() {
               <span className="sparkle s4">✨</span>
             </div>
 
-            {/* Main Card Content */}
-            <div className="th-guide-card-content">
-              <div className="th-guide-badge">✨ New User Guide</div>
+            <div className="th-guide-left-col">
+              <div className="th-guide-breadcrumb">
+                <span className="th-guide-bc-home">🏠</span>
+                <span className="th-guide-bc-arrow">❯</span>
+                <span className="th-guide-badge-text">✨ NEW USER GUIDE</span>
+              </div>
               <h2 className="th-guide-title">Getting Started in 60 Seconds</h2>
               <p className="th-guide-subtitle">Everything you need to start your TalentHub journey.</p>
-              
+            </div>
+
+            <div className="th-guide-right-col">
               <button
                 className="th-guide-cta-btn"
                 onClick={() => setShowOnboardingModal(true)}
@@ -526,6 +478,16 @@ export default function Home() {
                 <span className="th-guide-btn-shine" />
                 <span className="th-guide-btn-text">▶ Start Interactive Guide</span>
               </button>
+
+              <div className="th-guide-quick-links">
+                <span onClick={() => navigate('/upload')}>Learn Upload</span>
+                <span className="divider">·</span>
+                <span onClick={() => navigate('/explore')}>Explore</span>
+                <span className="divider">·</span>
+                <span onClick={() => navigate('/collab')}>Collaborate</span>
+                <span className="divider">·</span>
+                <span onClick={() => navigate('/competitions')}>Competitions</span>
+              </div>
             </div>
           </motion.div>
         </section>
@@ -797,112 +759,6 @@ export default function Home() {
           </Link>
         </div>
       </nav>
-
-      {/* ── INTERACTIVE TOUR VIDEO MODAL ── */}
-      {showTour && (
-        <div className="th-tour-modal-overlay" onClick={() => setShowTour(false)}>
-          <div className="th-tour-modal" onClick={e => e.stopPropagation()}>
-            {/* Modal Header */}
-            <div className="th-tour-modal-header">
-              <div className="th-tour-modal-title-row">
-                <span className="th-tour-modal-badge">🎥 TALENT HUB TUTORIAL</span>
-                <h3>Interactive Guided Tour</h3>
-              </div>
-              <button className="th-tour-modal-close" onClick={() => setShowTour(false)}>✕</button>
-            </div>
-
-            {/* Video Player Simulator */}
-            <div className="th-tour-player-container">
-              {/* Media Display Panel */}
-              <div className="th-tour-player-screen">
-                <div className="th-tour-player-glow" />
-                <div className="th-tour-player-content">
-                  <div className="th-tour-slide-icon">{TOUR_SLIDES[tourStep].icon}</div>
-                  <div className="th-tour-slide-text">
-                    <h4 className="th-tour-slide-title">{TOUR_SLIDES[tourStep].title}</h4>
-                    <p className="th-tour-slide-subtitle">{TOUR_SLIDES[tourStep].subtitle}</p>
-                    <p className="th-tour-slide-desc">{TOUR_SLIDES[tourStep].description}</p>
-                    <div className="th-tour-slide-tips">{TOUR_SLIDES[tourStep].tips}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Video Timeline & Controls */}
-              <div className="th-tour-player-controls">
-                {/* Timeline bar */}
-                <div className="th-tour-timeline-wrap">
-                  <div className="th-tour-timeline-bg">
-                    <div className="th-tour-timeline-fill" style={{ width: `${tourProgress}%` }} />
-                  </div>
-                </div>
-
-                {/* Buttons Row */}
-                <div className="th-tour-controls-row">
-                  <div className="th-tour-controls-left">
-                    <button
-                      className="th-tour-play-pause-btn"
-                      onClick={() => setTourPlaying(!tourPlaying)}
-                      title={tourPlaying ? "Pause Video" : "Play Video"}
-                    >
-                      {tourPlaying ? '⏸ Pause' : '▶ Play'}
-                    </button>
-
-                    <div className="th-tour-nav-btns">
-                      <button
-                        className="th-tour-nav-btn"
-                        onClick={() => selectTourStep((tourStep - 1 + 4) % 4)}
-                        title="Previous Step"
-                      >
-                        ⏮ Prev
-                      </button>
-                      <button
-                        className="th-tour-nav-btn"
-                        onClick={() => selectTourStep((tourStep + 1) % 4)}
-                        title="Next Step"
-                      >
-                        Next ⏭
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="th-tour-controls-right">
-                    <span className="th-tour-time-display">
-                      00:0{tourStep} / 00:04
-                    </span>
-                  </div>
-                </div>
-
-                {/* Step Pills Selector */}
-                <div className="th-tour-step-pills">
-                  {TOUR_SLIDES.map((slide, idx) => (
-                    <button
-                      key={idx}
-                      className={`th-tour-step-pill ${tourStep === idx ? 'active' : ''}`}
-                      onClick={() => selectTourStep(idx)}
-                    >
-                      Step {idx + 1}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-            
-            {/* Modal Footer quick links */}
-            <div className="th-tour-modal-footer">
-              <button className="th-tour-action-btn upload" onClick={() => { setShowTour(false); navigate('/upload'); }}>
-                📤 Upload
-              </button>
-              <button className="th-tour-action-btn explore" onClick={() => { setShowTour(false); navigate('/explore'); }}>
-                🔍 Browse
-              </button>
-              <button className="th-tour-action-btn thoughts" onClick={() => { setShowTour(false); navigate('/thoughts'); }}>
-                💭 Thoughts
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* ══ ONBOARDING INTERACTIVE TOUR MODAL ══ */}
       <OnboardingModal
         isOpen={showOnboardingModal}

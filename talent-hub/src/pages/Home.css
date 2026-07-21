@@ -1509,9 +1509,12 @@ body.light-mode .th-tour-card-details p {
                     linear-gradient(90deg, #7c3aed, #ec4899, #7c3aed);
   background-origin: border-box;
   background-clip: padding-box, border-box;
-  border-radius: 28px;
-  padding: 42px 32px;
-  text-align: center;
+  border-radius: 20px;
+  padding: 24px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
   overflow: hidden;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(124, 58, 237, 0.25);
   animation: floatGuideCard 6s ease-in-out infinite alternate;
@@ -1521,12 +1524,12 @@ body.light-mode .th-tour-card-details p {
 
 @keyframes floatGuideCard {
   0% { transform: translateY(0); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(124, 58, 237, 0.25); }
-  100% { transform: translateY(-8px); box-shadow: 0 28px 60px rgba(0, 0, 0, 0.7), 0 0 50px rgba(236, 72, 153, 0.35); }
+  100% { transform: translateY(-6px); box-shadow: 0 26px 55px rgba(0, 0, 0, 0.65), 0 0 45px rgba(236, 72, 153, 0.3); }
 }
 
 .th-premium-guide-card:hover {
-  transform: translateY(-6px) scale(1.01);
-  box-shadow: 0 30px 70px rgba(124, 58, 237, 0.4);
+  transform: translateY(-4px) scale(1.005);
+  box-shadow: 0 28px 65px rgba(124, 58, 237, 0.35);
 }
 
 body.light-mode .th-premium-guide-card {
@@ -1541,7 +1544,7 @@ body.light-mode .th-premium-guide-card {
   transform: translateX(-50%);
   width: 400px;
   height: 300px;
-  background: radial-gradient(circle, rgba(167, 139, 250, 0.25) 0%, rgba(236, 72, 153, 0.1) 60%, transparent 80%);
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.2) 0%, rgba(236, 72, 153, 0.08) 60%, transparent 80%);
   pointer-events: none;
   filter: blur(40px);
 }
@@ -1554,55 +1557,67 @@ body.light-mode .th-premium-guide-card {
 
 .th-guide-particles .sparkle {
   position: absolute;
-  font-size: 1.2rem;
-  opacity: 0.7;
+  font-size: 1.1rem;
+  opacity: 0.6;
   animation: sparkleFloat 4s ease-in-out infinite alternate;
 }
 
-.sparkle.s1 { top: 15%; left: 10%; animation-delay: 0s; }
-.sparkle.s2 { top: 20%; right: 12%; animation-delay: 1s; }
-.sparkle.s3 { bottom: 20%; left: 15%; animation-delay: 2s; }
-.sparkle.s4 { bottom: 15%; right: 10%; animation-delay: 3s; }
+.sparkle.s1 { top: 15%; left: 8%; animation-delay: 0s; }
+.sparkle.s2 { top: 20%; right: 10%; animation-delay: 1s; }
+.sparkle.s3 { bottom: 20%; left: 12%; animation-delay: 2s; }
+.sparkle.s4 { bottom: 15%; right: 8%; animation-delay: 3s; }
 
 @keyframes sparkleFloat {
-  0% { transform: translateY(0) scale(1); opacity: 0.4; }
-  100% { transform: translateY(-12px) scale(1.3); opacity: 0.9; }
+  0% { transform: translateY(0) scale(1); opacity: 0.3; }
+  100% { transform: translateY(-10px) scale(1.25); opacity: 0.8; }
 }
 
-.th-guide-card-content {
+.th-guide-left-col {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  max-width: 600px;
-  margin: 0 auto;
+  gap: 4px;
+  flex: 1;
 }
 
-.th-guide-badge {
-  font-size: 0.78rem;
+.th-guide-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.th-guide-bc-home {
+  font-size: 1rem;
+}
+
+.th-guide-bc-arrow {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+body.light-mode .th-guide-bc-arrow {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.th-guide-badge-text {
+  font-size: 0.72rem;
   font-weight: 800;
   color: #a78bfa;
-  background: rgba(124, 58, 237, 0.15);
-  border: 1px solid rgba(124, 58, 237, 0.35);
-  padding: 6px 16px;
-  border-radius: 50px;
   letter-spacing: 0.8px;
-  text-transform: uppercase;
 }
 
-body.light-mode .th-guide-badge {
+body.light-mode .th-guide-badge-text {
   color: #7c3aed;
-  background: rgba(124, 58, 237, 0.08);
 }
 
 .th-guide-title {
-  font-size: 1.85rem;
-  font-weight: 900;
+  font-size: 1.55rem;
+  font-weight: 800;
   color: #fff;
-  margin: 4px 0;
-  letter-spacing: -0.5px;
+  margin: 0;
+  letter-spacing: -0.4px;
 }
 
 body.light-mode .th-guide-title {
@@ -1610,14 +1625,24 @@ body.light-mode .th-guide-title {
 }
 
 .th-guide-subtitle {
-  font-size: 0.95rem;
-  color: #cbd5e1;
-  margin: 0 0 16px;
-  line-height: 1.5;
+  font-size: 0.88rem;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.4;
 }
 
 body.light-mode .th-guide-subtitle {
-  color: #475569;
+  color: #64748b;
+}
+
+.th-guide-right-col {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .th-guide-cta-btn {
@@ -1625,21 +1650,20 @@ body.light-mode .th-guide-subtitle {
   background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
   color: #fff;
   border: none;
-  padding: 16px 36px;
+  padding: 12px 28px;
   border-radius: 50px;
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 8px 30px rgba(124, 58, 237, 0.45);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   font-family: 'Poppins', sans-serif;
-  letter-spacing: 0.3px;
 }
 
 .th-guide-cta-btn:hover {
-  transform: scale(1.05) translateY(-2px);
-  box-shadow: 0 12px 40px rgba(124, 58, 237, 0.6);
+  transform: scale(1.04) translateY(-1px);
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.55);
 }
 
 .th-guide-btn-shine {
@@ -1661,4 +1685,38 @@ body.light-mode .th-guide-subtitle {
 .th-guide-btn-text {
   position: relative;
   z-index: 1;
-}
+}
+
+.th-guide-quick-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+body.light-mode .th-guide-quick-links {
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.th-guide-quick-links span:not(.divider) {
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.th-guide-quick-links span:not(.divider):hover {
+  color: #a78bfa;
+}
+
+body.light-mode .th-guide-quick-links span:not(.divider):hover {
+  color: #7c3aed;
+}
+
+.th-guide-quick-links .divider {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+body.light-mode .th-guide-quick-links .divider {
+  color: rgba(0, 0, 0, 0.15);
+}
+
