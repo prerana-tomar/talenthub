@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import API from '../config';
+import AppreciationBar from '../components/AppreciationBar';
 import './VideoPlayer.css';
 
 export default function VideoPlayer() {
@@ -8,8 +9,6 @@ export default function VideoPlayer() {
   const navigate = useNavigate();
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
   const [related, setRelated] = useState([]);
   const [toast, setToast] = useState('');
   const [comments, setComments] = useState([]);
@@ -58,20 +57,7 @@ export default function VideoPlayer() {
     fetchVideo();
   }, [id]);
 
-  const handleLike = async () => {
-    if (!token) { navigate('/login'); return; }
-    try {
-      const res = await fetch(`${API}/api/videos/${id}/like`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        setLiked(prev => !prev);
-        setLikeCount(prev => liked ? prev - 1 : prev + 1);
-        showToast(liked ? '💔 Unliked' : '❤️ Liked!');
-      }
-    } catch {}
-  };
+
 
   const handleCommentSubmit = async (e) => {
     if (e) e.preventDefault();
@@ -205,9 +191,11 @@ export default function VideoPlayer() {
             </div>
 
             <div className="vp-actions">
-              <button className={`vp-action-btn ${liked ? 'liked' : ''}`} onClick={handleLike}>
-                {liked ? '❤️' : '🤍'} {fmt(likeCount)} Likes
-              </button>
+              <AppreciationBar
+                targetId={video._id}
+                type="video"
+                initialAppreciations={video.appreciations || video.likes}
+              />
               <button className="vp-action-btn" onClick={handleShare}>
                 ↗ Share
               </button>

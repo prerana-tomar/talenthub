@@ -1,0 +1,113 @@
+.appreciation-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: 'Poppins', sans-serif;
+}
+
+.appreciation-reactions-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  padding: 4px 6px;
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+}
+
+body.light-mode .appreciation-reactions-row {
+  background: #f1f5f9;
+  border-color: rgba(124, 58, 237, 0.1);
+}
+
+.appreciation-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 4px 10px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  outline: none;
+  position: relative;
+  font-family: 'Poppins', sans-serif;
+}
+
+.appreciation-btn:hover {
+  background: rgba(124, 58, 237, 0.1);
+  transform: translateY(-2px) scale(1.08);
+}
+
+body.light-mode .appreciation-btn:hover {
+  background: rgba(124, 58, 237, 0.08);
+}
+
+.appreciation-btn.active {
+  background: rgba(124, 58, 237, 0.2);
+  border-color: var(--accent-color, #7c3aed);
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.35);
+  transform: scale(1.05);
+}
+
+body.light-mode .appreciation-btn.active {
+  background: rgba(124, 58, 237, 0.12);
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.2);
+}
+
+.appreciation-emoji {
+  font-size: 1.05rem;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+.appreciation-btn:hover .appreciation-emoji {
+  transform: scale(1.2);
+}
+
+.appreciation-btn.pop .appreciation-emoji {
+  animation: reactionPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes reactionPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5) rotate(-10deg); }
+  100% { transform: scale(1); }
+}
+
+.appreciation-count {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.appreciation-btn.active .appreciation-count {
+  color: #fff;
+}
+
+body.light-mode .appreciation-count {
+  color: #475569;
+}
+
+body.light-mode .appreciation-btn.active .appreciation-count {
+  color: #7c3aed;
+}
+
+.total-apprec-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #a78bfa;
+  background: rgba(124, 58, 237, 0.1);
+  padding: 3px 10px;
+  border-radius: 50px;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+body.light-mode .total-apprec-badge {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.06);
+  border-color: rgba(124, 58, 237, 0.15);
+}

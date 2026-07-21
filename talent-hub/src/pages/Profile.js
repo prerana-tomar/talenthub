@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import API from '../config';
+import AchievementCard from '../components/AchievementCard';
+import AchievementPopup from '../components/AchievementPopup';
 import './Profile.css';
 
 const BADGES = [
@@ -35,6 +37,8 @@ export default function Profile() {
   const [isFollowing,  setIsFollowing]  = useState(false);
   const [followLoad,   setFollowLoad]   = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
+  const [achievements, setAchievements] = useState([]);
+  const [unlockedPopup, setUnlockedPopup] = useState([]);
 
   const [editUsername, setEditUsername] = useState('');
   const [editBio,      setEditBio]      = useState('');
@@ -133,7 +137,20 @@ export default function Profile() {
     if (isOwnProfile && !token) { navigate('/login'); return; }
     fetchProfile();
     fetchVideos();
+    fetchAchievements();
   }, [id]);
+
+  const fetchAchievements = async () => {
+    try {
+      const targetId = !id || id === user?._id || id === user?.id ? (user?._id || user?.id) : id;
+      if (!targetId) return;
+      const res = await fetch(`${API}/api/achievements/user/${targetId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setAchievements(Array.isArray(data) ? data : []);
+      }
+    } catch {}
+  };
 
   const fetchProfile = async () => {
     setLoading(true);
@@ -419,7 +436,7 @@ export default function Profile() {
         <div className="profile-tabs">
           {[
             { id: 'videos', icon: '📹', label: isOwnProfile ? 'My Videos' : 'Videos' },
-            { id: 'badges', icon: '🏅', label: 'Badges' },
+            { id: 'achievements', icon: '🏆', label: 'Achievements & Badges' },
           ].map(tab => (
             <button key={tab.id}
               className={`profile-tab${activeTab === tab.id ? ' active' : ''}`}
@@ -476,38 +493,25 @@ export default function Profile() {
             )
           )}
 
-          {activeTab === 'badges' && (
-            <div className="profile-badges-section">
-              {earnedBadges.length > 0 && (
-                <div>
-                  <h3 className="profile-badges-title">🏅 Earned Badges ({earnedBadges.length})</h3>
-                  <div className="profile-badges-grid">
-                    {earnedBadges.map((b, i) => (
-                      <div key={i} className="profile-badge-card earned" style={{ borderColor: b.color }}>
-                        <div className="profile-badge-icon" style={{ background: b.color+'22', color: b.color }}>{b.icon}</div>
-                        <div className="profile-badge-label">{b.label}</div>
-                        <div className="profile-badge-desc">{b.desc}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div>
-                <h3 className="profile-badges-title">🔒 Locked Badges</h3>
-                <div className="profile-badges-grid">
-                  {BADGES.filter(b => !earnedBadges.find(e => e.label === b.label)).map((b, i) => (
-                    <div key={i} className="profile-badge-card locked">
-                      <div className="profile-badge-icon locked-icon">{b.icon}</div>
-                      <div className="profile-badge-label" style={{ color: '#475569' }}>{b.label}</div>
-                      <div className="profile-badge-desc">{b.desc}</div>
-                    </div>
-                  ))}
-                </div>
+          {(activeTab === 'achievements' || activeTab === 'badges') && (
+            <div className="profile-achievements-section">
+              <div className="profile-achievements-header">
+                <h3>🏆 Performer Achievements ({achievements.filter(a => a.unlocked).length}/{achievements.length || 10})</h3>
+                <p>Unlock badges automatically as you grow your views, appreciations, and audience on TalentHub!</p>
+              </div>
+
+              <div className="profile-achievements-grid">
+                {achievements.map(ach => (
+                  <AchievementCard key={ach.key} achievement={ach} />
+                ))}
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* ── UNLOCK POPUP ANIMATION ── */}
+      <AchievementPopup achievements={unlockedPopup} onClose={() => setUnlockedPopup([])} />
 
       {/* ── PROFILE PIC LIGHTBOX MODAL ── */}
       {viewPic && profile?.profilePic && (

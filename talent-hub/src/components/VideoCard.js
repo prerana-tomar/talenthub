@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../config';
+import AppreciationBar from './AppreciationBar';
 import './VideoCard.css';
 
 const VideoCard = ({ video, currentUserId, onDelete }) => {
@@ -9,8 +10,6 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
   // ✅ Hooks pehle — guard baad mein
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting,   setDeleting]   = useState(false);
-  const [liked,      setLiked]      = useState(false);
-  const [likeCount,  setLikeCount]  = useState(0);
   const [videoError, setVideoError] = useState(false);
   const [saved,      setSaved]      = useState(false);
   const [savingVid,  setSavingVid]  = useState(false);
@@ -99,20 +98,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
     setFollowLoad(false);
   };
 
-  const handleLike = async (e) => {
-    e.stopPropagation();
-    if (!token) { navigate('/login'); return; }
-    try {
-      const res = await fetch(`${API}/api/videos/${video._id}/like`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        setLiked(prev => !prev);
-        setLikeCount(prev => liked ? prev - 1 : prev + 1);
-      }
-    } catch {}
-  };
+
 
   const handleSave = async (e) => {
     e.stopPropagation();
@@ -307,9 +293,11 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
         </div>
 
         <div className="video-actions">
-          <button className={`action-btn like-btn${liked ? ' liked' : ''}`} onClick={handleLike}>
-            {liked ? '❤️' : '🤍'} <span>{likeCount}</span>
-          </button>
+          <AppreciationBar
+            targetId={video._id}
+            type="video"
+            initialAppreciations={video.appreciations || video.likes}
+          />
           <button
             className={`action-btn save-btn${saved ? ' saved' : ''}`}
             onClick={handleSave}

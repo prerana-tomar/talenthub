@@ -585,3 +585,37 @@
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+/* ── ACHIEVEMENTS & BADGES SECTION ── */
+.profile-achievements-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-achievements-header h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+body.light-mode .profile-achievements-header h3 {
+  color: #0f172a;
+}
+
+.profile-achievements-header p {
+  font-size: 0.84rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+body.light-mode .profile-achievements-header p {
+  color: #64748b;
+}
+
+.profile-achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}

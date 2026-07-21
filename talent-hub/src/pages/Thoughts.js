@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import API from '../config';
+import AppreciationBar from '../components/AppreciationBar';
 import './Thoughts.css';
 
 const CATEGORIES = ['All', 'General', 'Music', 'Dance', 'Poetry', 'Comedy', 'Art'];
@@ -131,22 +132,7 @@ export default function Thoughts() {
     setPosting(false);
   };
 
-  // ── LIKE ──
-  const handleLike = async (id) => {
-    if (!token) return alert('Login karo pehle!');
-    try {
-      const res  = await fetch(`${API}/api/thoughts/${id}/like`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setThoughts(prev => prev.map(t =>
-          t._id === id ? { ...t, likes: Array(data.likes).fill(0), _liked: data.liked } : t
-        ));
-      }
-    } catch {}
-  };
+
 
   // ── DELETE ──
   const handleDelete = async (id) => {
@@ -538,12 +524,11 @@ export default function Thoughts() {
 
               {/* Actions */}
               <div className="thought-actions">
-                <button
-                  className={`thought-like-btn ${thought._liked ? 'liked' : ''}`}
-                  onClick={() => handleLike(thought._id)}
-                >
-                  {thought._liked ? '❤️' : '🤍'} {thought.likes?.length || 0} Likes
-                </button>
+                <AppreciationBar
+                  targetId={thought._id}
+                  type="thought"
+                  initialAppreciations={thought.appreciations || thought.likes}
+                />
                 <button
                   className="thought-comment-toggle-btn"
                   onClick={() => toggleComments(thought._id)}
