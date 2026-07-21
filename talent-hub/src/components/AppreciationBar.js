@@ -15,6 +15,7 @@ export default function AppreciationBar({
   initialAppreciations = {},
   initialUserReaction = null,
   onUnlockAchievement,
+  isCompact = false,
 }) {
   const token = localStorage.getItem('th_token') || localStorage.getItem('token');
   const user  = JSON.parse(localStorage.getItem('th_user') || 'null');
@@ -119,7 +120,7 @@ export default function AppreciationBar({
   const totalAppreciations = Object.values(counts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="appreciation-bar-wrap">
+    <div className={`appreciation-bar-wrap ${isCompact ? 'compact' : ''}`}>
       <div className="appreciation-reactions-row">
         {REACTION_CONFIG.map(rc => {
           const isSelected = activeReaction === rc.type;
@@ -135,12 +136,12 @@ export default function AppreciationBar({
               title={`${rc.label} (${count})`}
             >
               <span className="appreciation-emoji">{rc.emoji}</span>
-              <span className="appreciation-count">{count > 0 ? count : ''}</span>
+              <span className="appreciation-count">{count > 0 ? count : '0'}</span>
             </button>
           );
         })}
       </div>
-      {totalAppreciations > 0 && (
+      {!isCompact && totalAppreciations > 0 && (
         <span className="total-apprec-badge">
           {totalAppreciations} {totalAppreciations === 1 ? 'Appreciation' : 'Appreciations'}
         </span>

@@ -1,18 +1,20 @@
 /* ══ VIDEO CARD ════════════════════════════════════════════ */
 .video-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(26, 20, 50, 0.45), rgba(12, 10, 24, 0.7));
+  border: 1px solid rgba(167, 139, 250, 0.15);
+  border-radius: 18px;
   overflow: hidden;
   position: relative;
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   font-family: 'Poppins', sans-serif;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
 }
 
 .video-card:hover {
-  border-color: rgba(124,58,237,0.35);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+  border-color: rgba(167, 139, 250, 0.45);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(124, 58, 237, 0.25);
 }
 
 /* Toast */
@@ -39,13 +41,16 @@
 /* Category badge */
 .video-category-badge {
   position: absolute;
-  top: 10px; left: 10px;
-  background: #7c3aed;
+  top: 12px; left: 12px;
+  background: rgba(124, 58, 237, 0.35);
+  border: 1px solid rgba(167, 139, 250, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 50px;
   z-index: 5;
   letter-spacing: 0.3px;
 }
@@ -53,11 +58,13 @@
 /* Delete button */
 .delete-btn {
   position: absolute;
-  top: 10px; right: 10px;
-  background: rgba(239,68,68,0.85);
-  border: none;
+  top: 12px; right: 12px;
+  background: rgba(239, 68, 68, 0.45);
+  border: 1px solid rgba(239, 68, 68, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   color: #fff;
-  width: 28px; height: 28px;
+  width: 30px; height: 30px;
   border-radius: 50%;
   font-size: 13px;
   cursor: pointer;
@@ -182,23 +189,29 @@
 
 /* ── CARD BODY ─────────────────────────────────────────── */
 .video-card-body {
-  padding: 11px 12px 12px;
+  padding: 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .video-title {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: #fff;
-  margin: 0 0 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin: 0;
   cursor: pointer;
   transition: color 0.15s;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
 }
 .video-title:hover { color: #a78bfa; }
 
-.video-meta { margin-bottom: 10px; }
+.video-meta { margin-bottom: 0; }
 
 .uploader-row {
   display: flex;
@@ -219,7 +232,7 @@
 .uploader-name {
   font-size: 12px;
   font-weight: 500;
-  color: rgba(255,255,255,0.6);
+  color: #94a3b8;
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -228,7 +241,7 @@
 
 .video-date {
   font-size: 11px;
-  color: #555;
+  color: #64748b;
   white-space: nowrap;
   flex-shrink: 0;
 }

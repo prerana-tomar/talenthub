@@ -112,3 +112,37 @@ body.light-mode .total-apprec-badge {
   background: rgba(124, 58, 237, 0.06);
   border-color: rgba(124, 58, 237, 0.15);
 }
+
+/* ── COMPACT CARD MODE STYLE ── */
+.appreciation-bar-wrap.compact {
+  width: auto;
+  justify-content: flex-start;
+  gap: 0;
+}
+
+.appreciation-bar-wrap.compact .appreciation-reactions-row {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 2px 4px;
+  gap: 2px;
+}
+
+.appreciation-bar-wrap.compact .appreciation-btn {
+  padding: 3px 6px;
+  gap: 3px;
+}
+
+.appreciation-bar-wrap.compact .appreciation-emoji {
+  font-size: 0.95rem;
+}
+
+.appreciation-bar-wrap.compact .appreciation-count {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.appreciation-bar-wrap.compact .appreciation-btn.active .appreciation-count {
+  color: #fff;
+  font-weight: 800;
+}
+

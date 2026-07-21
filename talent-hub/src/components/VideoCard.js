@@ -182,18 +182,18 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
     <div className="video-card">
       {toast && <div className="vc-toast">{toast}</div>}
 
-      {video.category && (
-        <span className="video-category-badge">{video.category}</span>
-      )}
-
-      {isOwner && (
-        <button
-          className="delete-btn"
-          onClick={e => { e.stopPropagation(); setShowDeleteConfirm(true); }}
-        >🗑</button>
-      )}
-
       <div className="video-thumbnail" onClick={() => navigate(`/video/${video._id}`)}>
+        {video.category && (
+          <span className="video-category-badge">{video.category}</span>
+        )}
+
+        {isOwner && (
+          <button
+            className="delete-btn"
+            onClick={e => { e.stopPropagation(); setShowDeleteConfirm(true); }}
+          >🗑</button>
+        )}
+
         {videoSrc && !videoError ? (
           <>
             <video
@@ -292,6 +292,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
             targetId={video._id}
             type="video"
             initialAppreciations={video.appreciations || video.likes}
+            isCompact={true}
           />
           <div className="vc-secondary-actions">
             <button
