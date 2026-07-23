@@ -1719,4 +1719,61 @@ body.light-mode .th-guide-quick-links span:not(.divider):hover {
 body.light-mode .th-guide-quick-links .divider {
   color: rgba(0, 0, 0, 0.15);
 }
+
+/* ── RESPONSIVE PREMIUM GUIDE CARD ── */
+@media (max-width: 768px) {
+  .th-premium-guide-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 28px 24px;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .th-guide-left-col {
+    align-items: center;
+    text-align: center;
+  }
+
+  .th-guide-breadcrumb {
+    justify-content: center;
+  }
+
+  .th-guide-title {
+    font-size: 1.35rem;
+    line-height: 1.3;
+  }
+
+  .th-guide-subtitle {
+    font-size: 0.82rem;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .th-guide-right-col {
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+  }
+
+  .th-guide-cta-btn {
+    width: 100%;
+    max-width: 280px;
+    padding: 12px 20px;
+    font-size: 0.88rem;
+  }
+
+  .th-guide-quick-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 12px;
+    max-width: 280px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+  
+  .th-guide-quick-links .divider {
+    display: none; /* Hide divider dots on mobile and let them wrap naturally */
+  }
+}
 

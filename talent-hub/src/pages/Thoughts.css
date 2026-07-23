@@ -460,9 +460,19 @@
 .thought-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
   padding-top: 14px;
   border-top: 1px solid #1e1e3a;
+}
+
+.thought-actions .appreciation-bar-wrap {
+  width: auto;
+}
+
+.thought-secondary-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .thought-like-btn {
@@ -483,22 +493,7 @@
 .thought-like-btn:hover { color: #f43f5e; background: #f43f5e11; border-color: #f43f5e22; }
 .thought-like-btn.liked { color: #f43f5e; background: #f43f5e11; border-color: #f43f5e33; }
 
-.thought-comment-toggle-btn {
-  background: none;
-  border: 1px solid transparent;
-  color: #475569;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 50px;
-  font-family: 'Poppins', sans-serif;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.thought-comment-toggle-btn:hover { color: #60a5fa; background: #60a5fa11; border-color: #60a5fa22; }
+/* Unified button styles for comment and share are placed at the bottom */
 
 /* ── COMMENTS SECTION ── */
 .comments-section {
@@ -726,6 +721,28 @@
   .thoughts-header { flex-direction: column; align-items: flex-start; }
   .thought-form { flex-direction: column; }
   .form-category-row { flex-direction: column; align-items: flex-start; }
+  
+  .thought-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .thought-actions .appreciation-bar-wrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .thought-secondary-actions {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+  .thought-comment-toggle-btn,
+  .thought-share-btn {
+    flex: 1;
+    justify-content: center;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+  }
 }
 
 .thought-avatar-img,
@@ -737,28 +754,54 @@
   display: block;
 }
 
-/* ── THOUGHT SHARE BUTTON ── */
+/* ── THOUGHT ACTION BUTTONS (COMMENT & SHARE) ── */
+.thought-comment-toggle-btn,
 .thought-share-btn {
-  background: none;
-  border: none;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   color: #94a3b8;
-  font-size: 0.88rem;
-  font-weight: 500;
   cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Poppins', sans-serif;
-  transition: color 0.2s, transform 0.2s;
-  padding: 8px 12px;
-  border-radius: 8px;
 }
+
+.thought-comment-toggle-btn:hover {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.08);
+  border-color: rgba(96, 165, 250, 0.2);
+}
+
 .thought-share-btn:hover {
   color: #c084fc;
   background: rgba(192, 132, 252, 0.08);
+  border-color: rgba(192, 132, 252, 0.2);
 }
-body.light-mode .thought-share-btn { color: #64748b; }
-body.light-mode .thought-share-btn:hover { color: #7c3aed; background: rgba(124, 58, 237, 0.05); }
+
+body.light-mode .thought-comment-toggle-btn,
+body.light-mode .thought-share-btn {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  color: #64748b;
+}
+
+body.light-mode .thought-comment-toggle-btn:hover {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.05);
+  border-color: rgba(37, 99, 235, 0.15);
+}
+
+body.light-mode .thought-share-btn:hover {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.05);
+  border-color: rgba(124, 58, 237, 0.15);
+}
 
 /* ── SHARE MODAL OVERLAY ── */
 .share-modal-overlay {

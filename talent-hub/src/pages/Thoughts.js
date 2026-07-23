@@ -529,18 +529,20 @@ export default function Thoughts() {
                   type="thought"
                   initialAppreciations={thought.appreciations || thought.likes}
                 />
-                <button
-                  className="thought-comment-toggle-btn"
-                  onClick={() => toggleComments(thought._id)}
-                >
-                  💬 {thought.comments?.length || 0} Comments
-                </button>
-                <button
-                  className="thought-share-btn"
-                  onClick={() => openShareModal(thought)}
-                >
-                  🔗 Share
-                </button>
+                <div className="thought-secondary-actions">
+                  <button
+                    className="thought-comment-toggle-btn"
+                    onClick={() => toggleComments(thought._id)}
+                  >
+                    💬 {thought.comments?.length || 0} Comments
+                  </button>
+                  <button
+                    className="thought-share-btn"
+                    onClick={() => openShareModal(thought)}
+                  >
+                    🔗 Share
+                  </button>
+                </div>
               </div>
 
               {/* ── COMMENTS SECTION ── */}
