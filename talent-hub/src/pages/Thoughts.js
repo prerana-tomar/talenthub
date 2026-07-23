@@ -6,6 +6,14 @@ import './Thoughts.css';
 
 const CATEGORIES = ['All', 'General', 'Music', 'Dance', 'Poetry', 'Comedy', 'Art'];
 
+const PRESET_TRACKS = [
+  { name: "🎵 Acoustic Calm", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+  { name: "🎵 Lo-Fi Chill Beat", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+  { name: "🎵 Cinematic Vibe", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+  { name: "🎵 Smooth Jazz", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
+  { name: "🎵 Upbeat Rhythm", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" }
+];
+
 export default function Thoughts() {
   const [thoughts, setThoughts]     = useState([]);
   const [loading, setLoading]       = useState(true);
@@ -29,6 +37,15 @@ export default function Thoughts() {
   const [imagePreviews, setImagePreviews]     = useState([]);
   const fileInputRef                          = useRef(null);
 
+  // Music upload & playback states
+  const [imageFit, setImageFit]               = useState('cover');
+  const [musicUrl, setMusicUrl]               = useState('');
+  const [musicName, setMusicName]             = useState('');
+  const [uploadingAudio, setUploadingAudio]   = useState(false);
+  const [playingAudioId, setPlayingAudioId]   = useState(null);
+  const audioInputRef                         = useRef(null);
+  const audioPlayerRef                        = useRef(null);
+
   // Edit states
   const [editingId, setEditingId]   = useState(null);
   const [editText, setEditText]     = useState('');
@@ -41,6 +58,15 @@ export default function Thoughts() {
 
   const user  = JSON.parse(localStorage.getItem('th_user') || 'null');
   const token = localStorage.getItem('th_token') || localStorage.getItem('token');
+
+  // Clean up audio playback on unmount
+  useEffect(() => {
+    return () => {
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.pause();
+      }
+    };
+  }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchThoughts(); }, [category]);
@@ -87,7 +113,61 @@ export default function Thoughts() {
     setSelectedImages([]);
     imagePreviews.forEach(url => URL.revokeObjectURL(url));
     setImagePreviews([]);
+    setImageFit('cover');
+    setMusicUrl('');
+    setMusicName('');
     setShowForm(false);
+  };
+
+  const handleAudioSelect = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) {
+      alert('Audio file size 15MB se kam honi chahiye');
+      return;
+    }
+    setUploadingAudio(true);
+    try {
+      const audioFormData = new FormData();
+      audioFormData.append('audio', file);
+      const res = await fetch(`${API}/api/videos/upload-audio`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: audioFormData
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMusicUrl(data.url);
+        setMusicName(file.name);
+      } else {
+        alert(data.message || 'Audio upload fail ho gaya');
+      }
+    } catch {
+      alert('Audio file upload error');
+    } finally {
+      setUploadingAudio(false);
+      e.target.value = '';
+    }
+  };
+
+  const playTrack = (id, url) => {
+    if (playingAudioId === id) {
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.pause();
+      }
+      setPlayingAudioId(null);
+    } else {
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.pause();
+      }
+      const newAudio = new Audio(url);
+      newAudio.play();
+      newAudio.onended = () => {
+        setPlayingAudioId(null);
+      };
+      audioPlayerRef.current = newAudio;
+      setPlayingAudioId(id);
+    }
   };
 
   // ── POST ──
@@ -102,6 +182,9 @@ export default function Thoughts() {
         const formData = new FormData();
         formData.append('text', text);
         formData.append('category', category === 'All' ? 'General' : category);
+        formData.append('imageFit', imageFit);
+        formData.append('musicUrl', musicUrl);
+        formData.append('musicName', musicName);
         selectedImages.forEach(img => formData.append('images', img));
 
         res  = await fetch(`${API}/api/thoughts`, {
@@ -117,7 +200,13 @@ export default function Thoughts() {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ text, category: category === 'All' ? 'General' : category }),
+          body: JSON.stringify({
+            text,
+            category: category === 'All' ? 'General' : category,
+            imageFit,
+            musicUrl,
+            musicName
+          }),
         });
       }
 
@@ -411,6 +500,83 @@ export default function Thoughts() {
               onChange={handleImageSelect}
             />
 
+            {imagePreviews.length > 0 && (
+              <div className="form-image-fit-row" style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '4px 0 10px 0' }}>
+                <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600 }}>Image Style:</span>
+                <button
+                  type="button"
+                  className={`form-cat-pill ${imageFit === 'cover' ? 'active' : ''}`}
+                  onClick={() => setImageFit('cover')}
+                >
+                  Crop (16:9)
+                </button>
+                <button
+                  type="button"
+                  className={`form-cat-pill ${imageFit === 'contain' ? 'active' : ''}`}
+                  onClick={() => setImageFit('contain')}
+                >
+                  Fit (Full Image)
+                </button>
+              </div>
+            )}
+
+            <div className="form-music-section" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px', marginTop: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                <span style={{ color: '#94a3b8', fontSize: '0.82rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  🎵 Background Music:
+                </span>
+                {musicName ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: '#34d399', fontSize: '0.82rem', fontWeight: 700 }}>{musicName}</span>
+                    <button
+                      type="button"
+                      onClick={() => { setMusicUrl(''); setMusicName(''); }}
+                      style={{ background: 'none', border: 'none', color: '#f43f5e', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}
+                    >
+                      ✕ Remove
+                    </button>
+                  </div>
+                ) : (
+                  <span style={{ color: '#475569', fontSize: '0.8rem' }}>None Selected</span>
+                )}
+              </div>
+
+              {!musicUrl && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                  <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px', maxWidth: '100%' }}>
+                    {PRESET_TRACKS.map(track => (
+                      <button
+                        key={track.name}
+                        type="button"
+                        onClick={() => { setMusicUrl(track.url); setMusicName(track.name); }}
+                        className="form-cat-pill"
+                        style={{ whiteSpace: 'nowrap' }}
+                      >
+                        {track.name}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <button
+                    type="button"
+                    onClick={() => audioInputRef.current.click()}
+                    className="image-upload-trigger"
+                    disabled={uploadingAudio}
+                    style={{ borderStyle: 'dotted', height: '36px', padding: '0 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                  >
+                    📁 {uploadingAudio ? 'Uploading Music...' : 'Upload Custom MP3/Audio'}
+                  </button>
+                  <input
+                    ref={audioInputRef}
+                    type="file"
+                    accept="audio/*"
+                    style={{ display: 'none' }}
+                    onChange={handleAudioSelect}
+                  />
+                </div>
+              )}
+            </div>
+
             <div className="thought-form-footer">
               <span className="char-count">{text.length}/500</span>
               <button
@@ -506,12 +672,86 @@ export default function Thoughts() {
                 <p className="thought-text">{thought.text}</p>
               )}
 
+              {/* ── BACKGROUND MUSIC PLAYER ── */}
+              {thought.musicUrl && (
+                <div
+                  className="thought-music-player"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    background: 'rgba(139, 92, 246, 0.08)',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    borderRadius: '16px',
+                    padding: '10px 16px',
+                    margin: '12px 0 16px',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
+                    backdropFilter: 'blur(10px)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                    <span
+                      style={{
+                        animation: playingAudioId === thought._id ? 'floatPageHeroIcon 2s ease-in-out infinite alternate' : 'none',
+                        fontSize: '20px',
+                        display: 'inline-block',
+                      }}
+                    >
+                      💿
+                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                      <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {thought.musicName || 'Background Music'}
+                      </span>
+                      <span style={{ color: '#a78bfa', fontSize: '0.68rem', fontWeight: 500 }}>
+                        {playingAudioId === thought._id ? 'Playing Track' : 'Tap to Play'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => playTrack(thought._id, thought.musicUrl)}
+                    style={{
+                      background: playingAudioId === thought._id
+                        ? 'rgba(244, 63, 94, 0.15)'
+                        : 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
+                      border: playingAudioId === thought._id ? '1px solid rgba(244, 63, 94, 0.3)' : 'none',
+                      color: playingAudioId === thought._id ? '#f43f5e' : '#fff',
+                      padding: '6px 16px',
+                      borderRadius: '50px',
+                      fontSize: '0.78rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    {playingAudioId === thought._id ? '⏸ Pause' : '▶ Play'}
+                  </button>
+                </div>
+              )}
+
               {/* ── IMAGES DISPLAY ── */}
               {thought.images && thought.images.length > 0 && (
                 <div className={`thought-images-grid count-${Math.min(thought.images.length, 4)}`}>
                   {thought.images.slice(0, 4).map((img, i) => (
-                    <div key={i} className="thought-img-wrapper">
-                      <img src={getImageUrl(img)} alt="" className="thought-card-image" />
+                    <div
+                      key={i}
+                      className="thought-img-wrapper"
+                      style={
+                        Math.min(thought.images.length, 4) === 1 && thought.imageFit === 'contain'
+                          ? { aspectRatio: 'auto', maxHeight: '500px', display: 'flex', justifyContent: 'center', background: 'transparent' }
+                          : {}
+                      }
+                    >
+                      <img
+                        src={getImageUrl(img)}
+                        alt=""
+                        className="thought-card-image"
+                        style={
+                          Math.min(thought.images.length, 4) === 1 && thought.imageFit === 'contain'
+                            ? { objectFit: 'contain', height: 'auto', maxHeight: '500px', borderRadius: '14px' }
+                            : {}
+                        }
+                      />
                       {i === 3 && thought.images.length > 4 && (
                         <div className="more-images-overlay">+{thought.images.length - 4}</div>
                       )}
@@ -522,7 +762,12 @@ export default function Thoughts() {
 
               {/* Legacy single image support */}
               {!thought.images && thought.image && (
-                <img src={getImageUrl(thought.image)} alt="thought" className="thought-image" />
+                <img
+                  src={getImageUrl(thought.image)}
+                  alt="thought"
+                  className="thought-image"
+                  style={thought.imageFit === 'contain' ? { objectFit: 'contain', height: 'auto', maxHeight: '500px' } : {}}
+                />
               )}
 
               {/* Actions */}

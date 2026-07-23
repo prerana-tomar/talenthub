@@ -1,8 +1,15 @@
 import './Upload.css';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../config';
 
+const PRESET_TRACKS = [
+  { name: "🎵 Acoustic Calm", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+  { name: "🎵 Lo-Fi Chill Beat", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+  { name: "🎵 Cinematic Vibe", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+  { name: "🎵 Smooth Jazz", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
+  { name: "🎵 Upbeat Rhythm", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" }
+];
 
 function Upload() {
   const [title, setTitle]       = useState('');
@@ -12,12 +19,49 @@ function Upload() {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
   const [progress, setProgress] = useState(0);
+  const [musicUrl, setMusicUrl]   = useState('');
+  const [musicName, setMusicName] = useState('');
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+  const audioInputRef             = useRef(null);
   const navigate = useNavigate();
 
   const handleDrop = (e) => {
     e.preventDefault();
     const dropped = e.dataTransfer.files[0];
     if (dropped) setFile(dropped);
+  };
+
+  const handleAudioSelect = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) {
+      alert('Audio file size 15MB se kam honi chahiye');
+      return;
+    }
+    setUploadingAudio(true);
+    setError('');
+    try {
+      const token = localStorage.getItem('th_token') || localStorage.getItem('token');
+      const audioFormData = new FormData();
+      audioFormData.append('audio', file);
+      const res = await fetch(`${API}/api/videos/upload-audio`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: audioFormData
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMusicUrl(data.url);
+        setMusicName(file.name);
+      } else {
+        setError(data.message || 'Audio upload failed.');
+      }
+    } catch {
+      setError('Audio upload connection error.');
+    } finally {
+      setUploadingAudio(false);
+      e.target.value = '';
+    }
   };
 
   const handleSubmit = async () => {
@@ -28,7 +72,7 @@ function Upload() {
       return;
     }
 
-    const token = localStorage.getItem('th_token');
+    const token = localStorage.getItem('th_token') || localStorage.getItem('token');
     if (!token) {
       setError('You must be logged in to upload. Please sign in first.');
       return;
@@ -69,6 +113,8 @@ function Upload() {
     formData.append('video', file);
     formData.append('title', title);
     formData.append('category', category);
+    formData.append('musicUrl', musicUrl);
+    formData.append('musicName', musicName);
     if (thumbnailUrl) {
       formData.append('thumbnailUrl', thumbnailUrl);
       formData.append('thumbnailFilename', thumbnailFilename);
@@ -237,6 +283,71 @@ function Upload() {
             <option>Comedy</option>
             <option>Other</option>
           </select>
+        </div>
+
+        <div className="th-field" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '16px', marginTop: '8px' }}>
+          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>🎵 Background Music (Optional)</span>
+            {musicName ? (
+              <span style={{ color: '#34d399', fontSize: '12px' }}>{musicName}</span>
+            ) : (
+              <span style={{ color: '#555a6e', fontSize: '12px' }}>None</span>
+            )}
+          </label>
+          
+          {musicName ? (
+            <button
+              type="button"
+              onClick={() => { setMusicUrl(''); setMusicName(''); }}
+              style={{
+                background: 'rgba(244, 63, 94, 0.1)',
+                border: '1px solid rgba(244, 63, 94, 0.2)',
+                color: '#f43f5e',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                textAlign: 'center',
+                width: 'fit-content'
+              }}
+            >
+              ✕ Remove Music
+            </button>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
+                {PRESET_TRACKS.map(track => (
+                  <button
+                    key={track.name}
+                    type="button"
+                    onClick={() => { setMusicUrl(track.url); setMusicName(track.name); }}
+                    className="explore-cat-btn"
+                    style={{ whiteSpace: 'nowrap', padding: '6px 12px', fontSize: '11px' }}
+                  >
+                    {track.name}
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                type="button"
+                onClick={() => audioInputRef.current.click()}
+                className="th-dropzone"
+                disabled={uploadingAudio}
+                style={{ padding: '12px', margin: 0, fontSize: '13px', borderStyle: 'dashed', background: 'rgba(255,255,255,0.02)' }}
+              >
+                📁 {uploadingAudio ? 'Uploading Music...' : 'Upload Custom MP3/Audio'}
+              </button>
+              <input
+                ref={audioInputRef}
+                type="file"
+                accept="audio/*"
+                style={{ display: 'none' }}
+                onChange={handleAudioSelect}
+              />
+            </div>
+          )}
         </div>
 
         <button

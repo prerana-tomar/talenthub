@@ -16,8 +16,46 @@ export default function VideoPlayer() {
   const [postingComment, setPostingComment] = useState(false);
   const videoRef = useRef(null);
 
+  // Background music sync states
+  const bgMusicPlayerRef = useRef(null);
+  const [musicMuted, setMusicMuted] = useState(false);
+  const [musicVolume, setMusicVolume] = useState(0.5);
+
   const user  = JSON.parse(localStorage.getItem('th_user') || 'null');
   const token = localStorage.getItem('th_token');
+
+  // Synchronize background music with the video player
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl || !video || !video.musicUrl) return;
+
+    // Initialize bg music audio player
+    const bgAudio = new Audio(video.musicUrl);
+    bgAudio.loop = true;
+    bgAudio.volume = musicMuted ? 0 : musicVolume;
+    bgMusicPlayerRef.current = bgAudio;
+
+    const handlePlay = () => {
+      bgAudio.play().catch(e => console.error("Audio playback error:", e));
+    };
+    const handlePause = () => {
+      bgAudio.pause();
+    };
+
+    videoEl.addEventListener('play', handlePlay);
+    videoEl.addEventListener('pause', handlePause);
+
+    // If the video is already playing, start audio
+    if (!videoEl.paused) {
+      handlePlay();
+    }
+
+    return () => {
+      bgAudio.pause();
+      videoEl.removeEventListener('play', handlePlay);
+      videoEl.removeEventListener('pause', handlePause);
+    };
+  }, [video, musicMuted, musicVolume]);
 
   const showToast = (msg) => {
     setToast(msg);
@@ -213,6 +251,75 @@ export default function VideoPlayer() {
           {video.description && (
             <div className="vp-description">
               <p>{video.description}</p>
+            </div>
+          )}
+
+          {/* ── BACKGROUND MUSIC CONTROL ── */}
+          {video.musicUrl && (
+            <div
+              className="vp-music-box"
+              style={{
+                background: 'rgba(139, 92, 246, 0.08)',
+                border: '1px solid rgba(139, 92, 246, 0.2)',
+                borderRadius: '16px',
+                padding: '12px 18px',
+                margin: '16px 0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px',
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '20px', animation: 'floatPageHeroIcon 2s ease-in-out infinite alternate', display: 'inline-block' }}>🎵</span>
+                <div>
+                  <h4 style={{ margin: 0, color: '#fff', fontSize: '0.88rem', fontWeight: 700 }}>{video.musicName || 'Background Music'}</h4>
+                  <span style={{ color: '#a78bfa', fontSize: '0.72rem', fontWeight: 500 }}>Playing in sync with performance</span>
+                </div>
+              </div>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                {/* Volume slider */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 600 }}>Music Vol:</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={musicVolume}
+                    onChange={(e) => setMusicVolume(parseFloat(e.target.value))}
+                    style={{
+                      accentColor: '#8b5cf6',
+                      width: '80px',
+                      cursor: 'pointer',
+                    }}
+                  />
+                  <span style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 700, minWidth: '30px' }}>
+                    {Math.round(musicVolume * 100)}%
+                  </span>
+                </div>
+
+                {/* Mute button */}
+                <button
+                  type="button"
+                  onClick={() => setMusicMuted(!musicMuted)}
+                  style={{
+                    background: musicMuted ? 'rgba(244, 63, 94, 0.15)' : 'rgba(139, 92, 246, 0.15)',
+                    border: musicMuted ? '1px solid rgba(244, 63, 94, 0.3)' : '1px solid rgba(139, 92, 246, 0.3)',
+                    color: musicMuted ? '#f43f5e' : '#a78bfa',
+                    padding: '4px 12px',
+                    borderRadius: '50px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {musicMuted ? '🔇 Muted' : '🔊 Playing'}
+                </button>
+              </div>
             </div>
           )}
 
