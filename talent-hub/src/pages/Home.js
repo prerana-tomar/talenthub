@@ -400,7 +400,7 @@ export default function Home() {
 
             <div className="th-hero-img-wrap">
               <img
-                src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800&q=90"
+                src="/singer_hero_neon.png"
                 alt="Concert Stage"
                 className="th-hero-img"
               />
