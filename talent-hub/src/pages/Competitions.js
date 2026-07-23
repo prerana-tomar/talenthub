@@ -368,25 +368,25 @@ export default function CompetitionsPage() {
       </nav>
 
       <div style={styles.wrap}>
-        {/* HERO */}
-        <div style={styles.hero}>
-          <div style={styles.heroLeft}>
-            <div style={styles.trophyIcon}>🏆</div>
-            <div>
-              <div style={styles.heroTitle}>Competitions</div>
-              <div style={styles.heroSub}>Showcase your talent. Compete. Win. Shine.</div>
+        {/* Premium Page Hero */}
+        <div className="th-page-hero">
+          <div className="th-page-hero-text">
+            <h1 className="th-page-hero-title">COMPETE. PERFORM. <span>WIN.</span></h1>
+            <p className="th-page-hero-subtitle">Showcase your talent, join active challenges, perform on the virtual stage, and win ultimate glory and rewards.</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600 }}>
+                <span style={styles.liveDot} />
+                <span style={{ color: "#00c896" }}>
+                  {activeCount} Active Now
+                </span>
+              </div>
+              <div style={{ fontSize: 13, color: "#B8B8C5", fontWeight: 600 }}>
+                👥 {totalParticipants.toLocaleString()} Participants
+              </div>
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 500 }}>
-              <span style={styles.liveDot} />
-              <span style={{ color: "#00c896" }}>
-                {activeCount} Active
-              </span>
-            </div>
-            <div style={{ fontSize: 13, color: "#8b87a8" }}>
-              👥 {totalParticipants.toLocaleString()} Participants
-            </div>
+          <div className="th-page-hero-img-wrap">
+            🏆
           </div>
         </div>
 

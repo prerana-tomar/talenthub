@@ -332,17 +332,20 @@ export default function Thoughts() {
   return (
     <div className="thoughts-page">
 
-      {/* ── HEADER ── */}
-      <div className="thoughts-header">
-        <div className="thoughts-header-left">
-          <h1>💭 Thoughts</h1>
-          <p>Share your talent journey with the community</p>
+      {/* Premium Page Hero */}
+      <div className="th-page-hero">
+        <div className="th-page-hero-text">
+          <h1 className="th-page-hero-title">CREATOR <span>THOUGHTS</span></h1>
+          <p className="th-page-hero-subtitle">Share your talent journey, insights, milestones, and connect with the creator community in real time.</p>
+          {token && (
+            <button className="new-thought-btn" onClick={() => { setShowForm(f => !f); if (showForm) resetForm(); }} style={{ marginTop: '16px', width: 'fit-content' }}>
+              {showForm ? '✕ Cancel' : '✨ Share Thought'}
+            </button>
+          )}
         </div>
-        {token && (
-          <button className="new-thought-btn" onClick={() => { setShowForm(f => !f); if (showForm) resetForm(); }}>
-            {showForm ? '✕ Cancel' : '✨ Share Thought'}
-          </button>
-        )}
+        <div className="th-page-hero-img-wrap">
+          💭
+        </div>
       </div>
 
       {/* ── POST FORM ── */}

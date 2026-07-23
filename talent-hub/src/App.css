@@ -469,3 +469,194 @@ body.light-mode .cp-skeleton {
     font-size: 8px;
   }
 }
+
+/* =================================================================
+   PREMIUM GLASS & CYBERPUNK NEON REDESIGN OVERRIDES
+   ================================================================= */
+
+/* 1. Global Inner Pages Reset */
+.explore-page, .th-upload-page, .competitions-page, .profile-page, .leaderboard-page, .live-page, .categories-page, .thoughts-page, .settings-page, .saved-page, .following-page, .messages-page, .highlight-studio-page, .creative-studio-page, .collab-hub-page, .admin-requests-page, .my-requests-page, .notifications-page, .vp-page {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 32px 24px 80px !important;
+  background: transparent !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* 2. Premium Page Hero Layout */
+.th-page-hero {
+  position: relative;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(236, 72, 153, 0.04) 50%, transparent 100%) !important;
+  border: 1px solid rgba(139, 92, 246, 0.15) !important;
+  border-radius: 20px !important;
+  padding: 40px 36px !important;
+  margin-bottom: 28px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 24px !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 25px rgba(139, 92, 246, 0.05) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.th-page-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%) !important;
+  filter: blur(50px) !important;
+  pointer-events: none !important;
+}
+
+.th-page-hero-text {
+  flex: 1 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.th-page-hero-title {
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 2.2rem !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  color: #fff !important;
+  margin: 0 !important;
+  letter-spacing: -0.8px !important;
+}
+
+.th-page-hero-title span {
+  background: linear-gradient(135deg, #F59E0B 0%, #EC4899 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 0 12px rgba(236, 72, 153, 0.35)) !important;
+}
+
+.th-page-hero-subtitle {
+  font-size: 0.95rem !important;
+  color: #B8B8C5 !important;
+  line-height: 1.6 !important;
+  max-width: 520px !important;
+  margin: 0 0 4px 0 !important;
+}
+
+.th-page-hero-img-wrap {
+  width: 160px !important;
+  height: 160px !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 4.8rem !important;
+  filter: drop-shadow(0 0 18px rgba(139, 92, 246, 0.3)) !important;
+  animation: floatPageHeroIcon 4s ease-in-out infinite alternate !important;
+}
+
+@keyframes floatPageHeroIcon {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+/* 3. Reusable Glassmorphism Cards & Lists */
+.video-card, .thought-card, .cp-card, .th-thought-item, .th-comp-row, .profile-stat-box, .profile-video-card, .profile-badge-card, .category-card, .live-room-card, .leaderboard-row, .comp-card {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(139, 92, 246, 0.15) !important;
+  border-radius: 20px !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  overflow: hidden !important;
+}
+
+.video-card:hover, .thought-card:hover, .cp-card:hover, .th-thought-item:hover, .th-comp-row:hover, .profile-stat-box:hover, .profile-video-card:hover, .profile-badge-card:hover, .category-card:hover, .live-room-card:hover, .leaderboard-row:hover, .comp-card:hover {
+  border-color: rgba(236, 72, 153, 0.35) !important;
+  transform: translateY(-5px) !important;
+  box-shadow: 0 15px 35px rgba(139, 92, 246, 0.2), 0 0 15px rgba(236, 72, 153, 0.15) !important;
+}
+
+/* 4. Dropzone & Upload */
+.th-dropzone, .upload-drag-box {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 2px dashed rgba(139, 92, 246, 0.3) !important;
+  border-radius: 20px !important;
+  backdrop-filter: blur(10px) !important;
+  transition: all 0.3s ease !important;
+  padding: 40px !important;
+  text-align: center !important;
+}
+
+.th-dropzone:hover, .upload-drag-box:hover {
+  border-color: #EC4899 !important;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.15), 0 0 15px rgba(236, 72, 153, 0.1) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* 5. Filters, Chips & Selects */
+.explore-cat-btn, .thought-cat-btn, .cp-filter-pill, .filter-btn, .fb {
+  padding: 8px 18px !important;
+  border-radius: 50px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(139, 92, 246, 0.15) !important;
+  color: #B8B8C5 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.explore-cat-btn:hover, .thought-cat-btn:hover, .cp-filter-pill:hover, .filter-btn:hover, .fb:hover {
+  background: rgba(139, 92, 246, 0.08) !important;
+  color: #fff !important;
+  border-color: rgba(139, 92, 246, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+.explore-cat-btn.active, .thought-cat-btn.active, .cp-filter-pill.active, .filter-btn.active, .fbActive {
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.4) !important;
+}
+
+.category-select, .live-select, .profile-edit-select {
+  background: #0B0618 !important;
+  border: 1px solid rgba(139, 92, 246, 0.25) !important;
+  color: #fff !important;
+  padding: 8px 16px !important;
+  border-radius: 12px !important;
+  font-family: 'Poppins', sans-serif !important;
+  outline: none !important;
+  transition: all 0.2s !important;
+}
+
+.category-select:focus, .live-select:focus, .profile-edit-select:focus {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.2) !important;
+}
+
+@media (max-width: 768px) {
+  .th-page-hero {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    text-align: center !important;
+    padding: 32px 24px !important;
+    gap: 20px !important;
+  }
+  .th-page-hero-text {
+    align-items: center !important;
+  }
+  .th-page-hero-img-wrap {
+    margin: 0 auto !important;
+    width: 120px !important;
+    height: 120px !important;
+    font-size: 3.8rem !important;
+  }
+}

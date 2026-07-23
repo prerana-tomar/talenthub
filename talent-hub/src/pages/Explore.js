@@ -74,35 +74,38 @@ export default function Explore() {
   return (
     <div className="explore-page">
 
-      {/* Header */}
-      <div className="explore-header">
-        <div>
-          <h1>🔍 Explore</h1>
-          <p>Discover amazing talent from across India</p>
+      {/* Premium Hero Section */}
+      <div className="th-page-hero">
+        <div className="th-page-hero-text">
+          <h1 className="th-page-hero-title">EXPLORE <span>TALENT</span></h1>
+          <p className="th-page-hero-subtitle">Discover India's best singers, dancers, poets and creators.</p>
+          
+          {/* Search bar inside Hero Section */}
+          <form className="explore-search-form" onSubmit={handleSearch} style={{ width: '100%', maxWidth: '520px', marginTop: '16px' }}>
+            <div className="explore-search-wrap">
+              <span className="explore-search-icon">🔍</span>
+              <input
+                type="text"
+                className="explore-search-input"
+                placeholder="Search performers, songs, categories..."
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  className="explore-search-clear"
+                  onClick={() => { setSearchInput(''); setSearch(''); }}
+                >✕</button>
+              )}
+            </div>
+            <button type="submit" className="explore-search-btn">Search</button>
+          </form>
+        </div>
+        <div className="th-page-hero-img-wrap">
+          🎨
         </div>
       </div>
-
-      {/* Search bar */}
-      <form className="explore-search-form" onSubmit={handleSearch}>
-        <div className="explore-search-wrap">
-          <span className="explore-search-icon">🔍</span>
-          <input
-            type="text"
-            className="explore-search-input"
-            placeholder="Search performers, songs, categories..."
-            value={searchInput}
-            onChange={e => setSearchInput(e.target.value)}
-          />
-          {searchInput && (
-            <button
-              type="button"
-              className="explore-search-clear"
-              onClick={() => { setSearchInput(''); setSearch(''); }}
-            >✕</button>
-          )}
-        </div>
-        <button type="submit" className="explore-search-btn">Search</button>
-      </form>
 
       {/* Filters */}
       <div className="explore-filters">

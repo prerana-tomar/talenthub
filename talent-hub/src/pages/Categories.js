@@ -59,15 +59,18 @@ const Categories = () => {
     const meta = CATEGORY_META[selected];
     return (
       <div className="categories-page">
-        <button className="back-btn" onClick={() => { setSelected(null); setVideos([]); }}>
+        <button className="back-btn" onClick={() => { setSelected(null); setVideos([]); }} style={{ marginBottom: '16px' }}>
           ← Back to Categories
         </button>
 
-        <div className="category-header" style={{ borderColor: meta.color }}>
-          <span className="cat-icon-large">{meta.icon}</span>
-          <div>
-            <h1 style={{ color: meta.color }}>{selected}</h1>
-            <p>{meta.desc}</p>
+        {/* Premium Page Hero */}
+        <div className="th-page-hero">
+          <div className="th-page-hero-text">
+            <h1 className="th-page-hero-title">{selected.toUpperCase()} <span>PERFORMANCES</span></h1>
+            <p className="th-page-hero-subtitle">{meta.desc}</p>
+          </div>
+          <div className="th-page-hero-img-wrap">
+            {meta.icon}
           </div>
         </div>
 
@@ -112,9 +115,16 @@ const Categories = () => {
 
   return (
     <div className="categories-page">
-      <div className="categories-header">
-        <h1>🎭 Explore Categories</h1>
-        <p>Discover performances across every art form</p>
+      
+      {/* Premium Page Hero */}
+      <div className="th-page-hero">
+        <div className="th-page-hero-text">
+          <h1 className="th-page-hero-title">EXPLORE <span>CATEGORIES</span></h1>
+          <p className="th-page-hero-subtitle">Discover amazing performances across every art form. Find your flavor of talent today.</p>
+        </div>
+        <div className="th-page-hero-img-wrap">
+          🎭
+        </div>
       </div>
 
       <div className="categories-grid">

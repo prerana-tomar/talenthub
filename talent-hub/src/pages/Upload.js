@@ -118,8 +118,16 @@ function Upload() {
 
   return (
     <div className="th-upload-page">
-      <h1>Upload Your<br /><span style={{ color: '#f5c842' }}>Performance</span></h1>
-      <p className="sub">Share your talent with the world in under 60 seconds.</p>
+      {/* Premium Hero Section */}
+      <div className="th-page-hero">
+        <div className="th-page-hero-text">
+          <h1 className="th-page-hero-title">UPLOAD YOUR <span>TALENT</span></h1>
+          <p className="th-page-hero-subtitle">Share your unique talent with the world. Upload your performance now and inspire creators worldwide.</p>
+        </div>
+        <div className="th-page-hero-img-wrap">
+          📤
+        </div>
+      </div>
 
       {error && (
         <div style={{

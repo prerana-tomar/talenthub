@@ -1,6 +1,6 @@
 .profile-page {
   min-height: 100vh;
-  background: #0f0f1a;
+  background: transparent !important;
   color: #e2e8f0;
 }
 

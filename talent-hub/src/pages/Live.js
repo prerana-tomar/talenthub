@@ -236,6 +236,18 @@ export default function Live() {
 
       {mode === 'browse' && (
         <div className="live-browse">
+
+          {/* Premium Page Hero */}
+          <div className="th-page-hero">
+            <div className="th-page-hero-text">
+              <h1 className="th-page-hero-title">LIVE <span>STAGE</span></h1>
+              <p className="th-page-hero-subtitle">Watch top creators streaming live, interact via real-time chat, and show your support instantly.</p>
+            </div>
+            <div className="th-page-hero-img-wrap">
+              📡
+            </div>
+          </div>
+
           <div className="live-go-live-section">
             <div className="live-go-live-card">
               <div className="live-go-live-icon">🎥</div>

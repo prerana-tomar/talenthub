@@ -59,39 +59,41 @@ const Leaderboard = () => {
 
   return (
     <div className="leaderboard-page">
-      <div className="leaderboard-header">
-        <div className="leaderboard-title">
-          <span className="trophy-icon">🏆</span>
-          <div>
-            <h1>Leaderboard</h1>
-            <p>Top performers on TalentHub</p>
+      {/* Premium Hero Section */}
+      <div className="th-page-hero">
+        <div className="th-page-hero-text">
+          <h1 className="th-page-hero-title">LEADERBOARD <span>RANKINGS</span></h1>
+          <p className="th-page-hero-subtitle">Top performing creators and rising stars on TalentHub. Compete to claim the podium!</p>
+          
+          {/* Filters inside/below the text area of Hero */}
+          <div className="leaderboard-filters" style={{ marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="filter-group">
+              {periods.map((p) => (
+                <button
+                  key={p.value}
+                  className={`filter-btn ${period === p.value ? 'active' : ''}`}
+                  onClick={() => setPeriod(p.value)}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+
+            <select
+              className="category-select"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c === 'all' ? 'All Categories' : c}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
-
-        <div className="leaderboard-filters">
-          <div className="filter-group">
-            {periods.map((p) => (
-              <button
-                key={p.value}
-                className={`filter-btn ${period === p.value ? 'active' : ''}`}
-                onClick={() => setPeriod(p.value)}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-
-          <select
-            className="category-select"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c === 'all' ? 'All Categories' : c}
-              </option>
-            ))}
-          </select>
+        <div className="th-page-hero-img-wrap">
+          🏆
         </div>
       </div>
 
