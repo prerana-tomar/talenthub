@@ -475,7 +475,7 @@ body.light-mode .cp-skeleton {
    ================================================================= */
 
 /* 1. Global Inner Pages Reset */
-.explore-page, .th-upload-page, .competitions-page, .profile-page, .leaderboard-page, .live-page, .categories-page, .settings-page, .saved-page, .following-page, .messages-page, .highlight-studio-page, .creative-studio-page, .collab-hub-page, .admin-requests-page, .my-requests-page, .notifications-page, .vp-page {
+.explore-page, .competitions-page, .profile-page, .leaderboard-page, .live-page, .categories-page, .saved-page, .following-page, .messages-page, .highlight-studio-page, .creative-studio-page, .collab-hub-page, .admin-requests-page, .my-requests-page, .vp-page {
   max-width: 1200px !important;
   margin: 0 auto !important;
   padding: 32px 24px 80px !important;
