@@ -271,6 +271,7 @@ function Navbar() {
           <Link to="/collab"            className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('collab'); }}>Collab Hub</Link>
           <Link to="/upload"            className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('upload'); }}>Upload</Link>
           <NavLink to="/highlight-studio" className="nav-link" onClick={() => setMenuOpen(false)}>✦ AI Highlights</NavLink>
+          <NavLink to="/video-editor"   className="nav-link" onClick={() => setMenuOpen(false)}>🎬 Video Editor</NavLink>
           <Link to="/competitions"      className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('compete'); }}>
             Competitions <span className="nav-badge">New</span>
           </Link>

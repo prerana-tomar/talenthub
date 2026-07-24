@@ -26,6 +26,7 @@ import CollabHub from './pages/CollabHub';
 import AdminRequests from './pages/AdminRequests';
 import MyRequests from './pages/MyRequests';
 import Notifications from './pages/Notifications';
+import VideoEditor from './pages/VideoEditor';
 
 
 
@@ -137,6 +138,7 @@ function App() {
           <Route path="/messages" element={<WithNavbar><ProtectedRoute><Messages /></ProtectedRoute></WithNavbar>} />
           <Route path="/highlight-studio" element={<WithNavbar><ProtectedRoute><HighlightStudio /></ProtectedRoute></WithNavbar>} />
           <Route path="/creative-studio" element={<WithNavbar><CreativeStudio /></WithNavbar>} />
+          <Route path="/video-editor" element={<WithNavbar><ProtectedRoute><VideoEditor /></ProtectedRoute></WithNavbar>} />
           <Route path="/collab" element={<WithNavbar><CollabHub /></WithNavbar>} />
           <Route path="/admin/requests" element={<WithNavbar><AdminRequests /></WithNavbar>} />
           <Route path="/my-requests" element={<WithNavbar><ProtectedRoute><MyRequests /></ProtectedRoute></WithNavbar>} />
