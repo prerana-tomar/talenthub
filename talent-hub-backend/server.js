@@ -59,6 +59,7 @@ app.use('/api/highlights',   highlightRoutes);
 app.use('/api/creative',     creativeRoutes);
 app.use('/api/collab', require('./routes/collab'));
 app.use('/api/help-requests', helpRequestRoutes);
+app.use('/api/achievements', require('./routes/achievements').router);
 
 // MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -175,7 +176,13 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-
+// Global JSON error handler
+app.use((err, req, res, next) => {
+  console.error('API Error:', err);
+  res.status(err.status || 500).json({
+    message: err.message || 'An internal server error occurred.'
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

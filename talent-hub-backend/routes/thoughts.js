@@ -50,8 +50,11 @@ router.get('/', async (req, res) => {
 // POST /api/thoughts
 router.post('/', authMiddleware, upload.array('images', 4), async (req, res) => {
   try {
-    const text     = req.body.text     || '';
-    const category = req.body.category || 'General';
+    const text      = req.body.text      || '';
+    const category  = req.body.category  || 'General';
+    const imageFit  = req.body.imageFit  || 'cover';
+    const musicUrl  = req.body.musicUrl  || '';
+    const musicName = req.body.musicName || '';
 
     if (!text.trim() && (!req.files || req.files.length === 0)) {
       return res.status(400).json({ message: 'Text ya image zaroori hai' });
@@ -65,6 +68,9 @@ router.post('/', authMiddleware, upload.array('images', 4), async (req, res) => 
       category,
       images,
       image: images[0] || null,
+      imageFit,
+      musicUrl,
+      musicName,
     });
 
     const populated = await thought.populate('author', 'username profilePic');
@@ -124,7 +130,78 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// POST /api/thoughts/:id/like
+// POST /api/thoughts/:id/appreciate
+router.post('/:id/appreciate', authMiddleware, async (req, res) => {
+  try {
+    const thought = await Thought.findById(req.params.id);
+    if (!thought) return res.status(404).json({ message: 'Thought not found' });
+
+    const userId = (req.user.id || req.user._id).toString();
+    const { reactionType = 'lovedIt' } = req.body;
+    const validTypes = ['applause', 'lovedIt', 'outstanding', 'inspiring'];
+    if (!validTypes.includes(reactionType)) {
+      return res.status(400).json({ message: 'Invalid reaction type' });
+    }
+
+    if (!thought.appreciations) {
+      thought.appreciations = { applause: [], lovedIt: [], outstanding: [], inspiring: [] };
+    }
+
+    let activeReaction = null;
+    for (const type of validTypes) {
+      const arr = thought.appreciations[type] || [];
+      const idx = arr.findIndex(id => id.toString() === userId);
+      if (idx !== -1) {
+        activeReaction = type;
+        arr.splice(idx, 1);
+      }
+    }
+
+    let userSelected = null;
+    if (activeReaction !== reactionType) {
+      if (!thought.appreciations[reactionType]) thought.appreciations[reactionType] = [];
+      thought.appreciations[reactionType].push(userId);
+      userSelected = reactionType;
+
+      const Notification = require('../models/Notification');
+      const authorId = thought.author.toString();
+      if (authorId !== userId) {
+        await Notification.create({
+          recipient: thought.author,
+          sender: req.user.id || req.user._id,
+          type: 'like',
+          message: `appreciated your thought: "${thought.text.substring(0, 30)}"`,
+          link: '/thoughts'
+        });
+      }
+    }
+
+    await thought.save();
+
+    const { checkAndUnlockAchievements } = require('./achievements');
+    const newlyUnlocked = await checkAndUnlockAchievements(thought.author);
+
+    const counts = {
+      applause:    thought.appreciations.applause?.length || 0,
+      lovedIt:     (thought.appreciations.lovedIt?.length || 0) + (thought.likes?.length || 0),
+      outstanding: thought.appreciations.outstanding?.length || 0,
+      inspiring:   thought.appreciations.inspiring?.length || 0,
+    };
+    const total = counts.applause + counts.lovedIt + counts.outstanding + counts.inspiring;
+
+    res.json({
+      counts,
+      total,
+      userReaction: userSelected,
+      newlyUnlocked,
+    });
+  } catch (err) {
+    console.error('Appreciate error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// POST /api/thoughts/:id/like (Legacy fallback)
 router.post('/:id/like', authMiddleware, async (req, res) => {
   try {
     const thought = await Thought.findById(req.params.id);
@@ -135,18 +212,6 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
 
     if (idx === -1) {
       thought.likes.push(userId);
-      // Trigger notification for thought like
-      const Notification = require('../models/Notification');
-      const authorId = thought.author.toString();
-      if (authorId !== userId) {
-        await Notification.create({
-          recipient: thought.author,
-          sender: req.user.id || req.user._id,
-          type: 'like',
-          message: `liked your thought: "${thought.text.substring(0, 30)}${thought.text.length > 30 ? '...' : ''}"`,
-          link: '/thoughts'
-        });
-      }
     } else {
       thought.likes.splice(idx, 1);
     }

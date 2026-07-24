@@ -19,13 +19,20 @@ const userSchema = new mongoose.Schema({
   savedVideos:     [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }],
   savedPerformers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 
-  // Following / Followers
-  following:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  followers:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-
   googleId:     { type: String, default: null },
-  isGoogleUser: { type: Boolean, default: false }, 
- 
+  isGoogleUser: { type: Boolean, default: false },
+
+  // Achievements & Badges
+  achievements: [{
+    key: { type: String, required: true },
+    unlockedAt: { type: Date, default: Date.now }
+  }],
+
+  // Active streak tracker
+  activeStreak: {
+    count: { type: Number, default: 1 },
+    lastActiveDate: { type: Date, default: Date.now }
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

@@ -18,7 +18,20 @@ const thoughtSchema = new mongoose.Schema({
   images:   [{ type: String }],           // array of URL strings
   image:    { type: String, default: null }, // legacy single image
 
+  imageFit: { type: String, default: 'cover', enum: ['cover', 'contain'] },
+  musicUrl: { type: String, default: '' },
+  musicName: { type: String, default: '' },
+
   likes:    [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
+  // Rich Appreciation System (applause, lovedIt, outstanding, inspiring)
+  appreciations: {
+    applause:    [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    lovedIt:     [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    outstanding: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    inspiring:   [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+  },
+
   comments: [commentSchema],
 }, { timestamps: true });
 
