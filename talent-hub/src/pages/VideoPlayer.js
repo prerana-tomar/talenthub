@@ -36,7 +36,7 @@ export default function VideoPlayer() {
     bgMusicPlayerRef.current = bgAudio;
 
     const handlePlay = () => {
-      bgAudio.play().catch(e => console.error("Audio playback error:", e));
+      bgAudio.play().catch(() => {});
     };
     const handlePause = () => {
       bgAudio.pause();

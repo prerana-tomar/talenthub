@@ -75,7 +75,7 @@ export default function VideoEditor() {
     musicAudio.volume = musicMuted ? 0 : musicVolume;
 
     if (isPlaying && selectedMusic) {
-      musicAudio.play().catch(e => console.error("Audio playback error:", e));
+      musicAudio.play().catch(() => {});
     } else {
       musicAudio.pause();
     }
