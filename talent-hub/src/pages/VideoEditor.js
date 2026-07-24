@@ -53,6 +53,10 @@ export default function VideoEditor() {
   // Tabs for the settings panel
   const [activeTab, setActiveTab] = useState('trim'); // trim, filters, text, music
 
+  // Video Rendering States
+  const [renderingVideo, setRenderingVideo] = useState(false);
+  const [renderProgress, setRenderProgress] = useState(0);
+
   // Refs
   const videoRef = useRef(null);
   const musicAudioRef = useRef(null);
@@ -270,6 +274,214 @@ export default function VideoEditor() {
     }
   };
 
+  // Capture Actual Edited Video using Canvas CaptureStream and MediaRecorder
+  const handleExportVideo = async () => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    setIsPlaying(false);
+    videoEl.pause();
+    
+    setRenderingVideo(true);
+    setRenderProgress(0);
+
+    // Create rendering Canvas
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Aspect ratio dimensions
+    let targetWidth = videoEl.videoWidth;
+    let targetHeight = videoEl.videoHeight;
+    let sourceX = 0;
+    let sourceY = 0;
+    let sourceWidth = videoEl.videoWidth;
+    let sourceHeight = videoEl.videoHeight;
+
+    if (aspectRatio === '9:16') {
+      targetWidth = videoEl.videoHeight * (9 / 16);
+      targetHeight = videoEl.videoHeight;
+      sourceX = (videoEl.videoWidth - targetWidth) / 2;
+      sourceWidth = targetWidth;
+    } else if (aspectRatio === '1:1') {
+      const minDim = Math.min(videoEl.videoWidth, videoEl.videoHeight);
+      targetWidth = minDim;
+      targetHeight = minDim;
+      sourceX = (videoEl.videoWidth - minDim) / 2;
+      sourceY = (videoEl.videoHeight - minDim) / 2;
+      sourceWidth = minDim;
+      sourceHeight = minDim;
+    } else if (aspectRatio === '16:9') {
+      targetHeight = videoEl.videoWidth * (9 / 16);
+      targetWidth = videoEl.videoWidth;
+      sourceY = (videoEl.videoHeight - targetHeight) / 2;
+      sourceHeight = targetHeight;
+    }
+
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+
+    // Start video at trim start time
+    videoEl.currentTime = startTime;
+    videoEl.muted = true; // Mute preview so we don't hear echo during capture
+
+    // Prepare audio track nodes
+    let audioStreamDest = null;
+    let audioCtx = null;
+    let videoSourceNode = null;
+    let musicSourceNode = null;
+
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      audioStreamDest = audioCtx.createMediaStreamDestination();
+
+      videoSourceNode = audioCtx.createMediaElementSource(videoEl);
+      videoSourceNode.connect(audioStreamDest);
+      videoSourceNode.connect(audioCtx.destination);
+
+      if (selectedMusic && musicAudioRef.current) {
+        musicAudioRef.current.currentTime = 0;
+        musicAudioRef.current.volume = musicMuted ? 0 : musicVolume;
+        musicAudioRef.current.muted = false;
+        
+        musicSourceNode = audioCtx.createMediaElementSource(musicAudioRef.current);
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.value = musicMuted ? 0 : musicVolume;
+        musicSourceNode.connect(gainNode);
+        gainNode.connect(audioStreamDest);
+        gainNode.connect(audioCtx.destination);
+      }
+    } catch (e) {
+      console.warn("Audio Context setup failed (likely CORS or audio source already connected):", e);
+    }
+
+    // Capture Canvas Stream at 30 FPS
+    const canvasStream = canvas.captureStream(30);
+    const mixedTracks = [...canvasStream.getVideoTracks()];
+
+    if (audioStreamDest) {
+      mixedTracks.push(...audioStreamDest.stream.getAudioTracks());
+    }
+
+    const recordStream = new MediaStream(mixedTracks);
+
+    // Setup MediaRecorder
+    let mediaRecorder;
+    const recordedChunks = [];
+    const mimeTypes = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm',
+      'video/mp4'
+    ];
+
+    for (const type of mimeTypes) {
+      if (MediaRecorder.isTypeSupported(type)) {
+        try {
+          mediaRecorder = new MediaRecorder(recordStream, { mimeType: type });
+          break;
+        } catch (e) {}
+      }
+    }
+
+    if (!mediaRecorder) {
+      mediaRecorder = new MediaRecorder(recordStream);
+    }
+
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data && event.data.size > 0) {
+        recordedChunks.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${videoFile?.name?.replace(/\.[^/.]+$/, "") || 'edited'}_edited.webm`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      // Clean up audio nodes
+      if (audioCtx) {
+        audioCtx.close();
+      }
+
+      // Restore states
+      videoEl.muted = false;
+      videoEl.currentTime = startTime;
+      videoEl.pause();
+      if (musicAudioRef.current) {
+        musicAudioRef.current.pause();
+      }
+      setIsPlaying(false);
+      setRenderingVideo(false);
+      setRenderProgress(0);
+    };
+
+    // Draw loop function
+    let animationFrameId;
+    const drawFrame = () => {
+      if (videoEl.currentTime >= endTime) {
+        cancelAnimationFrame(animationFrameId);
+        mediaRecorder.stop();
+        return;
+      }
+
+      // Calculate progress percentage
+      const elapsed = videoEl.currentTime - startTime;
+      const total = endTime - startTime;
+      const progressPercent = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
+      setRenderProgress(progressPercent);
+
+      // Draw frame to canvas applying filters
+      if (ctx.filter !== undefined) {
+        ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) blur(${blur}px)`;
+      }
+
+      ctx.drawImage(
+        videoEl,
+        sourceX, sourceY, sourceWidth, sourceHeight,
+        0, 0, targetWidth, targetHeight
+      );
+
+      if (ctx.filter !== undefined) {
+        ctx.filter = 'none';
+      }
+
+      // Draw text overlays on top of the canvas
+      textOverlays.forEach(overlay => {
+        ctx.fillStyle = overlay.color;
+        const containerBox = containerRef.current.getBoundingClientRect();
+        const scaleFactor = targetWidth / containerBox.width;
+        const finalFontSize = overlay.fontSize * scaleFactor;
+
+        ctx.font = `bold ${finalFontSize}px Poppins, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const xPos = (overlay.x / 100) * targetWidth;
+        const yPos = (overlay.y / 100) * targetHeight;
+
+        ctx.fillText(overlay.text, xPos, yPos);
+      });
+
+      animationFrameId = requestAnimationFrame(drawFrame);
+    };
+
+    // Wait slightly to make sure video seeked
+    setTimeout(() => {
+      mediaRecorder.start();
+      videoEl.play();
+      if (musicAudioRef.current && selectedMusic) {
+        musicAudioRef.current.play().catch(() => {});
+      }
+      drawFrame();
+    }, 500);
+  };
+
   // Capture Frame and Export/Download as Image
   const handleExportFrame = () => {
     const videoEl = videoRef.current;
@@ -363,7 +575,46 @@ export default function VideoEditor() {
     <div className="ve-page">
       {/* Hidden music element */}
       {selectedMusic && (
-        <audio ref={musicAudioRef} src={selectedMusic.url} loop />
+        <audio ref={musicAudioRef} src={selectedMusic.url} loop crossOrigin="anonymous" />
+      )}
+
+      {/* Rendering Video Progress Modal */}
+      {renderingVideo && (
+        <div className="ve-render-modal" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(5, 5, 10, 0.95)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          backdropFilter: 'blur(12px)'
+        }}>
+          <div style={{
+            background: '#110c1f',
+            border: '1.5px solid rgba(139, 92, 246, 0.3)',
+            padding: '36px 30px',
+            borderRadius: '24px',
+            textAlign: 'center',
+            width: '90%',
+            maxWidth: '400px',
+            boxShadow: '0 15px 50px rgba(0,0,0,0.6)'
+          }}>
+            <div className="ve-empty-icon" style={{ fontSize: '48px', animation: 'spin 3s linear infinite', marginBottom: '8px' }}>💿</div>
+            <h3 style={{ margin: '16px 0 8px', fontSize: '1.25rem', fontWeight: 700 }}>Rendering Video</h3>
+            <p style={{ color: '#8b8b9c', fontSize: '0.85rem', margin: '0 0 24px', lineHeight: 1.5 }}>Applying filters, aspect ratios, overlays, and mixing background audio track...</p>
+            
+            {/* Progress bar */}
+            <div style={{ background: 'rgba(255,255,255,0.06)', height: '10px', borderRadius: '99px', overflow: 'hidden', marginBottom: '14px' }}>
+              <div style={{ width: `${renderProgress}%`, height: '100%', background: 'linear-gradient(90deg, #7c3aed, #ec4899)', borderRadius: '99px', transition: 'width 0.1s linear' }} />
+            </div>
+            <div style={{ fontSize: '0.82rem', color: '#a78bfa', fontWeight: 800 }}>{renderProgress}% Completed</div>
+          </div>
+        </div>
       )}
 
       {/* Editor Header */}
@@ -375,9 +626,14 @@ export default function VideoEditor() {
           <h1 className="ve-header-title">Studio <span>Video Editor</span></h1>
         </div>
         {videoFile && (
-          <button className="ve-export-btn" onClick={handleExportFrame}>
-            📸 Export Thumbnail
-          </button>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button className="ve-export-btn" style={{ background: 'linear-gradient(135deg, #10b981, #059669)', boxShadow: '0 4px 20px rgba(16, 185, 129, 0.4)' }} onClick={handleExportVideo} disabled={renderingVideo}>
+              {renderingVideo ? `Rendering ${renderProgress}%` : '🎬 Export Video'}
+            </button>
+            <button className="ve-export-btn" onClick={handleExportFrame} disabled={renderingVideo}>
+              📸 Export Thumbnail
+            </button>
+          </div>
         )}
       </header>
 
@@ -397,6 +653,7 @@ export default function VideoEditor() {
                   onLoadedMetadata={handleLoadedMetadata}
                   onTimeUpdate={handleTimeUpdate}
                   onClick={togglePlay}
+                  crossOrigin="anonymous"
                   style={{
                     filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) blur(${blur}px)`
                   }}
