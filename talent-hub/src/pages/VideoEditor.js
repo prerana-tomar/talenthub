@@ -169,6 +169,8 @@ export default function VideoEditor() {
       fontSize: textSize,
       x: 50, // default center percent
       y: 50,
+      rotation: 0,
+      fontFamily: 'Poppins, sans-serif'
     };
     setTextOverlays([...textOverlays, newOverlay]);
     setSelectedTextId(newOverlay.id);
@@ -322,7 +324,7 @@ export default function VideoEditor() {
 
     // Start video at trim start time
     videoEl.currentTime = startTime;
-    videoEl.muted = true; // Mute preview so we don't hear echo during capture
+    videoEl.muted = false; // Must be false so AudioContext receives the audio stream
 
     // Prepare audio track nodes
     let audioStreamDest = null;
@@ -336,7 +338,7 @@ export default function VideoEditor() {
 
       videoSourceNode = audioCtx.createMediaElementSource(videoEl);
       videoSourceNode.connect(audioStreamDest);
-      videoSourceNode.connect(audioCtx.destination);
+      // Do not connect to audioCtx.destination so rendering remains silent to speakers
 
       if (selectedMusic && musicAudioRef.current) {
         musicAudioRef.current.currentTime = 0;
@@ -348,7 +350,7 @@ export default function VideoEditor() {
         gainNode.gain.value = musicMuted ? 0 : musicVolume;
         musicSourceNode.connect(gainNode);
         gainNode.connect(audioStreamDest);
-        gainNode.connect(audioCtx.destination);
+        // Do not connect to audioCtx.destination so rendering remains silent to speakers
       }
     } catch (e) {
       console.warn("Audio Context setup failed (likely CORS or audio source already connected):", e);
@@ -453,19 +455,35 @@ export default function VideoEditor() {
 
       // Draw text overlays on top of the canvas
       textOverlays.forEach(overlay => {
+        ctx.save();
         ctx.fillStyle = overlay.color;
         const containerBox = containerRef.current.getBoundingClientRect();
         const scaleFactor = targetWidth / containerBox.width;
         const finalFontSize = overlay.fontSize * scaleFactor;
 
-        ctx.font = `bold ${finalFontSize}px Poppins, sans-serif`;
+        // Set font family dynamically
+        ctx.font = `bold ${finalFontSize}px ${overlay.fontFamily || 'Poppins, sans-serif'}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
         const xPos = (overlay.x / 100) * targetWidth;
         const yPos = (overlay.y / 100) * targetHeight;
 
-        ctx.fillText(overlay.text, xPos, yPos);
+        // Translate and Rotate canvas around the text center
+        ctx.translate(xPos, yPos);
+        ctx.rotate(((overlay.rotation || 0) * Math.PI) / 180);
+
+        // Draw multi-line text lines relative to origin 0,0
+        const lines = (overlay.text || '').split('\n');
+        lines.forEach((line, index) => {
+          ctx.fillText(
+            line,
+            0,
+            index * finalFontSize * 1.25 - ((lines.length - 1) * finalFontSize * 0.6)
+          );
+        });
+
+        ctx.restore();
       });
 
       animationFrameId = requestAnimationFrame(drawFrame);
@@ -542,13 +560,15 @@ export default function VideoEditor() {
 
     // Draw text overlays relative to canvas size
     textOverlays.forEach(overlay => {
+      ctx.save();
       ctx.fillStyle = overlay.color;
       // Scale font size according to the canvas width compared to preview container
       const containerBox = containerRef.current.getBoundingClientRect();
       const scaleFactor = targetWidth / containerBox.width;
       const finalFontSize = overlay.fontSize * scaleFactor;
 
-      ctx.font = `bold ${finalFontSize}px Poppins, sans-serif`;
+      // Set font family dynamically
+      ctx.font = `bold ${finalFontSize}px ${overlay.fontFamily || 'Poppins, sans-serif'}`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
@@ -556,7 +576,21 @@ export default function VideoEditor() {
       const xPos = (overlay.x / 100) * targetWidth;
       const yPos = (overlay.y / 100) * targetHeight;
 
-      ctx.fillText(overlay.text, xPos, yPos);
+      // Translate and Rotate canvas around the text center
+      ctx.translate(xPos, yPos);
+      ctx.rotate(((overlay.rotation || 0) * Math.PI) / 180);
+
+      // Draw multi-line text lines relative to origin 0,0
+      const lines = (overlay.text || '').split('\n');
+      lines.forEach((line, index) => {
+        ctx.fillText(
+          line,
+          0,
+          index * finalFontSize * 1.25 - ((lines.length - 1) * finalFontSize * 0.6)
+        );
+      });
+
+      ctx.restore();
     });
 
     // Trigger download
@@ -669,6 +703,10 @@ export default function VideoEditor() {
                       top: `${item.y}%`,
                       color: item.color,
                       fontSize: `${item.fontSize}px`,
+                      fontFamily: item.fontFamily || 'Poppins, sans-serif',
+                      transform: `translate(-50%, -50%) rotate(${item.rotation || 0}deg)`,
+                      whiteSpace: 'pre-wrap',
+                      textAlign: 'center'
                     }}
                     onPointerDown={(e) => handlePointerDown(e, item)}
                   >
@@ -884,16 +922,17 @@ export default function VideoEditor() {
             {activeTab === 'text' && (
               <div className="ve-text-panel">
                 <h3>Add Text Overlay</h3>
-                <div className="ve-text-input-row">
-                  <input
-                    type="text"
+                <div className="ve-text-input-row" style={{ flexDirection: 'column', gap: '8px' }}>
+                  <textarea
                     value={newText}
                     onChange={(e) => setNewText(e.target.value)}
-                    placeholder="Enter overlay text..."
+                    placeholder="Enter overlay text (Enter key for next line)..."
                     className="ve-text-input"
+                    rows="2"
+                    style={{ resize: 'vertical', width: '100%', boxSizing: 'border-box' }}
                   />
-                  <button className="ve-add-text-btn" onClick={addTextOverlay}>
-                    ➕ Add
+                  <button className="ve-add-text-btn" style={{ padding: '10px 16px', width: '100%' }} onClick={addTextOverlay}>
+                    ➕ Add Text Overlay
                   </button>
                 </div>
 
@@ -914,11 +953,44 @@ export default function VideoEditor() {
                       <div className="ve-filter-label">
                         <span>Text Content</span>
                       </div>
-                      <input
-                        type="text"
+                      <textarea
                         value={activeTextOverlayObj.text}
                         onChange={(e) => updateSelectedText('text', e.target.value)}
                         className="ve-text-input"
+                        rows="2"
+                        style={{ resize: 'vertical', width: '100%', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    <div className="ve-filter-control">
+                      <div className="ve-filter-label">
+                        <span>Font Family</span>
+                      </div>
+                      <select
+                        value={activeTextOverlayObj.fontFamily || 'Poppins, sans-serif'}
+                        onChange={(e) => updateSelectedText('fontFamily', e.target.value)}
+                        className="ve-text-input"
+                        style={{ width: '100%', height: '40px', background: '#090610' }}
+                      >
+                        <option value="Poppins, sans-serif">Poppins (Sans-serif)</option>
+                        <option value="'Playfair Display', serif">Playfair Display (Serif)</option>
+                        <option value="'Courier New', monospace">Courier New (Monospace)</option>
+                        <option value="Pacifico, cursive">Pacifico (Cursive)</option>
+                        <option value="Impact, sans-serif">Impact (Bold Impact)</option>
+                      </select>
+                    </div>
+
+                    <div className="ve-filter-control">
+                      <div className="ve-filter-label">
+                        <span>Rotation</span>
+                        <span>{activeTextOverlayObj.rotation || 0}°</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="-180"
+                        max="180"
+                        value={activeTextOverlayObj.rotation || 0}
+                        onChange={(e) => updateSelectedText('rotation', parseInt(e.target.value))}
                       />
                     </div>
 

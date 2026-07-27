@@ -611,6 +611,39 @@
   }
 }
 
+@media (max-width: 600px) {
+  .ve-header {
+    height: auto;
+    flex-direction: column;
+    padding: 12px;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .ve-header-title {
+    font-size: 1.15rem;
+    text-align: center;
+  }
+  .ve-header div {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .ve-export-btn {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 0.72rem;
+    text-align: center;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  .ve-back-btn {
+    padding: 6px 12px;
+    font-size: 0.72rem;
+    border-radius: 8px;
+  }
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
