@@ -60,9 +60,17 @@ export default function VideoEditor() {
   // Refs
   const videoRef = useRef(null);
   const musicAudioRef = useRef(null);
+  const exportMusicAudioRef = useRef(null);
   const fileInputRef = useRef(null);
   const containerRef = useRef(null);
   const dragStartPos = useRef({ x: 0, y: 0, elementX: 0, elementY: 0 });
+
+  // Reusable AudioContext and source node refs to avoid duplicate connection exceptions
+  const audioCtxRef = useRef(null);
+  const videoSourceNodeRef = useRef(null);
+  const musicSourceNodeRef = useRef(null);
+  const musicGainNodeRef = useRef(null);
+  const audioStreamDestRef = useRef(null);
 
   // Revoke blob URL on cleanup
   useEffect(() => {
@@ -79,11 +87,16 @@ export default function VideoEditor() {
     musicAudio.volume = musicMuted ? 0 : musicVolume;
 
     if (isPlaying && selectedMusic) {
-      musicAudio.play().catch(() => {});
+      if (videoRef.current) {
+        musicAudio.currentTime = Math.max(0, videoRef.current.currentTime - startTime);
+      }
+      musicAudio.play().catch((err) => {
+        console.warn("Preview audio playback failed:", err);
+      });
     } else {
       musicAudio.pause();
     }
-  }, [isPlaying, selectedMusic, musicVolume, musicMuted]);
+  }, [isPlaying, selectedMusic, musicVolume, musicMuted, startTime]);
 
   // Handle Video Meta Load
   const handleLoadedMetadata = () => {
@@ -100,9 +113,21 @@ export default function VideoEditor() {
     const time = videoRef.current.currentTime;
     setCurrentTime(time);
 
+    // Sync preview music currentTime with video elapsed time
+    if (musicAudioRef.current && isPlaying && selectedMusic) {
+      const targetTime = time - startTime;
+      const drift = Math.abs(musicAudioRef.current.currentTime - targetTime);
+      if (drift > 0.3) {
+        musicAudioRef.current.currentTime = Math.max(0, targetTime);
+      }
+    }
+
     // Trim loop guard: if current time goes past the trimmed end time
     if (time >= endTime) {
       videoRef.current.currentTime = startTime;
+      if (musicAudioRef.current) {
+        musicAudioRef.current.currentTime = 0;
+      }
       if (!videoRef.current.loop) {
         videoRef.current.pause();
         setIsPlaying(false);
@@ -132,6 +157,9 @@ export default function VideoEditor() {
       // Seek back if we are near the end
       if (videoRef.current.currentTime >= endTime || videoRef.current.currentTime < startTime) {
         videoRef.current.currentTime = startTime;
+      }
+      if (musicAudioRef.current && selectedMusic) {
+        musicAudioRef.current.currentTime = Math.max(0, videoRef.current.currentTime - startTime);
       }
       videoRef.current.play().catch(() => {});
       setIsPlaying(true);
@@ -274,6 +302,9 @@ export default function VideoEditor() {
     if (musicAudioRef.current) {
       musicAudioRef.current.pause();
     }
+    if (exportMusicAudioRef.current) {
+      exportMusicAudioRef.current.pause();
+    }
   };
 
   // Capture Actual Edited Video using Canvas CaptureStream and MediaRecorder
@@ -326,31 +357,57 @@ export default function VideoEditor() {
     videoEl.currentTime = startTime;
     videoEl.muted = false; // Must be false so AudioContext receives the audio stream
 
-    // Prepare audio track nodes
-    let audioStreamDest = null;
-    let audioCtx = null;
-    let videoSourceNode = null;
-    let musicSourceNode = null;
+    // Prepare audio track nodes using refs to prevent duplicate connection exceptions
+    let audioCtx = audioCtxRef.current;
+    let audioStreamDest = audioStreamDestRef.current;
+    let videoSourceNode = videoSourceNodeRef.current;
+    let musicSourceNode = musicSourceNodeRef.current;
+    let musicGainNode = musicGainNodeRef.current;
 
     try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      audioStreamDest = audioCtx.createMediaStreamDestination();
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        audioCtxRef.current = audioCtx;
+      }
 
-      videoSourceNode = audioCtx.createMediaElementSource(videoEl);
-      videoSourceNode.connect(audioStreamDest);
-      // Do not connect to audioCtx.destination so rendering remains silent to speakers
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
 
-      if (selectedMusic && musicAudioRef.current) {
-        musicAudioRef.current.currentTime = 0;
-        musicAudioRef.current.volume = musicMuted ? 0 : musicVolume;
-        musicAudioRef.current.muted = false;
-        
-        musicSourceNode = audioCtx.createMediaElementSource(musicAudioRef.current);
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.value = musicMuted ? 0 : musicVolume;
-        musicSourceNode.connect(gainNode);
-        gainNode.connect(audioStreamDest);
-        // Do not connect to audioCtx.destination so rendering remains silent to speakers
+      if (!audioStreamDest) {
+        audioStreamDest = audioCtx.createMediaStreamDestination();
+        audioStreamDestRef.current = audioStreamDest;
+      }
+
+      if (!videoSourceNode) {
+        videoSourceNode = audioCtx.createMediaElementSource(videoEl);
+        videoSourceNodeRef.current = videoSourceNode;
+        videoSourceNode.connect(audioStreamDest);
+      }
+
+      if (selectedMusic && exportMusicAudioRef.current) {
+        const exportMusicAudio = exportMusicAudioRef.current;
+        exportMusicAudio.currentTime = 0;
+        exportMusicAudio.volume = musicMuted ? 0 : musicVolume;
+        exportMusicAudio.muted = false;
+
+        if (!musicSourceNode) {
+          musicSourceNode = audioCtx.createMediaElementSource(exportMusicAudio);
+          musicSourceNodeRef.current = musicSourceNode;
+
+          musicGainNode = audioCtx.createGain();
+          musicGainNodeRef.current = musicGainNode;
+
+          musicSourceNode.connect(musicGainNode);
+          musicGainNode.connect(audioStreamDest);
+        }
+
+        if (musicGainNode) {
+          musicGainNode.gain.value = musicMuted ? 0 : musicVolume;
+        }
+      } else if (musicGainNode) {
+        // Silence music if no track selected
+        musicGainNode.gain.value = 0;
       }
     } catch (e) {
       console.warn("Audio Context setup failed (likely CORS or audio source already connected):", e);
@@ -376,10 +433,12 @@ export default function VideoEditor() {
       'video/mp4'
     ];
 
+    let selectedMimeType = '';
     for (const type of mimeTypes) {
       if (MediaRecorder.isTypeSupported(type)) {
         try {
           mediaRecorder = new MediaRecorder(recordStream, { mimeType: type });
+          selectedMimeType = type;
           break;
         } catch (e) {}
       }
@@ -387,6 +446,7 @@ export default function VideoEditor() {
 
     if (!mediaRecorder) {
       mediaRecorder = new MediaRecorder(recordStream);
+      selectedMimeType = mediaRecorder.mimeType || 'video/webm';
     }
 
     mediaRecorder.ondataavailable = (event) => {
@@ -396,27 +456,27 @@ export default function VideoEditor() {
     };
 
     mediaRecorder.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const isMp4 = selectedMimeType.includes('mp4');
+      const ext = isMp4 ? 'mp4' : 'webm';
+      const blob = new Blob(recordedChunks, { type: isMp4 ? 'video/mp4' : 'video/webm' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${videoFile?.name?.replace(/\.[^/.]+$/, "") || 'edited'}_edited.webm`;
+      link.download = `${videoFile?.name?.replace(/\.[^/.]+$/, "") || 'edited'}_edited.${ext}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      // Clean up audio nodes
-      if (audioCtx) {
-        audioCtx.close();
-      }
+      // Do NOT close audioCtx to allow persistent reuse on subsequent exports.
+      // Simply reset values.
 
       // Restore states
       videoEl.muted = false;
       videoEl.currentTime = startTime;
       videoEl.pause();
-      if (musicAudioRef.current) {
-        musicAudioRef.current.pause();
+      if (exportMusicAudioRef.current) {
+        exportMusicAudioRef.current.pause();
       }
       setIsPlaying(false);
       setRenderingVideo(false);
@@ -493,8 +553,10 @@ export default function VideoEditor() {
     setTimeout(() => {
       mediaRecorder.start();
       videoEl.play();
-      if (musicAudioRef.current && selectedMusic) {
-        musicAudioRef.current.play().catch(() => {});
+      if (exportMusicAudioRef.current && selectedMusic) {
+        exportMusicAudioRef.current.play().catch((err) => {
+          console.warn("Export music audio playback failed:", err);
+        });
       }
       drawFrame();
     }, 500);
@@ -607,10 +669,9 @@ export default function VideoEditor() {
 
   return (
     <div className="ve-page">
-      {/* Hidden music element */}
-      {selectedMusic && (
-        <audio ref={musicAudioRef} src={selectedMusic.url} loop crossOrigin="anonymous" />
-      )}
+      {/* Hidden music elements */}
+      <audio ref={musicAudioRef} src={selectedMusic?.url || ''} loop />
+      <audio ref={exportMusicAudioRef} src={selectedMusic?.url || ''} loop crossOrigin="anonymous" />
 
       {/* Rendering Video Progress Modal */}
       {renderingVideo && (
