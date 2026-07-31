@@ -4,9 +4,11 @@ import './VideoEditor.css';
 
 // Curated royalty-free fallback tracks (hosted locally to prevent CORS and ISP network blocks)
 const FALLBACK_MUSIC = [
-  { id: '1', name: '🎵 Acoustic Calm', url: '/music/acoustic_calm.mp3', artist: 'Local Track (9s Loop)' },
-  { id: '2', name: '🎵 Lo-Fi Chill Beat', url: '/music/lofi_chill.mp3', artist: 'Local Track (12s Loop)' },
-  { id: '3', name: '🎵 Cinematic Vibe', url: '/music/cinematic_vibe.mp3', artist: 'Local Track (15s Loop)' },
+  { id: '1', name: '🎵 Acoustic Calm', url: '/music/acoustic_calm.mp3', artist: 'SoundHelix (Acoustic Guitar)' },
+  { id: '2', name: '🎵 Lo-Fi Chill Beat', url: '/music/lofi_chill.mp3', artist: 'SoundHelix (Calm Beats)' },
+  { id: '3', name: '🎵 Cinematic Vibe', url: '/music/cinematic_vibe.mp3', artist: 'SoundHelix (Orchestral)' },
+  { id: '4', name: '🎵 Smooth Jazz', url: '/music/smooth_jazz.mp3', artist: 'SoundHelix (Saxophone)' },
+  { id: '5', name: '🎵 Upbeat Rhythm', url: '/music/upbeat_rhythm.mp3', artist: 'SoundHelix (Energetic)' },
 ];
 
 export default function VideoEditor() {
