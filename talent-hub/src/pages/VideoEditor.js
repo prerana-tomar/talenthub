@@ -2,13 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './VideoEditor.css';
 
-// Curated royalty-free fallback tracks
+// Curated royalty-free fallback tracks (hosted locally to prevent CORS and ISP network blocks)
 const FALLBACK_MUSIC = [
-  { id: '1', name: '🎵 Acoustic Calm', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', artist: 'SoundHelix' },
-  { id: '2', name: '🎵 Lo-Fi Chill Beat', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', artist: 'SoundHelix' },
-  { id: '3', name: '🎵 Cinematic Vibe', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', artist: 'SoundHelix' },
-  { id: '4', name: '🎵 Smooth Jazz', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3', artist: 'SoundHelix' },
-  { id: '5', name: '🎵 Upbeat Rhythm', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3', artist: 'SoundHelix' },
+  { id: '1', name: '🎵 Acoustic Calm', url: '/music/acoustic_calm.mp3', artist: 'Local Track (9s Loop)' },
+  { id: '2', name: '🎵 Lo-Fi Chill Beat', url: '/music/lofi_chill.mp3', artist: 'Local Track (12s Loop)' },
+  { id: '3', name: '🎵 Cinematic Vibe', url: '/music/cinematic_vibe.mp3', artist: 'Local Track (15s Loop)' },
 ];
 
 export default function VideoEditor() {
