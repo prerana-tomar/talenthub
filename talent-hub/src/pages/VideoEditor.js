@@ -50,6 +50,13 @@ export default function VideoEditor() {
   const [musicVolume, setMusicVolume] = useState(0.5);
   const [musicMuted, setMusicMuted] = useState(false);
 
+  // Original Video Audio States
+  const [videoVolume, setVideoVolume] = useState(1.0);
+  const [videoMuted, setVideoMuted] = useState(false);
+
+  // Export Quality State
+  const [exportQuality, setExportQuality] = useState('high');
+
   // Tabs for the settings panel
   const [activeTab, setActiveTab] = useState('trim'); // trim, filters, text, music
 
@@ -68,6 +75,7 @@ export default function VideoEditor() {
   // Reusable AudioContext and source node refs to avoid duplicate connection exceptions
   const audioCtxRef = useRef(null);
   const videoSourceNodeRef = useRef(null);
+  const videoGainNodeRef = useRef(null);
   const musicSourceNodeRef = useRef(null);
   const musicGainNodeRef = useRef(null);
   const audioStreamDestRef = useRef(null);
@@ -78,6 +86,14 @@ export default function VideoEditor() {
       if (videoSrc) URL.revokeObjectURL(videoSrc);
     };
   }, [videoSrc]);
+
+  // Synchronize Original Video Volume in Preview
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = videoMuted ? 0 : videoVolume;
+      videoRef.current.muted = videoMuted;
+    }
+  }, [videoVolume, videoMuted]);
 
   // Synchronize Background Music with Video Play/Pause and Seek
   useEffect(() => {
@@ -350,6 +366,17 @@ export default function VideoEditor() {
       sourceHeight = targetHeight;
     }
 
+    // Export Quality Clamping (Max Dimension)
+    let maxDim = 1080;
+    if (exportQuality === 'medium') maxDim = 720;
+    if (exportQuality === 'low') maxDim = 480;
+
+    if (targetWidth > maxDim || targetHeight > maxDim) {
+      const scale = maxDim / Math.max(targetWidth, targetHeight);
+      targetWidth = Math.round(targetWidth * scale);
+      targetHeight = Math.round(targetHeight * scale);
+    }
+
     canvas.width = targetWidth;
     canvas.height = targetHeight;
 
@@ -361,6 +388,7 @@ export default function VideoEditor() {
     let audioCtx = audioCtxRef.current;
     let audioStreamDest = audioStreamDestRef.current;
     let videoSourceNode = videoSourceNodeRef.current;
+    let videoGainNode = videoGainNodeRef.current;
     let musicSourceNode = musicSourceNodeRef.current;
     let musicGainNode = musicGainNodeRef.current;
 
@@ -382,7 +410,17 @@ export default function VideoEditor() {
       if (!videoSourceNode) {
         videoSourceNode = audioCtx.createMediaElementSource(videoEl);
         videoSourceNodeRef.current = videoSourceNode;
-        videoSourceNode.connect(audioStreamDest);
+        
+        videoGainNode = audioCtx.createGain();
+        videoGainNodeRef.current = videoGainNode;
+        
+        videoSourceNode.connect(videoGainNode);
+        videoGainNode.connect(audioStreamDest);
+      }
+
+      // Update original video volume for export
+      if (videoGainNode) {
+        videoGainNode.gain.value = videoMuted ? 0 : videoVolume;
       }
 
       if (selectedMusic && exportMusicAudioRef.current) {
@@ -433,11 +471,16 @@ export default function VideoEditor() {
       'video/mp4'
     ];
 
+    // Determine target video bits per second based on quality
+    let bitsPerSecond = 5000000; // 5 Mbps (High)
+    if (exportQuality === 'medium') bitsPerSecond = 2500000; // 2.5 Mbps
+    if (exportQuality === 'low') bitsPerSecond = 1000000; // 1 Mbps
+
     let selectedMimeType = '';
     for (const type of mimeTypes) {
       if (MediaRecorder.isTypeSupported(type)) {
         try {
-          mediaRecorder = new MediaRecorder(recordStream, { mimeType: type });
+          mediaRecorder = new MediaRecorder(recordStream, { mimeType: type, videoBitsPerSecond: bitsPerSecond });
           selectedMimeType = type;
           break;
         } catch (e) {}
@@ -445,7 +488,7 @@ export default function VideoEditor() {
     }
 
     if (!mediaRecorder) {
-      mediaRecorder = new MediaRecorder(recordStream);
+      mediaRecorder = new MediaRecorder(recordStream, { videoBitsPerSecond: bitsPerSecond });
       selectedMimeType = mediaRecorder.mimeType || 'video/webm';
     }
 
@@ -472,7 +515,8 @@ export default function VideoEditor() {
       // Simply reset values.
 
       // Restore states
-      videoEl.muted = false;
+      videoEl.muted = videoMuted;
+      videoEl.volume = videoMuted ? 0 : videoVolume;
       videoEl.currentTime = startTime;
       videoEl.pause();
       if (exportMusicAudioRef.current) {
@@ -903,6 +947,27 @@ export default function VideoEditor() {
                 </div>
 
                 <div style={{ marginTop: '24px' }}>
+                  <h3>Export Video Quality</h3>
+                  <p className="ve-panel-help">Select the resolution and bitrate of the output video.</p>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                    {[
+                      { key: 'low', label: 'Low (480p)' },
+                      { key: 'medium', label: 'Medium (720p)' },
+                      { key: 'high', label: 'High (Source)' }
+                    ].map(q => (
+                      <button
+                        key={q.key}
+                        className={`ve-ratio-btn ${exportQuality === q.key ? 'active' : ''}`}
+                        onClick={() => setExportQuality(q.key)}
+                        style={{ flex: 1, padding: '10px 4px', fontSize: '0.78rem' }}
+                      >
+                        {q.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '24px' }}>
                   <h3>Video Source info</h3>
                   <div className="ve-info-card">
                     <div>Filename: <span style={{ color: '#fff' }}>{videoFile?.name || 'N/A'}</span></div>
@@ -1139,6 +1204,34 @@ export default function VideoEditor() {
             {/* TAB 4: Background Music */}
             {activeTab === 'music' && (
               <div className="ve-music-panel">
+                <h3>Original Video Volume</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px', marginBottom: '24px', backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '12px', borderRadius: '8px' }}>
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>Volume:</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={videoVolume}
+                    onChange={(e) => setVideoVolume(parseFloat(e.target.value))}
+                    style={{ flex: 1, accentColor: '#8B5CF6' }}
+                  />
+                  <button
+                    onClick={() => setVideoMuted(!videoMuted)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '15px'
+                    }}
+                  >
+                    {videoMuted ? '🔇' : '🔊'}
+                  </button>
+                  <span style={{ fontSize: '12px', color: '#94a3b8', minWidth: '35px', textAlign: 'right' }}>
+                    {Math.round(videoVolume * 100)}%
+                  </span>
+                </div>
+
                 <h3>Background Music</h3>
                 <p className="ve-panel-help">Search free royalty-free tracks via Pixabay API.</p>
 
