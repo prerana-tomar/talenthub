@@ -366,16 +366,20 @@ export default function VideoEditor() {
       sourceHeight = targetHeight;
     }
 
-    // Export Quality Clamping (Max Dimension)
-    let maxDim = 1080;
-    if (exportQuality === 'medium') maxDim = 720;
-    if (exportQuality === 'low') maxDim = 480;
+    // Determine the exact export dimensions based on selected quality preset (480p, 720p, 1080p+)
+    const targetRatio = targetWidth / targetHeight;
+    let exportHeight = videoEl.videoHeight; // Default to original source height
 
-    if (targetWidth > maxDim || targetHeight > maxDim) {
-      const scale = maxDim / Math.max(targetWidth, targetHeight);
-      targetWidth = Math.round(targetWidth * scale);
-      targetHeight = Math.round(targetHeight * scale);
+    if (exportQuality === 'low') {
+      exportHeight = 480;
+    } else if (exportQuality === 'medium') {
+      exportHeight = 720;
+    } else if (exportQuality === 'high') {
+      exportHeight = Math.max(videoEl.videoHeight, 1080);
     }
+
+    targetWidth = Math.round(exportHeight * targetRatio);
+    targetHeight = exportHeight;
 
     canvas.width = targetWidth;
     canvas.height = targetHeight;
