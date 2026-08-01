@@ -6,8 +6,54 @@ const fs = require('fs');
 const {protect} = require('../middleware/authMiddleware');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('ffmpeg-static');
+const { exec } = require('child_process');
+const archiver = require('archiver');
 
 ffmpeg.setFfmpegPath(ffmpegPath);
+
+// Helper function to programmatically analyze audio track energy peaks
+function analyzeAudioPeaks(videoPath) {
+  return new Promise((resolve) => {
+    // Run FFmpeg silencedetect to scan the audio track for loudness intervals
+    const cmd = `"${ffmpegPath}" -i "${videoPath}" -af silencedetect=noise=-35dB:d=1.0 -f null -`;
+    exec(cmd, (error, stdout, stderr) => {
+      const output = stderr + stdout;
+      const silenceEvents = [];
+      const regex = /silence_(start|end):\s*([\d.]+)/g;
+      let match;
+      
+      while ((match = regex.exec(output)) !== null) {
+        silenceEvents.push({
+          type: match[1],
+          time: parseFloat(match[2])
+        });
+      }
+
+      if (silenceEvents.length === 0) {
+        return resolve([]);
+      }
+
+      const peaks = [];
+      let lastSilenceEnd = 0;
+
+      for (let i = 0; i < silenceEvents.length; i++) {
+        const ev = silenceEvents[i];
+        if (ev.type === 'start') {
+          if (ev.time - lastSilenceEnd >= 2) {
+            peaks.push({
+              start: Math.round(lastSilenceEnd),
+              end: Math.round(ev.time)
+            });
+          }
+        } else if (ev.type === 'end') {
+          lastSilenceEnd = ev.time;
+        }
+      }
+
+      resolve(peaks);
+    });
+  });
+}
 
 
 
@@ -62,6 +108,18 @@ router.post('/generate', protect, upload.single('video'), async (req, res) => {
     const vibe = optionsObj.vibe || 'Epic';
     const instructions = optionsObj.instructions || 'Focus on energy and clean execution';
 
+    // Programmatically analyze audio peaks first
+    let audioPeaks = [];
+    try {
+      audioPeaks = await analyzeAudioPeaks(videoPath);
+    } catch (peakErr) {
+      console.error('Audio peak analysis error:', peakErr);
+    }
+
+    const peaksString = audioPeaks.length > 0
+      ? audioPeaks.map(p => `${p.start}s to ${p.end}s`).join(', ')
+      : 'Not explicitly detected (use generic spacing)';
+
     let reels = [];
     const apiKey = process.env.GEMINI_API_KEY;
 
@@ -70,6 +128,9 @@ router.post('/generate', protect, upload.single('video'), async (req, res) => {
         const prompt = `You are an AI Video Editor. An artist uploaded a performance video file named "${req.file.originalname}" with a total duration of ${durationSec} seconds.
 They want to extract exactly ${count} highlights/reels from this video.
 The user selected the vibe/style parameter: "${vibe}" and gave instructions: "${instructions}".
+
+Programmatic analysis of the audio track has detected high energy/volume peaks in the video around these time intervals: ${peaksString}.
+Please prioritize placing the highlights/reels start and end times near or within these detected high-energy peak intervals if applicable to the vibe "${vibe}".
 
 Please analyze this request and return a JSON list of highlight segments.
 Each segment must fit completely within the video duration of ${durationSec} seconds.
@@ -256,6 +317,104 @@ The JSON must be an array of objects matching this exact structure:
   } catch (err) {
     console.error('Highlight generation error:', err);
     res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// POST /api/highlights/reslice - allows editing trim and physically re-cutting a reel
+router.post('/reslice', protect, async (req, res) => {
+  try {
+    const { videoPath, startTime, endTime, reelId, ffmpegOptions } = req.body;
+
+    if (!videoPath) {
+      return res.status(400).json({ success: false, message: 'videoPath is required' });
+    }
+
+    const start = Number(startTime) || 0;
+    const end = Number(endTime) || 10;
+    const clipDuration = end - start;
+
+    const parentDir = path.join(__dirname, '../uploads/highlights');
+    const inputPath = path.join(parentDir, videoPath);
+
+    if (!fs.existsSync(inputPath)) {
+      return res.status(404).json({ success: false, message: 'Master video file not found' });
+    }
+
+    const outputFilename = `reel-${Date.now()}-${reelId}.mp4`;
+    const outputPath = path.join(parentDir, outputFilename);
+
+    const filters = Array.isArray(ffmpegOptions) ? ffmpegOptions : [];
+
+    await new Promise((resolve, reject) => {
+      let command = ffmpeg(inputPath)
+        .setStartTime(start)
+        .setDuration(clipDuration);
+
+      if (filters.length > 0) {
+        command.outputOptions(filters);
+      } else {
+        command.videoCodec('copy').audioCodec('copy');
+      }
+
+      command.output(outputPath)
+        .on('end', () => {
+          resolve();
+        })
+        .on('error', (err) => {
+          reject(err);
+        })
+        .run();
+    });
+
+    res.json({
+      success: true,
+      url: `/uploads/highlights/${outputFilename}`
+    });
+
+  } catch (err) {
+    console.error('Reslice error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// POST /api/highlights/download-zip - packages multiple clips into a ZIP stream
+router.post('/download-zip', protect, async (req, res) => {
+  try {
+    const { reels } = req.body;
+    if (!Array.isArray(reels) || reels.length === 0) {
+      return res.status(400).json({ success: false, message: 'No reels specified for download' });
+    }
+
+    res.attachment('ai-reels.zip');
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
+
+    archive.on('error', (err) => {
+      throw err;
+    });
+
+    archive.pipe(res);
+
+    const parentDir = path.join(__dirname, '../uploads/highlights');
+
+    reels.forEach((reel) => {
+      if (reel.url) {
+        const filename = path.basename(reel.url);
+        const filePath = path.join(parentDir, filename);
+        if (fs.existsSync(filePath)) {
+          archive.file(filePath, { name: `${reel.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.mp4` });
+        }
+      }
+    });
+
+    await archive.finalize();
+
+  } catch (err) {
+    console.error('ZIP download error:', err);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: err.message });
+    }
   }
 });
 
