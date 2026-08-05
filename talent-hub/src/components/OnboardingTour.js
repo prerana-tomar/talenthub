@@ -21,12 +21,19 @@ export default function OnboardingTour({ steps, run, onClose }) {
 
     const step = steps[currentStep];
     let el = document.querySelector(step.target);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) {
+        el = null; // treat as hidden/not found
+      }
+    }
 
-    // Fallback: search by text content if selector is not found
+    // Fallback: search by text content if selector is not found or hidden
     if (!el && step.fallbackText) {
       el = Array.from(document.querySelectorAll('a, button, span, div, strong')).find(node =>
         node.textContent.trim().toLowerCase().includes(step.fallbackText.toLowerCase()) &&
-        node.getBoundingClientRect().width > 0
+        node.getBoundingClientRect().width > 0 &&
+        node.getBoundingClientRect().height > 0
       );
     }
 

@@ -10,22 +10,102 @@ const TOUR_STEPS = [
   {
     target: '.th-topnav',
     fallbackText: 'Home',
-    text: 'Yahan se apna pura menu access karo'
+    text: 'Yahan se apna pura top menu panel access karein.'
   },
   {
     target: '.th-upload-btn',
     fallbackText: 'Upload',
-    text: 'Apni performance yahan se upload karo'
+    text: 'Apni videos aur performances ko yahan se website par direct upload karein.'
   },
   {
-    target: '.th-category-row',
-    fallbackText: 'All',
-    text: 'Apni pasand ki category yahan explore karo'
+    target: '.th-sidebar a[href="/"]',
+    fallbackText: 'Home',
+    text: 'Home page par popular performances aur trending community updates ko track karein.'
   },
   {
-    target: '.th-topnav-link[href="/competitions"]',
+    target: '.th-sidebar a[href="/explore"]',
+    fallbackText: 'Explore',
+    text: 'India ke best performance videos ko search aur browse yahan se karein.'
+  },
+  {
+    target: '.th-sidebar a[href="/categories"]',
+    fallbackText: 'Categories',
+    text: 'Singing, Dance, Rap, Comedy jaisi different categories ke videos directly filter karein.'
+  },
+  {
+    target: '.th-sidebar a[href="/collab"]',
+    fallbackText: 'Collab Hub',
+    text: 'Dushre performance creators ke sath collaborate karne ke liye requests yahan post karein.'
+  },
+  {
+    target: '.th-sidebar a[href="/live"]',
+    fallbackText: 'Live Performances',
+    text: 'Live streams perform karein ya dushre creators ko live perform karte hue dekhein.'
+  },
+  {
+    target: '.th-sidebar a[href="/competitions"]',
     fallbackText: 'Competitions',
-    text: 'Live competitions yahan dekho aur participate karo'
+    text: 'Active tournaments aur competitions mein register karke exciting titles jeetein.'
+  },
+  {
+    target: '.th-sidebar a[href="/top"]',
+    fallbackText: 'Top Performers',
+    text: 'Humare platform ke highly-rated aur famous stars ko yahan checkout karein.'
+  },
+  {
+    target: '.th-sidebar a[href="/leaderboard"]',
+    fallbackText: 'Leaderboard',
+    text: 'Weekly ranks dekhein aur check karein ki trending performers list me lead kaun kar raha hai.'
+  },
+  {
+    target: '.th-sidebar a[href="/thoughts"]',
+    fallbackText: 'Thoughts',
+    text: 'Apni status lines, poetry, shayari ya general announcements share karein.'
+  },
+  {
+    target: '.th-sidebar a[href="/creative-studio"]',
+    fallbackText: 'Creative Studio',
+    text: 'Multi-track options aur creative AI features ke sath apna new content model karein.'
+  },
+  {
+    target: '.th-sidebar a[href="/profile"]',
+    fallbackText: 'My Profile',
+    text: 'Apna user profile stats, biography description aur personal links manage karein.'
+  },
+  {
+    target: '.th-sidebar a[href="/uploads"]',
+    fallbackText: 'My Uploads',
+    text: 'Apne upload kiye gaye saare performance videos ka record aur metrics yahan check karein.'
+  },
+  {
+    target: '.th-sidebar a[href="/highlight-studio"]',
+    fallbackText: 'AI Highlights',
+    text: 'AI Highlight Studio se apne upload videos ke crop & peak shorts reels automatic banayein.'
+  },
+  {
+    target: '.th-sidebar a[href="/saved"]',
+    fallbackText: 'Saved',
+    text: 'Apne bookmark aur save kiye gaye videos ko ek jagah yahan manage karein.'
+  },
+  {
+    target: '.th-sidebar a[href="/following"]',
+    fallbackText: 'Following',
+    text: 'Jin creators ko aap follow karte hain unki latest performance feeds yahan dekhein.'
+  },
+  {
+    target: '.th-sidebar a[href="/messages"]',
+    fallbackText: 'Messages',
+    text: 'Fans aur other creators ke sath chat conversations aur messages yahan read karein.'
+  },
+  {
+    target: '.th-sidebar a[href="/settings"]',
+    fallbackText: 'Settings',
+    text: 'Apna login password change karein aur other account details configure karein.'
+  },
+  {
+    target: '.th-premium-card',
+    fallbackText: 'Premium',
+    text: 'Premium stage membership lekar dushro se jyada reach, views aur exclusive search visibility payein!'
   }
 ];
 
