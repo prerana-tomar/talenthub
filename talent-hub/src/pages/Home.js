@@ -71,15 +71,12 @@ export default function Home() {
   const [darkMode, setDarkMode]             = useState(true);
   const [competitions, setCompetitions]     = useState(FALLBACK_COMPETITIONS);
 
-  // Auto-trigger tour for first-time visitors
+  // Auto-trigger tour on every page refresh/load
   useEffect(() => {
-    const tourSeen = localStorage.getItem('talenthub_tour_seen');
-    if (!tourSeen) {
-      const timer = setTimeout(() => {
-        setShowTour(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
+    const timer = setTimeout(() => {
+      setShowTour(true);
+    }, 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   const [realUserCount, setRealUserCount]   = useState(null);
@@ -748,7 +745,6 @@ export default function Home() {
         steps={TOUR_STEPS}
         run={showTour}
         onClose={() => {
-          localStorage.setItem('talenthub_tour_seen', 'true');
           setShowTour(false);
         }}
       />
