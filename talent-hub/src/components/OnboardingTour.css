@@ -1,0 +1,179 @@
+/* ══ ONBOARDING SPOTLIGHT TOUR STYLES ══ */
+
+.th-tour-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999;
+  pointer-events: none; /* Let clicks pass through default dark zones */
+}
+
+/* Spotlight hole container */
+.th-tour-spotlight {
+  box-shadow: 0 0 15px #a855f7, 0 0 0 9999px rgba(5, 5, 12, 0.78);
+  border: 2px dashed #f472b6 !important;
+  animation: pulse-glowing-spotlight 2s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes pulse-glowing-spotlight {
+  0% {
+    box-shadow: 0 0 10px #a855f7, 0 0 0 9999px rgba(5, 5, 12, 0.78);
+    border-color: #f472b6;
+  }
+  50% {
+    box-shadow: 0 0 25px #ec4899, 0 0 0 9999px rgba(5, 5, 12, 0.78);
+    border-color: #a855f7;
+  }
+  100% {
+    box-shadow: 0 0 10px #a855f7, 0 0 0 9999px rgba(5, 5, 12, 0.78);
+    border-color: #f472b6;
+  }
+}
+
+/* Global Arrow SVG */
+.th-tour-arrow-svg {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
+
+/* Tooltip Card Box */
+.th-tour-tooltip {
+  width: 320px;
+  background: linear-gradient(135deg, rgba(20, 15, 38, 0.98) 0%, rgba(10, 8, 20, 0.99) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(168, 85, 247, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: auto; /* Enable buttons inside tooltip */
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.th-tour-tooltip-content {
+  margin-bottom: 16px;
+}
+
+.th-tour-step-badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: #f472b6;
+  background: rgba(244, 114, 182, 0.12);
+  border: 1px solid rgba(244, 114, 182, 0.25);
+  padding: 3px 8px;
+  border-radius: 50px;
+  letter-spacing: 0.8px;
+  display: inline-block;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.th-tour-instruction {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #f1f0f5;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Footer Section */
+.th-tour-tooltip-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.th-tour-footer-right {
+  display: flex;
+  gap: 8px;
+}
+
+/* Button styles */
+.th-tour-btn-skip {
+  background: none;
+  border: none;
+  color: #8b859e;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.th-tour-btn-skip:hover {
+  color: #f472b6;
+  background: rgba(244, 114, 182, 0.06);
+}
+
+.th-tour-btn-prev {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #8b859e;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.th-tour-btn-prev:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.th-tour-btn-next {
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  border: none;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+  transition: all 0.2s;
+}
+
+.th-tour-btn-next:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.5);
+}
+
+/* Dot Indicators */
+.th-tour-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.th-tour-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.th-tour-dot.active {
+  background: #f472b6;
+  width: 14px;
+  border-radius: 4px;
+}
+
+/* Mobile screen optimization */
+@media (max-width: 480px) {
+  .th-tour-tooltip {
+    width: 290px;
+  }
+}

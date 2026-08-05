@@ -2,9 +2,32 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import VideoCard from '../components/VideoCard';
-import OnboardingModal from '../components/OnboardingModal';
+import OnboardingTour from '../components/OnboardingTour';
 import API from '../config';
 import './Home.css';
+
+const TOUR_STEPS = [
+  {
+    target: '.th-topnav',
+    fallbackText: 'Home',
+    text: 'Yahan se apna pura menu access karo'
+  },
+  {
+    target: '.th-upload-btn',
+    fallbackText: 'Upload',
+    text: 'Apni performance yahan se upload karo'
+  },
+  {
+    target: '.th-category-row',
+    fallbackText: 'All',
+    text: 'Apni pasand ki category yahan explore karo'
+  },
+  {
+    target: '.th-topnav-link[href="/competitions"]',
+    fallbackText: 'Competitions',
+    text: 'Live competitions yahan dekho aur participate karo'
+  }
+];
 
 const CATEGORIES = ['All','Singing','Dance','Rap','Comedy','Acting','Instrumental','Poetry'];
 
@@ -42,11 +65,22 @@ const BOTTOM_NAV = [
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [activePage, setActivePage]         = useState('Home');
-  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [showTour, setShowTour]             = useState(false);
   const [videos, setVideos]                 = useState([]);
   const [loading, setLoading]               = useState(true);
   const [darkMode, setDarkMode]             = useState(true);
   const [competitions, setCompetitions]     = useState(FALLBACK_COMPETITIONS);
+
+  // Auto-trigger tour for first-time visitors
+  useEffect(() => {
+    const tourSeen = localStorage.getItem('talenthub_tour_seen');
+    if (!tourSeen) {
+      const timer = setTimeout(() => {
+        setShowTour(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const [realUserCount, setRealUserCount]   = useState(null);
   const [realStats, setRealStats]           = useState({ users:0, videos:0, views:0 });
@@ -327,7 +361,7 @@ export default function Home() {
             ))}
             <button
               className="th-topnav-link th-guide-nav-btn"
-              onClick={() => document.getElementById('guided-tour-section')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => setShowTour(true)}
             >
               Guide 💡
             </button>
@@ -440,57 +474,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ══ GUIDED TOUR SECTION ══ */}
-        <section id="guided-tour-section" className="th-guided-tour-section">
-          <motion.div
-            className="th-premium-guide-card"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
-          >
-            {/* Ambient Purple Glow */}
-            <div className="th-guide-glow-ambient" />
-            
-            {/* Background Floating Sparkles */}
-            <div className="th-guide-particles">
-              <span className="sparkle s1">✨</span>
-              <span className="sparkle s2">🌟</span>
-              <span className="sparkle s3">💫</span>
-              <span className="sparkle s4">✨</span>
-            </div>
-
-            <div className="th-guide-left-col">
-              <div className="th-guide-breadcrumb">
-                <span className="th-guide-bc-home">🏠</span>
-                <span className="th-guide-bc-arrow">❯</span>
-                <span className="th-guide-badge-text">✨ NEW USER GUIDE</span>
-              </div>
-              <h2 className="th-guide-title">Getting Started in 60 Seconds</h2>
-              <p className="th-guide-subtitle">Everything you need to start your TalentHub journey.</p>
-            </div>
-
-            <div className="th-guide-right-col">
-              <button
-                className="th-guide-cta-btn"
-                onClick={() => setShowOnboardingModal(true)}
-              >
-                <span className="th-guide-btn-shine" />
-                <span className="th-guide-btn-text">▶ Start Interactive Guide</span>
-              </button>
-
-              <div className="th-guide-quick-links">
-                <span onClick={() => navigate('/upload')}>Learn Upload</span>
-                <span className="divider">·</span>
-                <span onClick={() => navigate('/explore')}>Explore</span>
-                <span className="divider">·</span>
-                <span onClick={() => navigate('/collab')}>Collaborate</span>
-                <span className="divider">·</span>
-                <span onClick={() => navigate('/competitions')}>Competitions</span>
-              </div>
-            </div>
-          </motion.div>
-        </section>
+        {/* Guided tour card section removed as spotlight onboarding tour is integrated */}
 
         {/* ══ EXPLORE BY CATEGORY ══ */}
         <section className="th-section">
@@ -759,10 +743,14 @@ export default function Home() {
           </Link>
         </div>
       </nav>
-      {/* ══ ONBOARDING INTERACTIVE TOUR MODAL ══ */}
-      <OnboardingModal
-        isOpen={showOnboardingModal}
-        onClose={() => setShowOnboardingModal(false)}
+      {/* ══ ONBOARDING SPOTLIGHT TOUR ══ */}
+      <OnboardingTour
+        steps={TOUR_STEPS}
+        run={showTour}
+        onClose={() => {
+          localStorage.setItem('talenthub_tour_seen', 'true');
+          setShowTour(false);
+        }}
       />
     </div>
   );
