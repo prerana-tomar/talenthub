@@ -1510,15 +1510,26 @@ body.light-mode .th-sidenav-item.active .th-nav-icon {
 .light-mode .th-hero-accent { color: #e8750a !important; }
 .light-mode .th-hero-desc   { color: #6B6B80 !important; }
 .light-mode .th-section-title { color: #1A1A2E !important; }
-.light-mode .th-cat-pill        { background: #F0F0F5 !important; color: #6B6B80 !important; border-color: #E5E5EF !important; }
-.light-mode .th-cat-pill:hover  { background: #EAEAEF !important; color: #1A1A2E !important; }
+.light-mode .th-cat-pill        { background: #FFFFFF !important; border: 1px solid #E5E5EF !important; color: #6B6B80 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important; }
+.light-mode .th-cat-pill:hover  { background: #F9F9FC !important; border-color: rgba(124, 58, 237, 0.25) !important; color: #1A1A2E !important; }
 .light-mode .th-cat-pill.active { background: #7c3aed !important; color: #FFFFFF !important; border-color: #7c3aed !important; }
 .light-mode .th-stat-box    { background: #FFFFFF !important; border-color: #E5E5EF !important; box-shadow: 0 4px 16px rgba(26,26,46,0.04) !important; }
 .light-mode .th-stat-label  { color: #8A8A9F !important; }
 .light-mode .th-performers-panel { background: #FFFFFF !important; border-color: #E5E5EF !important; box-shadow: 0 4px 16px rgba(26,26,46,0.04) !important; }
-.light-mode .th-thought-item     { background: #FFFFFF !important; border-color: #E5E5EF !important; }
-.light-mode .th-comp-row  { background: #FFFFFF !important; border-color: #E5E5EF !important; }
-.light-mode .th-comp-name { color: #1A1A2E !important; }
+.light-mode .th-performer-row { border-bottom: 1px solid #F0F0F5 !important; }
+.light-mode .th-performer-row:last-child { border-bottom: none !important; }
+.light-mode .th-performer-row:hover { background: #F5F3FC !important; }
+.light-mode .th-thought-item     { background: #F4F1FD !important; border: 1px solid rgba(124, 58, 237, 0.16) !important; border-left: 3px solid #7c3aed !important; box-shadow: 0 4px 12px rgba(124,58,237,0.03) !important; }
+.light-mode .th-thought-item:hover { background: #ECE8FC !important; border-color: rgba(124,58,237,0.3) !important; box-shadow: 0 6px 16px rgba(124,58,237,0.08) !important; transform: translateY(-2px) !important; }
+.light-mode .th-thought-item-author { color: #5b21b6 !important; }
+.light-mode .th-thought-item-text { color: #2d2d3f !important; }
+.light-mode .th-thought-item-meta { color: #7c7c93 !important; }
+.light-mode .th-thought-share-btn { background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(236,72,153,0.08)) !important; border: 1px solid rgba(124,58,237,0.25) !important; color: #6d28d9 !important; }
+.light-mode .th-thought-share-btn:hover { background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(236,72,153,0.15)) !important; box-shadow: 0 4px 12px rgba(124,58,237,0.12) !important; }
+.light-mode .th-comp-row  { background: #FAF9FE !important; border: 1px solid #E5E5EF !important; border-left: 3px solid #db2777 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.02) !important; }
+.light-mode .th-comp-row:hover { background: #F3F1F9 !important; border-color: rgba(219,39,119,0.3) !important; box-shadow: 0 6px 16px rgba(219,39,119,0.06) !important; transform: translateY(-2px) !important; }
+.light-mode .th-comp-name { color: #1A1A2E !important; font-weight: 700 !important; }
+.light-mode .th-comp-date { color: #6B6B80 !important; }
 .light-mode .th-panel-title { color: #1A1A2E !important; }
 
 /* Inactive/Active Sidenav items overrides for Light mode */
