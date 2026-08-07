@@ -39,7 +39,22 @@ export default function OnboardingTour({ steps, run, onClose }) {
 
     if (!el) {
       setRect(null);
-      return;
+      const updateCenteredPos = () => {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const left = Math.max(16, Math.min(w - 336, w / 2 - 160));
+        setTooltipPos({
+          top: h / 2 - 80,
+          left: left,
+          isAbove: false,
+          isCentered: true
+        });
+      };
+      updateCenteredPos();
+      window.addEventListener('resize', updateCenteredPos);
+      return () => {
+        window.removeEventListener('resize', updateCenteredPos);
+      };
     }
 
     // Scroll target element into view smoothly
@@ -64,7 +79,7 @@ export default function OnboardingTour({ steps, run, onClose }) {
         let left = r.left + r.width / 2 - tooltipWidth / 2;
         left = Math.max(16, Math.min(viewportWidth - tooltipWidth - 16, left));
 
-        setTooltipPos({ top, left, isAbove });
+        setTooltipPos({ top, left, isAbove, isCentered: false });
       }
     };
 
@@ -122,129 +137,147 @@ export default function OnboardingTour({ steps, run, onClose }) {
   return (
     <div className="th-tour-overlay">
       <AnimatePresence mode="wait">
-        {rect && (
-          <>
-            {/* Spotlight cut-out hole layer */}
-            <motion.div
-              key={`highlight-${currentStep}`}
-              className="th-tour-spotlight"
-              initial={{
-                opacity: 0,
-                x: rect.left - 4,
-                y: rect.top - 4,
-                width: rect.width + 8,
-                height: rect.height + 8,
-              }}
-              animate={{
-                opacity: 1,
-                x: rect.left - 4,
-                y: rect.top - 4,
-                width: rect.width + 8,
-                height: rect.height + 8,
-                transition: { duration: 0.3, ease: 'easeOut' }
-              }}
-              exit={{ opacity: 0 }}
-              style={{
-                position: 'fixed',
-                borderRadius: '8px',
-                border: '2px solid #a855f7',
-                boxShadow: '0 0 15px #a855f7, 0 0 0 9999px rgba(5, 5, 12, 0.75)',
-                zIndex: 1000000,
-                pointerEvents: 'none',
-              }}
-            />
-
-            {/* Global SVG Arrow */}
-            <svg
-              className="th-tour-arrow-svg"
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                pointerEvents: 'none',
-                zIndex: 1000001,
-              }}
-            >
-              <defs>
-                <marker
-                  id="tour-arrowhead"
-                  viewBox="0 0 10 10"
-                  refX="3"
-                  refY="5"
-                  markerWidth="6"
-                  markerHeight="6"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#f472b6" />
-                </marker>
-              </defs>
-              <motion.path
-                key={`arrow-${currentStep}`}
-                d={getArrowPath()}
-                fill="none"
-                stroke="#f472b6"
-                strokeWidth="3.5"
-                strokeDasharray="8 4"
-                strokeLinecap="round"
-                markerEnd="url(#tour-arrowhead)"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 0.45, ease: 'easeOut' }}
-              />
-            </svg>
-
-            {/* Tooltip Card */}
-            <motion.div
-              ref={tooltipRef}
-              key={`tooltip-${currentStep}`}
-              className="th-tour-tooltip"
-              initial={{ opacity: 0, y: tooltipPos.isAbove ? 10 : -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              style={{
-                position: 'fixed',
-                top: tooltipPos.top,
-                left: tooltipPos.left,
-                zIndex: 1000002,
-              }}
-            >
-              <div className="th-tour-tooltip-content">
-                <span className="th-tour-step-badge">💡 STEP {currentStep + 1} OF {steps.length}</span>
-                <p className="th-tour-instruction">{currentStepData.text}</p>
-              </div>
-
-              <div className="th-tour-tooltip-footer">
-                <button className="th-tour-btn-skip" onClick={onClose}>
-                  Skip
-                </button>
-
-                <div className="th-tour-footer-right">
-                  {currentStep > 0 && (
-                    <button className="th-tour-btn-prev" onClick={handlePrev}>
-                      Back
-                    </button>
-                  )}
-                  <button className="th-tour-btn-next" onClick={handleNext}>
-                    {currentStep === steps.length - 1 ? 'Got it 👍' : 'Next →'}
-                  </button>
-                </div>
-              </div>
-
-              <div className="th-tour-dots">
-                {steps.map((_, idx) => (
-                  <span
-                    key={idx}
-                    className={`th-tour-dot ${idx === currentStep ? 'active' : ''}`}
-                    onClick={() => setCurrentStep(idx)}
-                  />
-                ))}
-              </div>
-            </motion.div>
-          </>
+        {/* If target exists, show spotlight cutout. If not, show full-screen overlay */}
+        {rect ? (
+          <motion.div
+            key={`highlight-${currentStep}`}
+            className="th-tour-spotlight"
+            initial={{
+              opacity: 0,
+              x: rect.left - 4,
+              y: rect.top - 4,
+              width: rect.width + 8,
+              height: rect.height + 8,
+            }}
+            animate={{
+              opacity: 1,
+              x: rect.left - 4,
+              y: rect.top - 4,
+              width: rect.width + 8,
+              height: rect.height + 8,
+              transition: { duration: 0.3, ease: 'easeOut' }
+            }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              borderRadius: '8px',
+              border: '2px solid #a855f7',
+              boxShadow: '0 0 15px #a855f7, 0 0 0 9999px rgba(5, 5, 12, 0.75)',
+              zIndex: 1000000,
+              pointerEvents: 'none',
+            }}
+          />
+        ) : (
+          <motion.div
+            key={`full-overlay-${currentStep}`}
+            className="th-tour-full-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(5, 5, 12, 0.75)',
+              zIndex: 1000000,
+              pointerEvents: 'auto',
+            }}
+          />
         )}
+
+        {/* Global SVG Arrow - only render when target exists */}
+        {rect && (
+          <svg
+            className="th-tour-arrow-svg"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              pointerEvents: 'none',
+              zIndex: 1000001,
+            }}
+          >
+            <defs>
+              <marker
+                id="tour-arrowhead"
+                viewBox="0 0 10 10"
+                refX="3"
+                refY="5"
+                markerWidth="6"
+                markerHeight="6"
+                orient="auto-start-reverse"
+              >
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#f472b6" />
+              </marker>
+            </defs>
+            <motion.path
+              key={`arrow-${currentStep}`}
+              d={getArrowPath()}
+              fill="none"
+              stroke="#f472b6"
+              strokeWidth="3.5"
+              strokeDasharray="8 4"
+              strokeLinecap="round"
+              markerEnd="url(#tour-arrowhead)"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 1 }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+            />
+          </svg>
+        )}
+
+        {/* Tooltip Card */}
+        <motion.div
+          ref={tooltipRef}
+          key={`tooltip-${currentStep}`}
+          className="th-tour-tooltip"
+          initial={{ opacity: 0, y: tooltipPos.isAbove ? 10 : -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          style={{
+            position: 'fixed',
+            top: tooltipPos.top,
+            left: tooltipPos.left,
+            zIndex: 1000002,
+          }}
+        >
+          <div className="th-tour-tooltip-content">
+            <span className="th-tour-step-badge">💡 STEP {currentStep + 1} OF {steps.length}</span>
+            <p className="th-tour-instruction">{currentStepData.text}</p>
+          </div>
+
+          <div className="th-tour-tooltip-footer">
+            <button className="th-tour-btn-skip" onClick={onClose}>
+              Skip
+            </button>
+
+            <div className="th-tour-footer-right">
+              {currentStep > 0 && (
+                <button className="th-tour-btn-prev" onClick={handlePrev}>
+                  Back
+                </button>
+              )}
+              <button className="th-tour-btn-next" onClick={handleNext}>
+                {currentStep === steps.length - 1 ? 'Got it 👍' : 'Next →'}
+              </button>
+            </div>
+          </div>
+
+          <div className="th-tour-dots">
+            {steps.map((_, idx) => (
+              <span
+                key={idx}
+                className={`th-tour-dot ${idx === currentStep ? 'active' : ''}`}
+                onClick={() => setCurrentStep(idx)}
+              />
+            ))}
+          </div>
+        </motion.div>
       </AnimatePresence>
     </div>
   );
