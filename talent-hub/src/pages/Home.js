@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import VideoCard from '../components/VideoCard';
 import OnboardingTour from '../components/OnboardingTour';
+import { useTheme } from '../App';
 import API from '../config';
 import './Home.css';
 
@@ -148,7 +149,7 @@ export default function Home() {
   const [showTour, setShowTour]             = useState(false);
   const [videos, setVideos]                 = useState([]);
   const [loading, setLoading]               = useState(true);
-  const [darkMode, setDarkMode]             = useState(true);
+  const { darkMode, toggleTheme }           = useTheme();
   const [competitions, setCompetitions]     = useState(FALLBACK_COMPETITIONS);
 
   // Auto-trigger tour on every page refresh/load
@@ -342,7 +343,7 @@ export default function Home() {
         <div className="th-darkmode-row">
           <span className="th-nav-icon">{darkMode ? '🌙' : '☀️'}</span>
           <span>{darkMode ? 'Dark Mode' : 'Light Mode'}</span>
-          <div className={`th-toggle${darkMode ? ' on' : ''}`} onClick={() => setDarkMode(d => !d)}>
+          <div className={`th-toggle${darkMode ? ' on' : ''}`} onClick={toggleTheme}>
             <div className="th-toggle-thumb" />
           </div>
         </div>
@@ -532,13 +533,13 @@ export default function Home() {
           {/* Stats Row */}
           <div className="th-stats-row">
             {[
-              { icon:'👥', val: fmt(realStats.users),  label:'Performers',        accent:'#a855f7', bg:'rgba(168,85,247,0.08)',  border:'rgba(168,85,247,0.25)' },
-              { icon:'📹', val: fmt(realStats.videos), label:'Videos',            accent:'#f472b6', bg:'rgba(244,114,182,0.08)', border:'rgba(244,114,182,0.25)' },
-              { icon:'👁',  val: fmt(realStats.views),  label:'Views',             accent:'#34d399', bg:'rgba(52,211,153,0.08)',  border:'rgba(52,211,153,0.25)' },
-              { icon:'👍', val: '95%',                  label:'Positive Feedback', accent:'#f5a623', bg:'rgba(245,166,35,0.08)',  border:'rgba(245,166,35,0.25)' },
+              { icon:'👥', val: fmt(realStats.users),  label:'Performers',        accent:'#a855f7', className: 'stat-icon-performers' },
+              { icon:'📹', val: fmt(realStats.videos), label:'Videos',            accent:'#f472b6', className: 'stat-icon-videos' },
+              { icon:'👁',  val: fmt(realStats.views),  label:'Views',             accent:'#34d399', className: 'stat-icon-views' },
+              { icon:'👍', val: '95%',                  label:'Positive Feedback', accent:'#f5a623', className: 'stat-icon-feedback' },
             ].map((s,i) => (
               <div key={i} className="th-stat-box">
-                <div className="th-stat-icon-wrap" style={{ background: s.bg, border: `1px solid ${s.border}` }}>
+                <div className={`th-stat-icon-wrap ${s.className}`}>
                   <span className="th-stat-icon">{s.icon}</span>
                 </div>
                 <div className="th-stat-val" style={{ color: s.accent }}>{s.val}</div>
@@ -789,7 +790,7 @@ export default function Home() {
         <div className="th-darkmode-row" style={{ marginTop: 'auto', padding: '16px 16px 24px' }}>
           <span className="th-nav-icon">{darkMode ? '🌙' : '☀️'}</span>
           <span>{darkMode ? 'Dark Mode' : 'Light Mode'}</span>
-          <div className={`th-toggle${darkMode ? ' on' : ''}`} onClick={() => setDarkMode(d => !d)}>
+          <div className={`th-toggle${darkMode ? ' on' : ''}`} onClick={toggleTheme}>
             <div className="th-toggle-thumb" />
           </div>
         </div>

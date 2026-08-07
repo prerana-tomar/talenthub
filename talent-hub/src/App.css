@@ -36,32 +36,32 @@ body, body.dark-mode {
 
 /* Light Mode */
 body.light-mode {
-  --bg-primary:    #f5f5f7;
-  --bg-secondary:  #ffffff;
-  --bg-card:       rgba(0,0,0,0.03);
-  --bg-card-hover: rgba(0,0,0,0.06);
-  --bg-input:      rgba(0,0,0,0.05);
-  --bg-input-hover:rgba(0,0,0,0.08);
+  --bg-primary:    #F7F7FB;
+  --bg-secondary:  #FFFFFF;
+  --bg-card:       #FFFFFF;
+  --bg-card-hover: #F9F9FC;
+  --bg-input:      #F0F0F5;
+  --bg-input-hover:#EAEAEF;
 
-  --border:        rgba(0,0,0,0.08);
-  --border-strong: rgba(0,0,0,0.15);
-  --border-focus:  rgba(124,58,237,0.5);
+  --border:        #E5E5EF;
+  --border-strong: #DCDCE5;
+  --border-focus:  #7c3aed;
 
-  --text-primary:   #0f0f1a;
-  --text-secondary: rgba(0,0,0,0.6);
-  --text-muted:     #888888;
-  --text-faint:     rgba(0,0,0,0.4);
+  --text-primary:   #1A1A2E;
+  --text-secondary: #6B6B80;
+  --text-muted:     #8A8A9F;
+  --text-faint:     #A2A2B5;
 
   --accent:        #7c3aed;
   --accent-light:  #6d28d9;
   --accent-hover:  #5b21b6;
 
-  --topbar-bg:     rgba(255,255,255,0.97);
-  --sidebar-bg:    #ffffff;
-  --hero-gradient: linear-gradient(180deg, rgba(124,58,237,0.07) 0%, rgba(236,72,153,0.03) 60%, transparent 100%);
+  --topbar-bg:     #FFFFFF;
+  --sidebar-bg:    #FFFFFF;
+  --hero-gradient: linear-gradient(180deg, rgba(124,58,237,0.06) 0%, rgba(236,72,153,0.03) 60%, transparent 100%);
 
-  --shadow:        0 8px 32px rgba(0,0,0,0.12);
-  --shadow-card:   0 4px 20px rgba(0,0,0,0.08);
+  --shadow:        0 8px 30px rgba(26,26,46,0.08);
+  --shadow-card:   0 4px 16px rgba(26,26,46,0.04);
 
   background: var(--bg-primary);
   color: var(--text-primary);
