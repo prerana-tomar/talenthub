@@ -172,8 +172,25 @@
 }
 
 /* Mobile screen optimization */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .th-tour-tooltip {
-    width: 290px;
+    max-width: 90vw !important;
+    padding: 16px !important;
+  }
+  .th-tour-dots {
+    display: none !important; /* Hide dots on mobile since 20 dots don't fit */
+  }
+  .th-tour-btn-skip,
+  .th-tour-btn-prev,
+  .th-tour-btn-next {
+    min-height: 44px !important; /* Touch-friendly tap target minimum */
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .th-tour-instruction {
+    font-size: 12.5px !important;
   }
 }

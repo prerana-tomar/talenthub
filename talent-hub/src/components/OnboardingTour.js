@@ -2,6 +2,31 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './OnboardingTour.css';
 
+const getResponsiveSelector = (selector) => {
+  if (window.innerWidth > 768) return selector;
+
+  if (selector === '.th-topnav') {
+    return '.th-hamburger-btn';
+  }
+  if (selector === '.th-upload-btn') {
+    return '.upload-mob';
+  }
+  if (selector.includes('.th-sidebar')) {
+    const hrefMatch = selector.match(/href="([^"]+)"/);
+    if (hrefMatch) {
+      const href = hrefMatch[1];
+      if (href === '/' || href === '/explore' || href === '/thoughts' || href === '/profile') {
+        return `.th-mobile-bottom-nav a[href="${href}"]`;
+      }
+      return `.th-mobile-drawer a[href="${href}"]`;
+    }
+  }
+  if (selector === '.th-premium-card') {
+    return '.th-mobile-drawer .th-premium-card';
+  }
+  return selector;
+};
+
 export default function OnboardingTour({ steps, run, onClose, onStepChange }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [rect, setRect] = useState(null);
@@ -27,7 +52,7 @@ export default function OnboardingTour({ steps, run, onClose, onStepChange }) {
     if (!run || !steps || steps.length === 0) return;
 
     const step = steps[currentStep];
-    let el = document.querySelector(step.target);
+    let el = document.querySelector(getResponsiveSelector(step.target));
     if (el) {
       const rect = el.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) {
@@ -73,7 +98,7 @@ export default function OnboardingTour({ steps, run, onClose, onStepChange }) {
         setRect(r);
 
         // Calculate tooltip position based on target rect and viewport height
-        const tooltipWidth = 320;
+        const tooltipWidth = Math.min(320, window.innerWidth - 32);
         const tooltipHeight = 130; // approximate estimation
         const viewportHeight = window.innerHeight;
         const viewportWidth = window.innerWidth;
@@ -126,7 +151,7 @@ export default function OnboardingTour({ steps, run, onClose, onStepChange }) {
   // Calculate coordinates for curved SVG arrow
   const getArrowPath = () => {
     if (!rect) return '';
-    const tooltipWidth = 320;
+    const tooltipWidth = Math.min(320, window.innerWidth - 32);
     const tooltipHeight = 120; // approximate
     const targetX = rect.left + rect.width / 2;
     const targetY = tooltipPos.isAbove ? rect.top : rect.bottom;
@@ -252,6 +277,7 @@ export default function OnboardingTour({ steps, run, onClose, onStepChange }) {
             position: 'fixed',
             top: tooltipPos.top,
             left: tooltipPos.left,
+            width: Math.min(320, window.innerWidth - 32),
             zIndex: 1000002,
           }}
         >

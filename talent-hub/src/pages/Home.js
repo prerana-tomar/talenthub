@@ -831,8 +831,9 @@ export default function Home() {
         }}
         onStepChange={(stepIndex) => {
           if (window.innerWidth <= 768) {
-            // Sidebar navigation and Go Premium card are at indices 1 to 19 inclusive
-            if (stepIndex >= 1 && stepIndex <= 19) {
+            // Only open drawer for hidden sidebar navigation items
+            const drawerSteps = [4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 18, 19];
+            if (drawerSteps.includes(stepIndex)) {
               setMobileMenuOpen(true);
             } else {
               setMobileMenuOpen(false);
