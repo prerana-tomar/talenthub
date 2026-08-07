@@ -1198,3 +1198,176 @@ body.light-mode .share-user-name {
     box-shadow: 0 0 0 0px rgba(167, 139, 250, 0);
   }
 }
+
+/* ══ THOUGHTS PAGE — LIGHT MODE EXHAUSTIVE LEGIBILITY FIXES ══ */
+body.light-mode .thoughts-page {
+  background: transparent;
+}
+body.light-mode .thoughts-empty h3 {
+  color: #1A1A2E !important;
+}
+body.light-mode .thoughts-header-left p {
+  color: #6B6B80 !important;
+}
+
+/* Category buttons */
+body.light-mode .thought-cat-btn {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E5EF !important;
+  color: #6B6B80 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+}
+body.light-mode .thought-cat-btn:hover {
+  background: #F9F9FC !important;
+  border-color: rgba(124, 58, 237, 0.25) !important;
+  color: #1A1A2E !important;
+}
+body.light-mode .thought-cat-btn.active {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25) !important;
+}
+
+/* Thought Post Form */
+body.light-mode .thought-form {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E5EF !important;
+  box-shadow: 0 8px 24px rgba(26, 26, 46, 0.04) !important;
+}
+body.light-mode .thought-form-right textarea {
+  background: #F7F7FB !important;
+  border: 1px solid #E5E5EF !important;
+  color: #1A1A2E !important;
+}
+body.light-mode .thought-form-right textarea::placeholder {
+  color: #A2A2B5 !important;
+}
+body.light-mode .form-cat-pill {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E5EF !important;
+  color: #6B6B80 !important;
+}
+body.light-mode .form-cat-pill:hover {
+  background: #F9F9FC !important;
+  border-color: rgba(124, 58, 237, 0.2) !important;
+  color: #1A1A2E !important;
+}
+body.light-mode .form-cat-pill.active {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+}
+body.light-mode .image-upload-trigger {
+  background: rgba(124, 58, 237, 0.05) !important;
+  border: 1.5px dashed rgba(124, 58, 237, 0.2) !important;
+  color: #7c3aed !important;
+}
+body.light-mode .image-upload-trigger:hover {
+  background: rgba(124, 58, 237, 0.1) !important;
+  border-color: #7c3aed !important;
+}
+body.light-mode .char-count {
+  color: #8A8A9F !important;
+}
+
+/* Thought Card */
+body.light-mode .thought-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E5EF !important;
+  box-shadow: 0 4px 16px rgba(26, 26, 46, 0.03) !important;
+}
+body.light-mode .thought-card:hover {
+  border-color: rgba(124, 58, 237, 0.25) !important;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.08) !important;
+}
+body.light-mode .thought-author {
+  color: #1A1A2E !important;
+}
+body.light-mode .thought-time {
+  color: #8A8A9F !important;
+}
+body.light-mode .thought-text {
+  color: #2D2D3F !important;
+}
+body.light-mode .thought-actions {
+  border-top: 1px solid #E5E5EF !important;
+}
+body.light-mode .thought-like-btn {
+  color: #6B6B80 !important;
+}
+body.light-mode .thought-like-btn:hover,
+body.light-mode .thought-like-btn.liked {
+  color: #f43f5e !important;
+  background: rgba(244, 63, 94, 0.06) !important;
+  border-color: rgba(244, 63, 94, 0.12) !important;
+}
+body.light-mode .thought-category-badge {
+  background: rgba(124, 58, 237, 0.05) !important;
+  border: 1px solid rgba(124, 58, 237, 0.15) !important;
+  color: #7c3aed !important;
+}
+body.light-mode .thought-edit-btn,
+body.light-mode .thought-delete-btn {
+  color: #8A8A9F !important;
+}
+body.light-mode .thought-edit-btn:hover {
+  color: #7c3aed !important;
+  background: rgba(124, 58, 237, 0.06) !important;
+}
+body.light-mode .thought-delete-btn:hover {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.06) !important;
+}
+
+/* Edit Box */
+body.light-mode .thought-edit-textarea {
+  background: #F7F7FB !important;
+  border-color: #7c3aed !important;
+  color: #1A1A2E !important;
+}
+body.light-mode .edit-cancel-btn {
+  border-color: #E5E5EF !important;
+  color: #6B6B80 !important;
+}
+body.light-mode .edit-cancel-btn:hover {
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
+  background: rgba(124, 58, 237, 0.04) !important;
+}
+
+/* Comments Section inside Card */
+body.light-mode .comments-section {
+  border-top: 1px solid #E5E5EF !important;
+}
+body.light-mode .comment-body {
+  background: #F7F7FB !important;
+  border: 1px solid #E5E5EF !important;
+}
+body.light-mode .comment-author {
+  color: #5b21b6 !important;
+}
+body.light-mode .comment-text {
+  color: #2D2D3F !important;
+}
+body.light-mode .comment-input-row textarea {
+  background: #F7F7FB !important;
+  border: 1px solid #E5E5EF !important;
+  color: #1A1A2E !important;
+}
+body.light-mode .comment-input-row textarea::placeholder {
+  color: #A2A2B5 !important;
+}
+body.light-mode .comment-input-row textarea:focus {
+  border-color: #7c3aed !important;
+}
+body.light-mode .comment-post-btn {
+  box-shadow: 0 3px 10px rgba(124, 58, 237, 0.2) !important;
+}
+
+/* Skeleton */
+body.light-mode .thought-skeleton {
+  background: linear-gradient(90deg, #F0F0F5 25%, #E5E5EF 50%, #F0F0F5 75%) !important;
+  border-color: #E5E5EF !important;
+}
+
