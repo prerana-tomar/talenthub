@@ -9,14 +9,14 @@ const getResponsiveSelector = (selector) => {
     return '.th-hamburger-btn';
   }
   if (selector === '.th-upload-btn') {
-    return '.upload-mob';
+    return '.global-upload';
   }
   if (selector.includes('.th-sidebar')) {
     const hrefMatch = selector.match(/href="([^"]+)"/);
     if (hrefMatch) {
       const href = hrefMatch[1];
       if (href === '/' || href === '/explore' || href === '/thoughts' || href === '/profile') {
-        return `.th-mobile-bottom-nav a[href="${href}"]`;
+        return `.global-mobile-bottom-nav a[href="${href}"]`;
       }
       return `.th-mobile-drawer a[href="${href}"]`;
     }
@@ -89,8 +89,21 @@ export default function OnboardingTour({ steps, run, onClose, onStepChange }) {
       };
     }
 
-    // Scroll target element into view smoothly
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Helper to check if element or any ancestor is fixed
+    const isFixed = (element) => {
+      let current = element;
+      while (current && current !== document.body) {
+        const style = window.getComputedStyle(current);
+        if (style.position === 'fixed') return true;
+        current = current.parentElement;
+      }
+      return false;
+    };
+
+    // Scroll target element into view smoothly if not fixed
+    if (!isFixed(el)) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 
     const updateRect = () => {
       if (el) {
@@ -170,7 +183,7 @@ export default function OnboardingTour({ steps, run, onClose, onStepChange }) {
 
   return (
     <div className="th-tour-overlay">
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {/* If target exists, show spotlight cutout. If not, show full-screen overlay */}
         {rect ? (
           <motion.div
