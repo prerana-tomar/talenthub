@@ -2,11 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './OnboardingTour.css';
 
-export default function OnboardingTour({ steps, run, onClose }) {
+export default function OnboardingTour({ steps, run, onClose, onStepChange }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [rect, setRect] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0, isAbove: false });
   const tooltipRef = useRef(null);
+
+  // Trigger onStepChange callback
+  useEffect(() => {
+    if (run && onStepChange) {
+      onStepChange(currentStep);
+    }
+  }, [currentStep, run, onStepChange]);
 
   // Reset step to 0 when tour starts running
   useEffect(() => {
@@ -83,14 +90,16 @@ export default function OnboardingTour({ steps, run, onClose }) {
       }
     };
 
-    // Delay briefly to allow scrollIntoView to complete
-    const timer = setTimeout(updateRect, 300);
+    // Delay briefly to allow scrollIntoView and drawer transitions to complete
+    const timer1 = setTimeout(updateRect, 150);
+    const timer2 = setTimeout(updateRect, 450);
 
     window.addEventListener('resize', updateRect);
     window.addEventListener('scroll', updateRect);
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
       window.removeEventListener('resize', updateRect);
       window.removeEventListener('scroll', updateRect);
     };

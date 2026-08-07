@@ -827,6 +827,17 @@ export default function Home() {
         run={showTour}
         onClose={() => {
           setShowTour(false);
+          setMobileMenuOpen(false);
+        }}
+        onStepChange={(stepIndex) => {
+          if (window.innerWidth <= 768) {
+            // Sidebar navigation and Go Premium card are at indices 1 to 19 inclusive
+            if (stepIndex >= 1 && stepIndex <= 19) {
+              setMobileMenuOpen(true);
+            } else {
+              setMobileMenuOpen(false);
+            }
+          }
         }}
       />
     </div>
