@@ -111,14 +111,17 @@ export default function OnboardingTour({ steps, run, onClose, onStepChange }) {
         setRect(r);
 
         // Calculate tooltip position based on target rect and viewport height
-        const tooltipWidth = Math.min(320, window.innerWidth - 32);
-        const tooltipHeight = 130; // approximate estimation
+        const tooltipWidth = tooltipRef.current ? tooltipRef.current.offsetWidth : Math.min(320, window.innerWidth - 32);
+        const tooltipHeight = tooltipRef.current ? tooltipRef.current.offsetHeight : 140;
         const viewportHeight = window.innerHeight;
         const viewportWidth = window.innerWidth;
 
         // If target is in the bottom half of viewport, place tooltip above it
         const isAbove = r.top > viewportHeight / 2;
-        let top = isAbove ? r.top - tooltipHeight - 35 : r.bottom + 35;
+        let top = isAbove ? r.top - tooltipHeight - 20 : r.bottom + 20;
+
+        // Vertical clamping to prevent card from overflowing top/bottom viewport edges
+        top = Math.max(16, Math.min(viewportHeight - tooltipHeight - 16, top));
         
         // Horizontal centering with screen margins clamping
         let left = r.left + r.width / 2 - tooltipWidth / 2;
