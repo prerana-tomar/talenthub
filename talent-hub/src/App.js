@@ -131,7 +131,7 @@ function App() {
           <Route path="/leaderboard"  element={<WithNavbar><Leaderboard /></WithNavbar>} />
           <Route path="/categories"   element={<WithNavbar><Categories /></WithNavbar>} />
           <Route path="/thoughts"     element={<WithNavbar><Thoughts /></WithNavbar>} />
-          <Route path="/competitions" element={<Competitions />} />
+          <Route path="/competitions" element={<WithNavbar><Competitions /></WithNavbar>} />
           <Route path="/uploads" element={<WithNavbar><ProtectedRoute><MyUploads /></ProtectedRoute></WithNavbar>} />
           <Route path="/following" element={<WithNavbar><ProtectedRoute><Following /></ProtectedRoute></WithNavbar>} />
           <Route path="/saved"    element={<WithNavbar><ProtectedRoute><Saved /></ProtectedRoute></WithNavbar>} />

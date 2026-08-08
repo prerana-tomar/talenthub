@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Compass, Search, Calendar, Heart, Flame } from 'lucide-react';
 import VideoCard from '../components/VideoCard';
 import API from '../config';
 import './Explore.css';
@@ -83,7 +84,7 @@ export default function Explore() {
           {/* Search bar inside Hero Section */}
           <form className="explore-search-form" onSubmit={handleSearch} style={{ width: '100%', maxWidth: '520px', marginTop: '16px' }}>
             <div className="explore-search-wrap">
-              <span className="explore-search-icon">🔍</span>
+              <Search size={18} className="explore-search-icon" />
               <input
                 type="text"
                 className="explore-search-input"
@@ -102,8 +103,8 @@ export default function Explore() {
             <button type="submit" className="explore-search-btn">Search</button>
           </form>
         </div>
-        <div className="th-page-hero-img-wrap">
-          🎨
+        <div className="th-page-hero-img-wrap" style={{ background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899', borderRadius: '50%', width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Compass size={36} />
         </div>
       </div>
 
@@ -122,15 +123,26 @@ export default function Explore() {
         </div>
 
         <div className="explore-sort">
-          {SORT_OPTIONS.map(opt => (
-            <button
-              key={opt.value}
-              className={`explore-sort-btn ${sort === opt.value ? 'active' : ''}`}
-              onClick={() => { setSort(opt.value); setPage(1); }}
-            >
-              {opt.label}
-            </button>
-          ))}
+          {SORT_OPTIONS.map(opt => {
+            const getIcon = (val) => {
+              if (val === 'newest') return <Calendar size={13} style={{ marginRight: '6px' }} />;
+              if (val === 'popular') return <Flame size={13} style={{ marginRight: '6px' }} />;
+              if (val === 'likes') return <Heart size={13} style={{ marginRight: '6px' }} />;
+              return null;
+            };
+            const labelText = opt.label.replace(/^[^\s]+\s+/, ''); // strip emoji
+            return (
+              <button
+                key={opt.value}
+                className={`explore-sort-btn ${sort === opt.value ? 'active' : ''}`}
+                onClick={() => { setSort(opt.value); setPage(1); }}
+                style={{ display: 'flex', alignItems: 'center' }}
+              >
+                {getIcon(opt.value)}
+                {labelText}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -150,19 +162,21 @@ export default function Explore() {
           ))}
         </div>
       ) : videos.length === 0 ? (
-        <div className="explore-empty">
-          <div className="explore-empty-icon">🎬</div>
+        <div className="th-empty-state-illustrated">
+          <div className="th-empty-state-icon-wrapper">
+            <Compass size={32} />
+          </div>
           <h3>No videos found</h3>
           <p>
             {search
-              ? `No results for "${search}". Try different keywords.`
-              : 'No videos in this category yet. Be the first to upload!'}
+              ? `No results for "${search}". Try different keywords or browse another category.`
+              : 'No videos in this category yet. Be the first to upload your performance!'}
           </p>
           <button
-            className="explore-upload-btn"
+            className="th-empty-state-cta-btn"
             onClick={() => navigate('/upload')}
           >
-            ⬆ Upload Performance
+            Upload Performance
           </button>
         </div>
       ) : (

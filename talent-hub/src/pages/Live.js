@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import { Radio, Video, ArrowLeft, Tv, Users, MessageSquare, AlertCircle } from 'lucide-react';
 import './Live.css';
 
 const SOCKET_URL = '';
@@ -165,13 +166,13 @@ export default function Live() {
       setMode('host');
     } catch (err) {
       if (err.name === 'NotReadableError') {
-        setError('❌ Camera already in use!');
+        setError('Camera already in use!');
       } else if (err.name === 'NotAllowedError') {
-        setError('❌ Camera permission denied!');
+        setError('Camera permission denied!');
       } else if (err.name === 'NotFoundError') {
-        setError('❌ Camera not found!');
+        setError('Camera not found!');
       } else {
-        setError('❌ Camera error: ' + err.message);
+        setError('Camera error: ' + err.message);
       }
     }
     setLoading(false);
@@ -217,11 +218,13 @@ export default function Live() {
     <div className="live-page">
 
       <header className="live-topbar">
-        <button className="live-back-btn" onClick={() => navigate('/')}>← Back</button>
-        <div className="live-topbar-logo" onClick={() => navigate('/')}>
-          TALENT<span>HUB</span>
+        <button className="live-back-btn" onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <ArrowLeft size={16} /> Back
+        </button>
+        <div className="live-topbar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+          TALENT<span className="live-logo-accent">HUB</span>
         </div>
-        <div className="live-topbar-badge">
+        <div className="live-topbar-badge" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span className="live-dot" /> LIVE
         </div>
         {user && (
@@ -232,10 +235,10 @@ export default function Live() {
         )}
       </header>
 
-      {error && <div className="live-error">⚠️ {error}</div>}
+      {error && <div className="live-error" style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '20px auto', maxWidth: '1000px' }}><AlertCircle size={16} /> {error}</div>}
 
       {mode === 'browse' && (
-        <div className="live-browse">
+        <div className="live-browse" style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 20px' }}>
 
           {/* Premium Page Hero */}
           <div className="th-page-hero">
@@ -243,58 +246,60 @@ export default function Live() {
               <h1 className="th-page-hero-title">LIVE <span>STAGE</span></h1>
               <p className="th-page-hero-subtitle">Watch top creators streaming live, interact via real-time chat, and show your support instantly.</p>
             </div>
-            <div className="th-page-hero-img-wrap">
-              📡
+            <div className="th-page-hero-img-wrap" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: '50%', width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Radio size={36} className="hs-spin-animation" />
             </div>
           </div>
 
           <div className="live-go-live-section">
-            <div className="live-go-live-card">
-              <div className="live-go-live-icon">🎥</div>
-              <h2>Go Live</h2>
-              <p>Share your talent with the world in real-time!</p>
+            <div className="live-go-live-card th-premium-card-redesign" style={{ padding: '32px 24px', textAlign: 'center' }}>
+              <div className="live-go-live-icon" style={{ display: 'inline-flex', background: 'rgba(139, 92, 246, 0.08)', color: '#8b5cf6', padding: '14px', borderRadius: '50%', marginBottom: '16px' }}>
+                <Video size={28} />
+              </div>
+              <h2 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '6px' }}>Go Live</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '13.5px', marginBottom: '24px' }}>Share your talent with the world in real-time!</p>
 
               {/* ✅ COMING SOON BANNER */}
               <div style={{
-                background: 'linear-gradient(135deg, rgba(124,58,237,0.15), rgba(236,72,153,0.1))',
-                border: '1px solid rgba(124,58,237,0.3)',
-                borderRadius: '12px',
-                padding: '16px',
-                marginBottom: '16px',
+                background: 'linear-gradient(135deg, rgba(124,58,237,0.06), rgba(236,72,153,0.03))',
+                border: '1px solid var(--border)',
+                borderRadius: '16px',
+                padding: '24px',
+                marginBottom: '24px',
                 textAlign: 'center',
               }}>
                 <div style={{ fontSize: '32px', marginBottom: '8px' }}>🚀</div>
                 <div style={{ color: '#a78bfa', fontWeight: 700, fontSize: '16px', marginBottom: '4px' }}>
                   Coming Soon!
                 </div>
-                <div style={{ color: '#888', fontSize: '12px', lineHeight: 1.5 }}>
-                  Live streaming feature abhi develop ho rahi hai.<br />
-                  Bahut jald aayegi — stay tuned! ✨
+                <div style={{ color: 'var(--text-secondary)', fontSize: '13px', lineHeight: 1.6 }}>
+                  Live streaming feature is currently under active development.<br />
+                  Stay tuned — it will be launched very soon! ✨
                 </div>
               </div>
 
-              <div className="live-form">
+              <div className="live-form" style={{ maxWidth: '400px', margin: '0 auto' }}>
                 <input
                   className="live-input"
                   placeholder="Performance title..."
                   value={goLiveForm.title}
                   onChange={e => setGoLiveForm(p => ({ ...p, title: e.target.value }))}
                   disabled
-                  style={{ opacity: 0.5, cursor: 'not-allowed' }}
+                  style={{ opacity: 0.5, cursor: 'not-allowed', width: '100%', marginBottom: '12px' }}
                 />
                 <select
                   className="live-select"
                   value={goLiveForm.category}
                   onChange={e => setGoLiveForm(p => ({ ...p, category: e.target.value }))}
                   disabled
-                  style={{ opacity: 0.5, cursor: 'not-allowed' }}
+                  style={{ opacity: 0.5, cursor: 'not-allowed', width: '100%', marginBottom: '16px', borderRadius: '30px' }}
                 >
                   {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                 </select>
                 <button
                   className="live-go-btn"
                   disabled={true}
-                  style={{ opacity: 0.6, cursor: 'not-allowed', background: '#444' }}
+                  style={{ opacity: 0.6, cursor: 'not-allowed', background: '#333', width: '100%' }}
                 >
                   🚀 Coming Soon
                 </button>
@@ -302,39 +307,37 @@ export default function Live() {
             </div>
           </div>
 
-          <div className="live-rooms-section">
-            <h2 className="live-rooms-title">
-              🔴 Live Now
-              <span className="live-rooms-count">{liveRooms.length} streams</span>
+          <div className="live-rooms-section" style={{ marginTop: '40px' }}>
+            <h2 className="live-rooms-title" style={{ fontSize: '20px', fontWeight: 700, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="live-dot" /> Live Now
+              <span className="live-rooms-count" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontSize: '12px', padding: '3px 10px', borderRadius: '20px' }}>{liveRooms.length} streams</span>
             </h2>
 
             {liveRooms.length === 0 ? (
-              <div className="live-empty">
-                <div className="live-empty-icon">📡</div>
+              <div className="th-empty-state-illustrated">
+                <div className="th-empty-state-icon-wrapper" style={{ background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444' }}>
+                  <Tv size={32} />
+                </div>
                 <h3>No one is live right now</h3>
-                <p>Be the first to go live and share your talent!</p>
+                <p>There are no active streams on the Live Stage at the moment. Keep an eye out for upcoming performance alerts!</p>
               </div>
             ) : (
               <div className="live-rooms-grid">
                 {liveRooms.map(room => (
-                  <div key={room.roomId} className="live-room-card">
-                    <div className="live-room-preview">
-                      <div className="live-room-placeholder">🎭</div>
-                      <div className="live-room-badge">
-                        <span className="live-dot" /> LIVE
+                  <div key={room.roomId} className="live-room-card th-premium-card-redesign" onClick={() => handleJoinRoom(room)}>
+                    <div className="live-room-thumb">
+                      <div className="live-room-placeholder-gradient">
+                        <Radio size={24} color="#fff" className="hs-spin-animation" />
                       </div>
-                      <div className="live-room-viewers">👁 {room.viewers} watching</div>
+                      <span className="live-room-badge">🔴 LIVE</span>
+                      <span className="live-room-category">{room.category}</span>
                     </div>
-                    <div className="live-room-info">
-                      <div className="live-room-title">{room.title}</div>
-                      <div className="live-room-host">
-                        <div className="live-room-host-avatar">{room.hostName?.[0]?.toUpperCase()}</div>
-                        <span>{room.hostName}</span>
-                        <span className="live-room-cat">{room.category}</span>
+                    <div className="live-room-info" style={{ padding: '16px' }}>
+                      <h3 className="live-room-title-text" style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>{room.title}</h3>
+                      <div className="live-room-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                        <span>@{room.hostName}</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Users size={12} /> {viewerCount} viewing</span>
                       </div>
-                      <button className="live-join-btn" onClick={() => handleJoinRoom(room)}>
-                        ▶ Join Stream
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -345,82 +348,70 @@ export default function Live() {
       )}
 
       {mode === 'host' && (
-        <div className="live-stream-layout">
-          <div className="live-stream-main">
-            <div className="live-stream-header">
-              <div className="live-stream-status"><span className="live-dot" /> LIVE</div>
-              <div className="live-stream-title">{goLiveForm.title}</div>
-              <div className="live-stream-viewers">👁 {viewerCount} viewers</div>
-              <button className="live-end-btn" onClick={handleEndLive}>⏹ End Stream</button>
-            </div>
-            <div className="live-video-wrap">
-              {!cameraReady && (
-                <div className="live-camera-loading">
-                  <div className="live-camera-spinner" />
-                  <p>Starting camera...</p>
-                </div>
-              )}
-              <video ref={localVideoRef} autoPlay muted playsInline className="live-video"
-                style={{ display: cameraReady ? 'block' : 'none' }} />
-              <div className="live-video-label">You (Host)</div>
-            </div>
-            <div className="live-stream-stats">
-              <div className="live-stat">👁 {viewerCount} watching</div>
-              <div className="live-stat">💬 {chat.length} messages</div>
-              <div className="live-stat">🎭 {goLiveForm.category}</div>
+        <div className="live-studio">
+          <div className="live-video-container">
+            <video ref={localVideoRef} className="live-video" autoPlay playsInline />
+            <div className="live-video-overlay">
+              <span className="live-studio-badge">🔴 HOSTING</span>
+              <span className="live-studio-title">{goLiveForm.title}</span>
+              <span className="live-studio-viewers">👁 {viewerCount} viewers</span>
             </div>
           </div>
-          <div className="live-chat">
-            <div className="live-chat-header">💬 Live Chat</div>
+          <div className="live-sidebar">
+            <div className="live-chat-header">Live Chat</div>
             <div className="live-chat-messages">
-              {chat.length === 0 ? <div className="live-chat-empty">No messages yet...</div> :
-                chat.map(msg => (
-                  <div key={msg.id} className="live-chat-msg">
-                    <span className="live-chat-sender">{msg.sender}</span>
-                    <span className="live-chat-text">{msg.message}</span>
-                  </div>
-                ))}
+              {chat.map((msg, i) => (
+                <div key={i} className="live-chat-msg">
+                  <span className="live-chat-sender">{msg.sender}:</span>
+                  <span className="live-chat-text">{msg.message}</span>
+                </div>
+              ))}
               <div ref={chatEndRef} />
             </div>
-            <form className="live-chat-form" onSubmit={handleSendChat}>
-              <input className="live-chat-input" placeholder="Say something..."
-                value={chatInput} onChange={e => setChatInput(e.target.value)} />
-              <button type="submit" className="live-chat-send">↑</button>
+            <form className="live-chat-input-row" onSubmit={handleSendChat}>
+              <input
+                className="live-chat-input"
+                placeholder="Chat message..."
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+              />
+              <button type="submit" className="live-chat-send-btn">Send</button>
             </form>
+            <button className="live-end-btn" onClick={handleEndLive}>End Live</button>
           </div>
         </div>
       )}
 
       {mode === 'watch' && (
-        <div className="live-stream-layout">
-          <div className="live-stream-main">
-            <div className="live-stream-header">
-              <button className="live-back-btn" onClick={handleLeaveRoom}>← Leave</button>
-              <div className="live-stream-status"><span className="live-dot" /> LIVE</div>
-              <div className="live-stream-viewers">👁 {viewerCount} watching</div>
-            </div>
-            <div className="live-video-wrap">
-              <video ref={remoteVideoRef} autoPlay playsInline className="live-video" />
-              <div className="live-video-label">Live Stream</div>
+        <div className="live-studio">
+          <div className="live-video-container">
+            <video ref={remoteVideoRef} className="live-video" autoPlay playsInline />
+            <div className="live-video-overlay">
+              <span className="live-studio-badge">🔴 LIVE</span>
+              <span className="live-studio-viewers">👁 {viewerCount} viewing</span>
             </div>
           </div>
-          <div className="live-chat">
-            <div className="live-chat-header">💬 Live Chat</div>
+          <div className="live-sidebar">
+            <div className="live-chat-header">Live Chat</div>
             <div className="live-chat-messages">
-              {chat.length === 0 ? <div className="live-chat-empty">No messages yet...</div> :
-                chat.map(msg => (
-                  <div key={msg.id} className={`live-chat-msg${msg.sender === user?.username ? ' own' : ''}`}>
-                    <span className="live-chat-sender">{msg.sender}</span>
-                    <span className="live-chat-text">{msg.message}</span>
-                  </div>
-                ))}
+              {chat.map((msg, i) => (
+                <div key={i} className="live-chat-msg">
+                  <span className="live-chat-sender">{msg.sender}:</span>
+                  <span className="live-chat-text">{msg.message}</span>
+                </div>
+              ))}
               <div ref={chatEndRef} />
             </div>
-            <form className="live-chat-form" onSubmit={handleSendChat}>
-              <input className="live-chat-input" placeholder="Say something..."
-                value={chatInput} onChange={e => setChatInput(e.target.value)} />
-              <button type="submit" className="live-chat-send">↑</button>
+            <form className="live-chat-input-row" onSubmit={handleSendChat}>
+              <input
+                className="live-chat-input"
+                placeholder="Say something..."
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+              />
+              <button type="submit" className="live-chat-send-btn">Send</button>
             </form>
+            <button className="live-end-btn" onClick={handleLeaveRoom}>Leave Room</button>
           </div>
         </div>
       )}

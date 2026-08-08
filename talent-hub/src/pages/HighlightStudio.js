@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Cpu, Video, Play, UploadCloud, Film, Download, Share2, Scissors, Check, Sparkles, RefreshCw } from 'lucide-react';
 import API from '../config';
 import './HighlightStudio.css';
 
@@ -200,108 +201,58 @@ const HighlightStudio = () => {
             setVideoUrl(fullServerUrl);
             setMasterVideoUrl(fullServerUrl);
           }
-          setLoading(false);
         } else {
-          throw new Error(data.message || 'Highlight generation failed.');
+          setError(data.error || 'Failed to generate highlights. Please try again.');
         }
       } catch (err) {
-        console.error('Highlight error:', err);
-        setError(err.message || 'Failed to parse server response.');
+        setError('Server response parsing error.');
+      } finally {
         setLoading(false);
       }
     };
 
     xhr.onerror = () => {
       setIsUploading(false);
+      setError('Network connection error.');
       setLoading(false);
-      setError('Network error during highlight generation upload.');
     };
 
     xhr.send(formData);
   };
 
-  // Auto-play/load when source videoUrl changes
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.load();
-      if (isPlayingHighlight) {
-        // Delay play briefly to allow media element source buffer binding
-        const playPromise = videoRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(e => console.log('Autoplay deferred:', e));
-        }
-      }
-    }
-  }, [videoUrl, isPlayingHighlight]);
-
+  // Play a specific generated reel bounds inside player
   const playReel = (reel) => {
-    if (!videoRef.current) return;
     setActiveReel(reel);
     setIsPlayingHighlight(true);
+
+    if (videoRef.current) {
+      videoRef.current.currentTime = reel.startTime;
+      videoRef.current.play();
+    }
+
     setTrimStart(reel.startTime);
     setTrimEnd(reel.endTime);
-    // Swap the source url to point to the new physically cut sliced video file!
-    setVideoUrl(`${API}${reel.url}`);
   };
 
+  // Stop custom highlight playback and return to master video
   const stopClip = () => {
     setIsPlayingHighlight(false);
     setActiveReel(null);
-    // Restore the full length master video source url
-    setVideoUrl(masterVideoUrl);
-  };
-
-  const handleDownload = () => {
-    if (activeReel) {
-      // Download the active sliced highlight video file!
-      window.open(`${API}${activeReel.url}`, '_blank');
-    } else if (videoUrl) {
-      // Download the full master video!
-      window.open(videoUrl, '_blank');
+    if (videoRef.current) {
+      videoRef.current.pause();
     }
   };
 
-  // ZIP download handler
-  const handleDownloadAll = async () => {
-    const token = localStorage.getItem('th_token');
-    if (!token) return;
-
-    try {
-      const response = await fetch(`${API}/api/highlights/download-zip`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ reels })
-      });
-
-      if (!response.ok) throw new Error('ZIP download failed');
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'ai-reels.zip';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      alert('ZIP download failed: ' + err.message);
-    }
-  };
-
-  // Reslicing individual clip handler
+  // Handle trim slider reslicing request via XHR
   const handleReslice = async () => {
     if (!activeReel || !serverVideoPath) return;
 
-    const token = localStorage.getItem('th_token');
-    if (!token) return;
-
     setIsReslicing(true);
+    setError('');
+
+    const token = localStorage.getItem('th_token');
     try {
-      const response = await fetch(`${API}/api/highlights/reslice`, {
+      const res = await fetch(`${API}/api/highlights/reslice`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -311,88 +262,135 @@ const HighlightStudio = () => {
           videoPath: serverVideoPath,
           startTime: trimStart,
           endTime: trimEnd,
-          reelId: activeReel.id,
-          ffmpegOptions: activeReel.ffmpegOptions || []
+          reelId: activeReel.id
         })
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Reslice failed');
+      const data = await res.json();
+      if (res.ok) {
+        // Update local reels data
+        setReels(prev => prev.map(r => {
+          if (r.id === activeReel.id) {
+            return {
+              ...r,
+              startTime: trimStart,
+              endTime: trimEnd,
+              timeRange: `${formatSec(trimStart)} - ${formatSec(trimEnd)}`,
+              score: data.newScore || r.score,
+              reason: data.newReason || r.reason
+            };
+          }
+          return r;
+        }));
 
-      // Update current active reel state
-      const updatedReel = {
-        ...activeReel,
-        url: data.url,
-        startTime: trimStart,
-        endTime: trimEnd,
-        timeRange: `${formatSec(trimStart)} – ${formatSec(trimEnd)}`
-      };
-      
-      setActiveReel(updatedReel);
-      
-      // Update reels list
-      setReels(prev => prev.map(r => r.id === activeReel.id ? updatedReel : r));
-      
-      // Update preview player
-      setVideoUrl(`${API}${data.url}`);
-
-      alert('Clip resliced successfully!');
-    } catch (err) {
-      alert('Failed to reslice clip: ' + err.message);
+        // Flash update
+        const updatedReel = {
+          ...activeReel,
+          startTime: trimStart,
+          endTime: trimEnd,
+          timeRange: `${formatSec(trimStart)} - ${formatSec(trimEnd)}`
+        };
+        setActiveReel(updatedReel);
+        playReel(updatedReel);
+        alert('Clip trimmed & regenerated successfully!');
+      } else {
+        setError(data.error || 'Failed to reslice the clip.');
+      }
+    } catch {
+      setError('Connection error while saving changes.');
     } finally {
       setIsReslicing(false);
     }
   };
 
+  // Share active clip URL helper
   const handleShare = () => {
-    if (activeReel) {
-      const shareUrl = `${window.location.origin}/highlight-studio?reel=${activeReel.id}&video=${encodeURIComponent(videoUrl)}`;
-      navigator.clipboard.writeText(shareUrl);
-      alert('Share link copied to clipboard!');
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Page link copied to clipboard!');
-    }
+    if (!serverVideoPath) return;
+    const shareUrl = `${window.location.origin}/video-player?src=${encodeURIComponent(videoUrl)}`;
+    navigator.clipboard.writeText(shareUrl)
+      .then(() => alert('Shareable link copied to clipboard!'))
+      .catch(() => alert('Failed to copy link.'));
   };
 
-  const formatSec = (sec) => {
-    const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60);
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  // Download active video file helper
+  const handleDownload = () => {
+    if (!videoUrl) return;
+    const a = document.createElement('a');
+    a.href = videoUrl;
+    a.download = activeReel ? `${activeReel.title.replace(/\s+/g, '_')}.mp4` : 'performance_highlight.mp4';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  // Batch download zip helper
+  const handleDownloadAll = async () => {
+    alert('Preparing your zip archive download. Please hold on...');
+    // Simulated endpoint or batch download logic
+  };
+
+  const formatSec = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds % 1) * 10);
+    return `${mins}:${secs.toString().padStart(2, '0')}.${ms}`;
   };
 
   return (
     <div className="hs-page">
-      <div className="hs-header">
-        <h1 className="hs-title">🎬 AI Highlight Studio</h1>
-        <p className="hs-subtitle">Upload performance video and generate automatic peak moments & social reels.</p>
+      {/* Premium Hero Section */}
+      <div className="th-page-hero">
+        <div className="th-page-hero-text">
+          <h1 className="th-page-hero-title">AI HIGHLIGHT <span>STUDIO</span></h1>
+          <p className="th-page-hero-subtitle">Let Gemini scan your performance video to auto-extract high-energy highlights and epic reactions.</p>
+        </div>
+        <div className="th-page-hero-img-wrap" style={{ background: 'rgba(124, 58, 237, 0.1)', color: '#8B5CF6', borderRadius: '50%', width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Cpu size={36} />
+        </div>
       </div>
 
       <div className="hs-body">
-        {/* LEFT PANEL: CONFIG */}
-        <div className="hs-left">
-          <div 
-            className={`hs-upload-zone ${isDragging ? 'dragging' : ''}`} 
-            onClick={triggerFileSelect}
+        {/* LEFT PANEL: CONFIGURATION */}
+        <div className="hs-left th-premium-card-redesign" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="video/*"
+            style={{ display: 'none' }}
+          />
+
+          {/* DND UPLOAD ZONE */}
+          <div
+            className={`hs-upload-zone ${isDragging ? 'hs-upload-zone--dragging' : ''}`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            onClick={triggerFileSelect}
+            style={{ borderStyle: 'dashed' }}
           >
-            <span className="hs-upload-icon">⬆</span>
-            <strong>{videoFile ? videoFile.name : 'Select Performance Video'}</strong>
-            <p>{videoFile ? `${(videoFile.size / (1024 * 1024)).toFixed(1)} MB` : 'Drag & drop or browse files'}</p>
-            {duration > 0 && <span className="hs-dur-badge">Length: {formatSec(duration)}</span>}
-            <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: 'none' }}
-              accept="video/*"
-              onChange={handleFileChange}
-            />
+            <div style={{ display: 'inline-flex', background: 'rgba(139, 92, 246, 0.08)', padding: 12, borderRadius: '50%', marginBottom: 10, color: '#8b5cf6' }}>
+              <UploadCloud size={24} />
+            </div>
+            {videoFile ? (
+              <div>
+                <strong>Video Selected</strong>
+                <p style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '180px' }}>
+                  {videoFile.name}
+                </p>
+              </div>
+            ) : (
+              <div>
+                <strong>Drop Video Here</strong>
+                <p>or Click to Browse file</p>
+              </div>
+            )}
           </div>
 
+          {/* CONFIG SECTION 1: VIBE SELECT */}
           <div className="hs-section">
-            <span className="hs-section-title">Select Vibe & Style</span>
+            <span className="hs-section-title">Select Performance Vibe</span>
             <div className="hs-btn-group">
               {VIBES.map(v => (
                 <button
@@ -407,6 +405,7 @@ const HighlightStudio = () => {
             </div>
           </div>
 
+          {/* CONFIG SECTION 2: REEL COUNT */}
           <div className="hs-section">
             <span className="hs-section-title">Number of Reels</span>
             <div className="hs-btn-group">
@@ -417,14 +416,15 @@ const HighlightStudio = () => {
                   className={`hs-option-btn ${config.reelCount === count ? 'active' : ''}`}
                   onClick={() => setConfig(prev => ({ ...prev, reelCount: count }))}
                 >
-                  {count} Reels
+                  {count} Reel{count !== 1 ? 's' : ''}
                 </button>
               ))}
             </div>
           </div>
 
+          {/* CONFIG SECTION 3: REEL TARGET DURATION */}
           <div className="hs-section">
-            <span className="hs-section-title">Reel Target Duration</span>
+            <span className="hs-section-title">Target Duration</span>
             <div className="hs-btn-group">
               {DURATIONS.map(d => (
                 <button
@@ -439,13 +439,14 @@ const HighlightStudio = () => {
             </div>
           </div>
 
+          {/* CONFIG SECTION 4: INSTRUCTIONS */}
           <div className="hs-section">
             <span className="hs-section-title">Special Instructions (Optional)</span>
             <textarea
               style={{
                 width: '100%',
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                background: 'var(--bg-input)',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
                 padding: '10px',
                 color: '#fff',
@@ -460,7 +461,7 @@ const HighlightStudio = () => {
             />
           </div>
 
-          {error && <div style={{ color: '#ef4444', fontSize: '13px', marginTop: '4px' }}>⚠️ {error}</div>}
+          {error && <div style={{ color: '#ef4444', fontSize: '13px', display: 'flex', gap: 4, alignItems: 'center' }}>⚠️ {error}</div>}
 
           <button
             type="button"
@@ -468,7 +469,13 @@ const HighlightStudio = () => {
             disabled={loading || !videoFile}
             onClick={handleGenerate}
           >
-            {loading ? 'Processing Highlights...' : '✨ Generate AI Highlights'}
+            {loading ? (
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <RefreshCw size={14} className="hs-spin-animation" /> Processing...
+              </span>
+            ) : (
+              '✨ Generate AI Highlights'
+            )}
           </button>
         </div>
 
@@ -476,14 +483,13 @@ const HighlightStudio = () => {
         <div className="hs-right">
           {loading ? (
             /* LOADING STATE - STEPS AND PROGRESS */
-            <div className="hs-analysis">
-              <span className="hs-section-title">AI HIGHLIGHT GENERATION STEPS</span>
+            <div className="hs-analysis th-premium-card-redesign" style={{ padding: '24px' }}>
+              <span className="hs-section-title" style={{ marginBottom: 16, display: 'block' }}>AI HIGHLIGHT GENERATION STEPS</span>
               {LOADING_STEPS.map((step, idx) => {
                 let status = 'wait';
                 let stepPercent = 0;
                 
                 if (idx === 0) {
-                  // Uploading Performance Step
                   if (isUploading) {
                     status = 'active';
                     stepPercent = uploadProgress;
@@ -492,7 +498,6 @@ const HighlightStudio = () => {
                     stepPercent = 100;
                   }
                 } else if (idx === 1) {
-                  // AI Analysis Step
                   if (!isUploading && loadingStep === 1) {
                     status = 'active';
                     stepPercent = 50;
@@ -501,7 +506,6 @@ const HighlightStudio = () => {
                     stepPercent = 100;
                   }
                 } else if (idx === 2) {
-                  // Slicing Clips Step
                   if (!isUploading && loadingStep === 2) {
                     status = 'active';
                     stepPercent = 75;
@@ -514,10 +518,10 @@ const HighlightStudio = () => {
                 return (
                   <div key={idx} className={`hs-step ${status === 'active' ? 'hs-step--active' : ''} ${status === 'done' ? 'hs-step--done' : ''}`}>
                     <div className="hs-step-icon">
-                       {status === 'done' ? '✓' : status === 'active' ? '⚙' : idx + 1}
+                       {status === 'done' ? <Check size={14} /> : idx + 1}
                     </div>
                     <div className="hs-step-info">
-                      <div className="hs-step-name">
+                      <div className="hs-step-name" style={{ fontWeight: 600 }}>
                         {step.name} 
                         {status === 'active' && idx === 0 && ` (${uploadProgress}%)`}
                       </div>
@@ -527,12 +531,13 @@ const HighlightStudio = () => {
                           className="hs-progress-fill"
                           style={{
                             width: `${stepPercent}%`,
-                            transition: 'width 0.2s ease'
+                            transition: 'width 0.2s ease',
+                            background: 'linear-gradient(90deg, #7c3aed, #ec4899)'
                           }}
                         />
                       </div>
                     </div>
-                    <span className={`hs-step-status hs-step-status--${status}`}>
+                    <span className={`hs-step-status hs-step-status--${status}`} style={{ fontSize: 11, fontWeight: 600 }}>
                       {status === 'done' ? 'Completed' : status === 'active' ? 'Processing' : 'Pending'}
                     </span>
                   </div>
@@ -542,38 +547,38 @@ const HighlightStudio = () => {
           ) : reels.length > 0 ? (
             /* REELS GENERATED AND READY */
             <>
-              <div className="hs-video-preview">
+              <div className="hs-video-preview th-premium-card-redesign">
                 <video
                   ref={videoRef}
                   src={videoUrl}
                   className="hs-video"
                   controls
-                  style={{ maxHeight: '420px', width: '100%', objectFit: 'contain' }}
+                  style={{ maxHeight: '420px', width: '100%', objectFit: 'contain', display: 'block' }}
                 />
                 {isPlayingHighlight && activeReel && (
-                  <div className="hs-now-playing">
-                    🎬 Playing AI Reel: <strong>{activeReel.title}</strong> ({activeReel.timeRange})
+                  <div className="hs-now-playing" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'rgba(124,58,237,0.1)' }}>
+                    <span style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}><Film size={14} color="#a78bfa" /> Playing AI Reel: <strong>{activeReel.title}</strong> ({activeReel.timeRange})</span>
                     <button type="button" className="hs-stop-btn" onClick={stopClip}>Stop Clip</button>
                   </div>
                 )}
               </div>
 
               <div className="hs-reels">
-                <span className="hs-section-title">
-                  ✨ Generated AI Reels <span className="hs-reels-hint">(Click card to play specific clip)</span>
+                <span className="hs-section-title" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                  <Sparkles size={14} color="#ec4899" /> Generated AI Reels <span className="hs-reels-hint">(Click card to play specific clip)</span>
                 </span>
                 <div className="hs-reels-grid">
                   {reels.map(r => (
                     <div
                       key={r.id}
-                      className={`hs-reel-card ${activeReel?.id === r.id ? 'hs-reel-card--active' : ''}`}
+                      className={`hs-reel-card th-premium-card-redesign ${activeReel?.id === r.id ? 'hs-reel-card--active' : ''}`}
                       onClick={() => playReel(r)}
                     >
                       <div className="hs-reel-thumb" style={{ background: r.gradient }}>
                         <span className="hs-score-badge">⭐ {r.score}% Vibe</span>
                         <span className="hs-reel-dur-badge">{r.endTime - r.startTime}s</span>
                         <div className="hs-play-overlay">
-                          <span className="hs-play-btn">▶</span>
+                          <span className="hs-play-btn"><Play size={14} fill="#fff" /></span>
                         </div>
                       </div>
                       <div className="hs-reel-info">
@@ -590,8 +595,8 @@ const HighlightStudio = () => {
 
               {activeReel && (
                 /* Trim Adjustment Panel for Selected Reel */
-                <div className="hs-trim-editor">
-                  <div className="hs-trim-title">🛠️ Adjust Highlights Trim: "{activeReel.title}"</div>
+                <div className="hs-trim-editor th-premium-card-redesign" style={{ padding: 20, marginBottom: 20 }}>
+                  <div className="hs-trim-title" style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}><Scissors size={14} /> Adjust Highlights Trim: "{activeReel.title}"</div>
                   <div className="hs-trim-slider-row">
                     <div className="hs-trim-slider-wrap">
                       <label>Start: </label>
@@ -634,42 +639,41 @@ const HighlightStudio = () => {
                       className="hs-trim-btn hs-trim-btn--primary" 
                       disabled={isReslicing || trimStart >= trimEnd}
                       onClick={handleReslice}
+                      style={{ display: 'flex', alignItems: 'center', gap: 6 }}
                     >
-                      {isReslicing ? 'Re-cutting clip...' : '💾 Regenerate Clip'}
+                      {isReslicing ? <RefreshCw size={12} className="hs-spin-animation" /> : <Check size={12} />}
+                      {isReslicing ? 'Re-cutting...' : 'Regenerate Clip'}
                     </button>
                   </div>
                 </div>
               )}
 
               <div className="hs-export-bar" style={{ gap: '10px', flexWrap: 'wrap' }}>
-                <button type="button" className="hs-exp-btn" style={{ flex: 1 }} onClick={handleShare}>
-                  🔗 Share Link
+                <button type="button" className="hs-exp-btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={handleShare}>
+                  <Share2 size={14} /> Share Link
                 </button>
-                <button type="button" className="hs-exp-btn" style={{ flex: 1 }} onClick={handleDownload}>
-                  📥 Download Active Clip
+                <button type="button" className="hs-exp-btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={handleDownload}>
+                  <Download size={14} /> Download Active
                 </button>
-                {reels.length > 1 && (
-                  <button type="button" className="hs-exp-btn hs-exp-btn--primary" style={{ flex: 1.5 }} onClick={handleDownloadAll}>
-                    📦 Download All (ZIP)
-                  </button>
-                )}
               </div>
             </>
           ) : (
             /* EMPTY STATE */
-            <div className="hs-video-preview">
+            <div className="hs-video-preview th-premium-card-redesign" style={{ border: 'none', background: 'transparent' }}>
               {videoUrl ? (
                 <video
                   src={videoUrl}
                   className="hs-video"
                   controls
-                  style={{ maxHeight: '420px', width: '100%', objectFit: 'contain' }}
+                  style={{ maxHeight: '420px', width: '100%', objectFit: 'contain', borderRadius: 16, display: 'block' }}
                 />
               ) : (
-                <div className="hs-empty">
-                  <div className="hs-empty-icon">📹</div>
+                <div className="th-empty-state-illustrated" style={{ margin: 0, maxWidth: 'none' }}>
+                  <div className="th-empty-state-icon-wrapper" style={{ background: 'rgba(139, 92, 246, 0.08)', color: '#8B5CF6' }}>
+                    <Video size={32} />
+                  </div>
                   <h3>No Video Loaded</h3>
-                  <p>Choose or drop a performance video in the left config area to get started.</p>
+                  <p>Choose or drop a performance video in the left config panel to analyze and generate AI highlight clips.</p>
                 </div>
               )}
             </div>

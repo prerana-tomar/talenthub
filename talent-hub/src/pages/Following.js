@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Users, Search, UserPlus, UserCheck, MessageSquare, Compass, X } from 'lucide-react';
 import API from '../config';
 import './Following.css';
 
@@ -46,7 +47,6 @@ export default function Following() {
       setFollowers(frArr);
       setAllUsers(usArr);
 
-      // Build set of IDs I follow
       const ids = new Set(fwArr.map(u => u._id?.toString() || u.toString()));
       setFollowingIds(ids);
     } catch {}
@@ -64,18 +64,17 @@ export default function Following() {
       if (res.ok) {
         if (data.following) {
           setFollowingIds(prev => new Set([...prev, userId]));
-          // Add to following list
           const user = allUsers.find(u => u._id === userId) ||
                        followers.find(u => u._id === userId);
           if (user) setFollowing(prev => [...prev, user]);
-          showToast(`✅ Following ${username}`);
+          showToast(`Following ${username}`);
         } else {
           setFollowingIds(prev => { const s = new Set(prev); s.delete(userId); return s; });
           setFollowing(prev => prev.filter(u => u._id !== userId));
-          showToast(`➖ Unfollowed ${username}`);
+          showToast(`Unfollowed ${username}`);
         }
       }
-    } catch { showToast('❌ Error'); }
+    } catch { showToast('Error'); }
   };
 
   const fmt = (n) => {
@@ -104,9 +103,13 @@ export default function Following() {
     const isFollowing_ = followingIds.has(uid);
 
     return (
-      <div className="fw-user-card">
+      <div className="fw-user-card th-premium-card-redesign" onClick={() => navigate(`/profile/${uid}`)}>
         <div className="fw-user-avatar">
-          {user.username?.[0]?.toUpperCase() || 'U'}
+          {user.profilePic ? (
+            <img src={user.profilePic} alt={user.username} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+          ) : (
+            user.username?.[0]?.toUpperCase() || 'U'
+          )}
         </div>
         <div className="fw-user-info">
           <div className="fw-user-name">{user.username}</div>
@@ -118,18 +121,23 @@ export default function Following() {
             <span>👥 {fmt(user.followers?.length || 0)} followers</span>
           </div>
         </div>
-        <div className="fw-user-actions">
+        <div className="fw-user-actions" onClick={e => e.stopPropagation()}>
           <button
-            className={`fw-follow-btn${isFollowing_ ? ' following' : ''}`}
+            className={`fw-follow-btn ${isFollowing_ ? 'following' : ''}`}
             onClick={() => handleFollow(uid, user.username)}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
           >
-            {isFollowing_ ? '✓ Following' : showFollowBack ? '↩ Follow Back' : '+ Follow'}
+            {isFollowing_ ? <UserCheck size={12} /> : <UserPlus size={12} />}
+            {isFollowing_ ? 'Following' : showFollowBack ? 'Follow Back' : 'Follow'}
           </button>
           <button
             className="fw-msg-btn"
             onClick={() => navigate('/messages', { state: { startChat: { _id: uid, username: user.username } } })}
             title="Send message"
-          >💬</button>
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <MessageSquare size={13} />
+          </button>
         </div>
       </div>
     );
@@ -142,21 +150,21 @@ export default function Following() {
       {/* Header */}
       <div className="fw-header">
         <div>
-          <h1 className="fw-title">👥 My Network</h1>
+          <h1 className="fw-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Users size={32} color="#a78bfa" /> My Network</h1>
           <p className="fw-sub">People you follow and your followers</p>
         </div>
-        <button className="fw-find-btn" onClick={() => setActiveTab('discover')}>
-          🔍 Find Performers
+        <button className="fw-find-btn" onClick={() => setActiveTab('discover')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Search size={14} /> Find Performers
         </button>
       </div>
 
       {/* Stats */}
       <div className="fw-stats">
-        <div className={`fw-stat-box${activeTab==='following'?' active':''}`} onClick={() => setActiveTab('following')}>
+        <div className={`fw-stat-box th-premium-card-redesign ${activeTab==='following'?'active':''}`} onClick={() => setActiveTab('following')}>
           <div className="fw-stat-val">{following.length}</div>
           <div className="fw-stat-label">FOLLOWING</div>
         </div>
-        <div className={`fw-stat-box${activeTab==='followers'?' active':''}`} onClick={() => setActiveTab('followers')}>
+        <div className={`fw-stat-box th-premium-card-redesign ${activeTab==='followers'?'active':''}`} onClick={() => setActiveTab('followers')}>
           <div className="fw-stat-val">{followers.length}</div>
           <div className="fw-stat-label">FOLLOWERS</div>
         </div>
@@ -167,25 +175,31 @@ export default function Following() {
         {[
           { id:'following', label:`Following (${following.length})` },
           { id:'followers', label:`Followers (${followers.length})` },
-          { id:'discover',  label:'🔍 Discover' },
+          { id:'discover',  label:'Discover' },
         ].map(t => (
           <button
             key={t.id}
-            className={`fw-tab${activeTab===t.id?' active':''}`}
+            className={`fw-tab ${activeTab===t.id?'active':''}`}
             onClick={() => setActiveTab(t.id)}
-          >{t.label}</button>
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            {t.id === 'discover' && <Compass size={14} />}
+            {t.label}
+          </button>
         ))}
       </div>
 
       {/* Search */}
       <div className="fw-search-wrap">
+        <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}><Search size={14} color="#8b87a8" /></span>
         <input
           className="fw-search"
-          placeholder="🔍 Search by name..."
+          placeholder="Search by name..."
           value={search}
           onChange={e => setSearch(e.target.value)}
+          style={{ paddingLeft: '38px' }}
         />
-        {search && <button className="fw-search-clear" onClick={() => setSearch('')}>✕</button>}
+        {search && <button className="fw-search-clear" onClick={() => setSearch('')}><X size={12} /></button>}
       </div>
 
       {/* Content */}
@@ -198,13 +212,15 @@ export default function Following() {
           {/* FOLLOWING TAB */}
           {activeTab === 'following' && (
             filteredFollowing.length === 0 ? (
-              <div className="fw-empty">
-                <div className="fw-empty-icon">🔍</div>
+              <div className="th-empty-state-illustrated">
+                <div className="th-empty-state-icon-wrapper" style={{ background: 'rgba(139, 92, 246, 0.08)', color: '#8B5CF6' }}>
+                  <Users size={32} />
+                </div>
                 <h3>{search ? 'No results found' : 'Not following anyone yet'}</h3>
-                <p>{search ? 'Try a different name' : 'Explore and follow talented performers!'}</p>
+                <p>{search ? 'Try checking your spelling or searching for a different creator name.' : 'Explore and follow talented performers across India!'}</p>
                 {!search && (
-                  <button className="fw-explore-btn" onClick={() => setActiveTab('discover')}>
-                    🌟 Discover Performers
+                  <button className="th-empty-state-cta-btn" onClick={() => setActiveTab('discover')}>
+                    Discover Performers
                   </button>
                 )}
               </div>
@@ -218,13 +234,15 @@ export default function Following() {
           {/* FOLLOWERS TAB */}
           {activeTab === 'followers' && (
             filteredFollowers.length === 0 ? (
-              <div className="fw-empty">
-                <div className="fw-empty-icon">👥</div>
+              <div className="th-empty-state-illustrated">
+                <div className="th-empty-state-icon-wrapper" style={{ background: 'rgba(236, 72, 153, 0.08)', color: '#ec4899' }}>
+                  <Users size={32} />
+                </div>
                 <h3>{search ? 'No results found' : 'No followers yet'}</h3>
-                <p>{search ? 'Try a different name' : 'Upload performances to gain followers!'}</p>
+                <p>{search ? 'Try checking your spelling or searching for a different creator name.' : 'Gain followers by uploading awesome video performances!'}</p>
                 {!search && (
-                  <button className="fw-explore-btn" onClick={() => navigate('/upload')}>
-                    ⬆ Upload Performance
+                  <button className="th-empty-state-cta-btn" onClick={() => navigate('/upload')}>
+                    Upload Performance
                   </button>
                 )}
               </div>
@@ -244,10 +262,12 @@ export default function Following() {
           {/* DISCOVER TAB */}
           {activeTab === 'discover' && (
             discoverUsers.length === 0 ? (
-              <div className="fw-empty">
-                <div className="fw-empty-icon">🌟</div>
+              <div className="th-empty-state-illustrated">
+                <div className="th-empty-state-icon-wrapper" style={{ background: 'rgba(245, 166, 35, 0.08)', color: '#f5a623' }}>
+                  <Compass size={32} />
+                </div>
                 <h3>{search ? 'No performers found' : 'No performers yet'}</h3>
-                <p>Be the first to join TalentHub!</p>
+                <p>Try searching for other creator names or reset your search query.</p>
               </div>
             ) : (
               <div className="fw-list">

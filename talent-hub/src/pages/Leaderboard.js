@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Trophy } from 'lucide-react';
+import API from '../config';
 import './Leaderboard.css';
 
 const Leaderboard = () => {
@@ -14,9 +16,9 @@ const Leaderboard = () => {
   const fetchLeaderboard = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('th_token') || localStorage.getItem('token');
       const res = await fetch(
-        `/api/users/leaderboard?period=${period}&category=${category}`,
+        `${API}/api/users/leaderboard?period=${period}&category=${category}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
@@ -37,9 +39,9 @@ const Leaderboard = () => {
   };
 
   const getRankIcon = (rank) => {
-    if (rank === 1) return '🥇';
-    if (rank === 2) return '🥈';
-    if (rank === 3) return '🥉';
+    if (rank === 1) return <Trophy size={14} color="#f59e0b" />;
+    if (rank === 2) return <Trophy size={14} color="#94a3b8" />;
+    if (rank === 3) return <Trophy size={14} color="#cd7c2f" />;
     return `#${rank}`;
   };
 
@@ -66,12 +68,13 @@ const Leaderboard = () => {
           <p className="th-page-hero-subtitle">Top performing creators and rising stars on TalentHub. Compete to claim the podium!</p>
           
           {/* Filters inside/below the text area of Hero */}
-          <div className="leaderboard-filters" style={{ marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div className="filter-group">
+          <div className="leaderboard-filters" style={{ marginTop: '20px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="filter-group" style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '30px', border: '1px solid var(--border)' }}>
               {periods.map((p) => (
                 <button
                   key={p.value}
-                  className={`filter-btn ${period === p.value ? 'active' : ''}`}
+                  className={period === p.value ? 'fbActive' : 'fb'}
+                  style={{ padding: '6px 14px !important', border: 'none !important', background: 'transparent' }}
                   onClick={() => setPeriod(p.value)}
                 >
                   {p.label}
@@ -83,6 +86,7 @@ const Leaderboard = () => {
               className="category-select"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
+              style={{ border: '1px solid var(--border)', background: 'var(--bg-card)', padding: '8px 16px', borderRadius: '30px', color: 'var(--text-primary)', outline: 'none' }}
             >
               {categories.map((c) => (
                 <option key={c} value={c}>
@@ -92,8 +96,8 @@ const Leaderboard = () => {
             </select>
           </div>
         </div>
-        <div className="th-page-hero-img-wrap">
-          🏆
+        <div className="th-page-hero-img-wrap" style={{ background: 'rgba(245, 166, 35, 0.1)', color: '#f5a623', borderRadius: '50%', width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Trophy size={40} />
         </div>
       </div>
 
@@ -104,10 +108,15 @@ const Leaderboard = () => {
           ))}
         </div>
       ) : performers.length === 0 ? (
-        <div className="leaderboard-empty">
-          <span style={{ fontSize: '3rem' }}>🎭</span>
+        <div className="th-empty-state-illustrated">
+          <div className="th-empty-state-icon-wrapper" style={{ background: 'rgba(139, 92, 246, 0.08)', color: '#8B5CF6' }}>
+            <Trophy size={32} />
+          </div>
           <h3>No performers found</h3>
-          <p>Be the first to make it to the leaderboard!</p>
+          <p>Nobody has claimed the leaderboard ranks yet for this selection. Be the first creator to upload and rule the stage!</p>
+          <button className="th-empty-state-cta-btn" onClick={() => window.location.href = '/explore'}>
+            Find Performers
+          </button>
         </div>
       ) : (
         <>
@@ -116,13 +125,13 @@ const Leaderboard = () => {
             <div className="podium-section">
               {/* 2nd place */}
               <div className="podium-card podium-second">
-                <div className="podium-avatar">
+                <div className="podium-avatar silver">
                   {performers[1]?.profilePic ? (
                     <img src={`${performers[1].profilePic}`} alt={performers[1]?.username} />
                   ) : (
                     <span>{performers[1]?.username?.[0]?.toUpperCase()}</span>
                   )}
-                  <div className="podium-rank silver">🥈</div>
+                  <div className="podium-rank-badge rank-silver">🥈</div>
                 </div>
                 <p className="podium-name">{performers[1]?.username}</p>
                 <p className="podium-followers">{formatFollowers(performers[1]?.followers?.length)} followers</p>
@@ -132,13 +141,13 @@ const Leaderboard = () => {
               {/* 1st place */}
               <div className="podium-card podium-first">
                 <div className="podium-crown">👑</div>
-                <div className="podium-avatar large">
+                <div className="podium-avatar gold large">
                   {performers[0]?.profilePic ? (
                     <img src={`${performers[0].profilePic}`} alt={performers[0]?.username} />
                   ) : (
                     <span>{performers[0]?.username?.[0]?.toUpperCase()}</span>
                   )}
-                  <div className="podium-rank gold">🥇</div>
+                  <div className="podium-rank-badge rank-gold">🥇</div>
                 </div>
                 <p className="podium-name">{performers[0]?.username}</p>
                 <p className="podium-followers">{formatFollowers(performers[0]?.followers?.length)} followers</p>
@@ -147,13 +156,13 @@ const Leaderboard = () => {
 
               {/* 3rd place */}
               <div className="podium-card podium-third">
-                <div className="podium-avatar">
+                <div className="podium-avatar bronze">
                   {performers[2]?.profilePic ? (
                     <img src={`${performers[2].profilePic}`} alt={performers[2]?.username} />
                   ) : (
                     <span>{performers[2]?.username?.[0]?.toUpperCase()}</span>
                   )}
-                  <div className="podium-rank bronze">🥉</div>
+                  <div className="podium-rank-badge rank-bronze">🥉</div>
                 </div>
                 <p className="podium-name">{performers[2]?.username}</p>
                 <p className="podium-followers">{formatFollowers(performers[2]?.followers?.length)} followers</p>
@@ -167,7 +176,10 @@ const Leaderboard = () => {
             {performers.map((performer, index) => (
               <div
                 key={performer._id}
-                className={`leaderboard-row ${index < 3 ? 'top-three' : ''}`}
+                className={`leaderboard-row th-premium-card-redesign ${index < 3 ? 'top-three' : ''}`}
+                style={{
+                  borderLeft: index < 3 ? `4px solid ${index === 0 ? '#f59e0b' : index === 1 ? '#94a3b8' : '#cd7c2f'}` : 'none'
+                }}
               >
                 <div className={`rank-badge ${getRankStyle(index + 1)}`}>
                   {getRankIcon(index + 1)}

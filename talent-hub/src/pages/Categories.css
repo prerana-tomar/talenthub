@@ -1,46 +1,26 @@
 .categories-page {
   padding: 24px;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
-}
-
-.categories-header {
-  margin-bottom: 32px;
-}
-
-.categories-header h1 {
-  font-size: 1.9rem;
-  font-weight: 700;
-  color: #fff;
-  margin: 0 0 6px;
-}
-
-.categories-header p {
-  color: #aaa;
-  margin: 0;
 }
 
 /* Category grid */
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
 }
 
 .category-card {
-  position: relative;
-  background: #12122a;
-  border: 1px solid #2a2a4a;
-  border-radius: 16px;
+  border-left: 4px solid var(--cat-color) !important;
   padding: 28px 24px 20px;
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 
 .category-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--cat-color);
+  border-color: var(--cat-color) !important;
+  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.1), 0 0 20px color-mix(in srgb, var(--cat-color) 25%, transparent) !important;
 }
 
 .category-card:hover .cat-glow {
@@ -56,51 +36,45 @@
   background: var(--cat-color);
   opacity: 0;
   transition: opacity 0.2s;
-  border-radius: 16px 16px 0 0;
-}
-
-.cat-icon {
-  font-size: 2.5rem;
-  margin-bottom: 12px;
 }
 
 .cat-name {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  color: #fff;
-  margin: 0 0 6px;
+  color: var(--text-primary);
+  margin: 0 0 8px;
 }
 
 .cat-desc {
-  font-size: 0.85rem;
-  color: #888;
-  margin: 0 0 20px;
-  line-height: 1.5;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 24px;
+  line-height: 1.6;
+  flex-grow: 1;
 }
 
 .cat-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: auto;
 }
 
 .cat-count {
   font-size: 0.82rem;
-  color: var(--cat-color);
   font-weight: 600;
-  background: color-mix(in srgb, var(--cat-color) 15%, transparent);
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
 }
 
 .cat-arrow {
-  color: #555;
+  color: var(--text-muted);
   font-size: 1.1rem;
-  transition: transform 0.2s, color 0.2s;
+  transition: transform 0.25s ease, color 0.25s ease;
 }
 
 .category-card:hover .cat-arrow {
-  transform: translateX(4px);
+  transform: translateX(6px);
   color: var(--cat-color);
 }
 
@@ -108,72 +82,37 @@
 .back-btn {
   background: none;
   border: none;
-  color: #7c3aed;
+  color: var(--accent);
   font-size: 0.95rem;
   cursor: pointer;
   padding: 0;
-  margin-bottom: 24px;
-  font-weight: 500;
-  transition: color 0.2s;
+  font-weight: 600;
+  transition: color 0.2s, transform 0.2s;
 }
 
 .back-btn:hover {
-  color: #a78bfa;
-}
-
-.category-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: #12122a;
-  border: 1px solid;
-  border-radius: 14px;
-  padding: 20px 24px;
-  margin-bottom: 28px;
-}
-
-.cat-icon-large {
-  font-size: 2.8rem;
-}
-
-.category-header h1 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin: 0 0 4px;
-}
-
-.category-header p {
-  color: #888;
-  margin: 0;
-  font-size: 0.9rem;
+  color: var(--accent-light);
+  transform: translateX(-2px);
 }
 
 /* Video grid */
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
 }
 
 .video-card-cat {
-  background: #12122a;
-  border: 1px solid #2a2a4a;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s, border-color 0.2s;
-}
-
-.video-card-cat:hover {
-  transform: translateY(-3px);
-  border-color: #7c3aed55;
+  display: flex;
+  flex-direction: column;
 }
 
 .video-thumb {
   position: relative;
   aspect-ratio: 16/9;
-  background: #0d0d20;
+  background: #000;
   overflow: hidden;
+  border-radius: 12px 12px 0 0;
 }
 
 .video-thumb video {
@@ -185,12 +124,13 @@
 .video-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.3);
+  background: rgba(5,5,15,0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   transition: opacity 0.2s;
+  z-index: 2;
 }
 
 .video-card-cat:hover .video-overlay {
@@ -198,8 +138,17 @@
 }
 
 .play-icon {
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: white;
+  background: rgba(124, 58, 237, 0.8);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .view-count {
@@ -211,30 +160,33 @@
   background: rgba(0,0,0,0.6);
   padding: 2px 8px;
   border-radius: 20px;
+  z-index: 3;
 }
 
 .video-info-cat {
-  padding: 10px 12px;
+  padding: 14px 16px;
+  background: transparent;
+  flex-grow: 1;
 }
 
 .video-title-cat {
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.88rem;
-  margin: 0 0 4px;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.92rem;
+  margin: 0 0 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .video-uploader {
-  color: #888;
-  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
 }
 
 .video-skeleton {
   aspect-ratio: 16/9;
-  background: linear-gradient(90deg, #1a1a2e 25%, #252550 50%, #1a1a2e 75%);
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 12px;
@@ -245,30 +197,13 @@
   100% { background-position: -200% 0; }
 }
 
-.cat-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 60px 20px;
-  text-align: center;
-  color: #aaa;
-}
-
-.cat-empty h3 { color: #fff; margin: 0; }
-.cat-empty p { margin: 0; }
-
 @media (max-width: 600px) {
-  .category-header {
-    flex-direction: column;
-    text-align: center;
-    padding: 16px;
-    gap: 12px;
+  .categories-page {
+    padding: 16px 14px 80px;
   }
 }
 
 @media (max-width: 480px) {
   .categories-grid { grid-template-columns: 1fr; }
   .video-grid { grid-template-columns: 1fr; }
-  .categories-page { padding: 16px 14px 76px; }
 }

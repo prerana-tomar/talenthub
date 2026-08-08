@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Trophy, Users, Award, Search, ShieldCheck, Gift, Globe, Lock, Star } from "lucide-react";
 import API from "../config";
 
 // ── constants ────────────────────────────────────────────────────────────────
@@ -43,14 +44,23 @@ const getEmptyQuote = (category) => {
 // ── sub-components ───────────────────────────────────────────────────────────
 
 function EmptyTP({ quote, color, isEnded }) {
+  const accentColor = ACCENT[color] || color || "#ff6b35";
   return (
     <div style={styles.tpBox}>
-      <div style={styles.tpHeader}>{isEnded ? "🏆 Final Winners" : "⭐ Top Performers"}</div>
+      <div style={styles.tpHeader}>
+        {isEnded ? (
+          <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Trophy size={12} color="#ffb800" /> Final Winners</span>
+        ) : (
+          <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Award size={12} color={accentColor} /> Top Performers</span>
+        )}
+      </div>
       <div style={styles.emptyState}>
-        <div style={{ fontSize: 24, marginBottom: 8, opacity: 0.6 }}>{isEnded ? "🏁" : "🌟"}</div>
+        <div style={{ display: "inline-flex", background: `${accentColor}10`, padding: 12, borderRadius: "50%", marginBottom: 10 }}>
+          <Star size={24} color={accentColor} style={{ opacity: 0.8 }} />
+        </div>
         <div style={styles.emptyQuote}>"{quote}"</div>
         {!isEnded && (
-          <div style={{ fontSize: 11, fontWeight: 600, color: ACCENT[color] || color || "#ff6b35" }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: accentColor }}>
             Pehle bano — leaderboard aapka intezaar kar raha hai!
           </div>
         )}
@@ -63,7 +73,13 @@ function PerformersList({ performers, color, isEnded }) {
   const accentColor = ACCENT[color] || color || "#ff6b35";
   return (
     <div style={styles.tpBox}>
-      <div style={styles.tpHeader}>{isEnded ? "🏆 Final Winners" : "⭐ Top Performers"}</div>
+      <div style={styles.tpHeader}>
+        {isEnded ? (
+          <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Trophy size={12} color="#ffb800" /> Final Winners</span>
+        ) : (
+          <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Award size={12} color={accentColor} /> Top Performers</span>
+        )}
+      </div>
       {performers.slice(0, 3).map((p, i) => {
         const bg = (AVATAR_BG[color] || AVATAR_BG.blue)[i] || "#7c3aed";
         const initials = p.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -71,7 +87,7 @@ function PerformersList({ performers, color, isEnded }) {
         const label = isEnded ? ["🥇 Winner", "🥈 2nd", "🥉 3rd"][i] : (p.score ? p.score + " ★" : "Joined");
         const scoreCol = i === 0 ? accentColor : "#8b87a8";
         return (
-          <div key={i} style={{ ...styles.performerRow, borderBottom: i < performers.length - 1 ? "1px solid #2e2a45" : "none" }}>
+          <div key={i} style={{ ...styles.performerRow, borderBottom: i < performers.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
             <span style={{ fontSize: 14, width: 18, textAlign: "center", flexShrink: 0 }}>{RANKS[i] || "•"}</span>
             <div style={{ ...styles.pAvatar, background: bg }}>{initials || "P"}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -139,15 +155,15 @@ function CompCard({ comp, joined, onRegister, registeringId }) {
 
   const statusBadge =
     comp.status === "active" ? (
-      <span style={{ ...styles.badge, background: "rgba(0,200,150,.15)", color: "#00c896", border: "1px solid rgba(0,200,150,.3)" }}>🟢 Active</span>
+      <span style={{ ...styles.badge, background: "rgba(16,185,129,0.1)", color: "#10b981", border: "1px solid rgba(16,185,129,0.2)" }}>🟢 Active</span>
     ) : comp.status === "ended" ? (
-      <span style={{ ...styles.badge, background: "rgba(139,135,168,.15)", color: "#8b87a8", border: "1px solid rgba(139,135,168,.3)" }}>🏁 Ended</span>
+      <span style={{ ...styles.badge, background: "rgba(139,135,168,0.1)", color: "#8b87a8", border: "1px solid rgba(139,135,168,0.2)" }}>🏁 Ended</span>
     ) : (
-      <span style={{ ...styles.badge, background: "rgba(255,107,53,.15)", color: "#ff6b35", border: "1px solid rgba(255,107,53,.3)" }}>⏳ Upcoming</span>
+      <span style={{ ...styles.badge, background: "rgba(255,107,53,0.1)", color: "#ff6b35", border: "1px solid rgba(255,107,53,0.2)" }}>⏳ Upcoming</span>
     );
 
   const levelBadge = (
-    <span style={{ ...styles.badge, background: "rgba(79,172,254,.15)", color: "#4facfe", border: "1px solid rgba(79,172,254,.3)" }}>
+    <span style={{ ...styles.badge, background: "rgba(79,172,254,0.1)", color: "#4facfe", border: "1px solid rgba(79,172,254,0.2)" }}>
       {comp.difficulty || "Open"}
     </span>
   );
@@ -166,7 +182,7 @@ function CompCard({ comp, joined, onRegister, registeringId }) {
     btnColor = "#00c896";
     isActionEnabled = true;
   } else if (comp.status === "ended") {
-    btnLabel = "🏆 See Winners";
+    btnLabel = "🏆 Winners";
     btnColor = "#4facfe";
   }
 
@@ -185,9 +201,11 @@ function CompCard({ comp, joined, onRegister, registeringId }) {
   }
 
   return (
-    <div style={styles.card} className={`comp-card comp-card-${comp.color}`}>
+    <div style={{ ...styles.card, borderTop: `4px solid ${accentColor}` }} className="comp-card th-premium-card-redesign">
       <div style={styles.cardHeader}>
-        <div style={styles.cardEmoji}>{comp.icon || "🏆"}</div>
+        <div style={{ ...styles.cardEmoji, background: `${accentColor}10`, color: accentColor }}>
+          <Trophy size={20} />
+        </div>
         <div style={{ flex: 1 }}>
           <div style={styles.cardBadges}>{statusBadge}{levelBadge}</div>
           <div style={styles.cardTitle}>{comp.name || comp.title}</div>
@@ -198,7 +216,7 @@ function CompCard({ comp, joined, onRegister, registeringId }) {
       </div>
       <div style={styles.cardMeta}>
         {(comp.tags || []).map(t => (
-          <span key={t} style={{ ...styles.metaTag, borderColor: accentColor + "66", color: accentColor }}>{t}</span>
+          <span key={t} style={{ ...styles.metaTag, borderColor: accentColor + "33", color: accentColor, background: `${accentColor}08` }}>{t}</span>
         ))}
       </div>
       <p style={styles.cardDesc}>{comp.description || comp.desc}</p>
@@ -241,11 +259,12 @@ export default function CompetitionsPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchCompetitions = async () => {
+    setLoading(true);
     try {
       const res = await fetch(`${API}/api/competitions`);
       const data = await res.json();
-      if (res.ok && Array.isArray(data)) {
-        setCompetitions(data);
+      if (res.ok) {
+        setCompetitions(data || []);
       }
     } catch (err) {
       console.error("Error fetching competitions:", err);
@@ -298,74 +317,40 @@ export default function CompetitionsPage() {
         alert(data.error || data.message || "Failed to register.");
       }
     } catch (err) {
-      console.error("Register error:", err);
-      alert("Error occurred. Please try again.");
+      alert("Network error. Please try again.");
     } finally {
       setRegisteringId(null);
     }
   };
 
-  const totalParticipants = stats.total_participants;
+  // derived state filters
   const activeCount = competitions.filter(c => c.status === "active").length;
+  const totalParticipants = stats.total_participants || competitions.reduce((sum, c) => sum + (c.participants?.length || 0), 0);
 
   const filtered = competitions.filter(c => {
-    const matchCat =
-      activeFilter === "All" ||
-      c.name.toLowerCase().includes(activeFilter.toLowerCase()) ||
-      c.category.toLowerCase().includes(activeFilter.toLowerCase()) ||
-      c.tags.some(t => t.toLowerCase().includes(activeFilter.toLowerCase()));
-    const matchStatus =
-      statusFilter === "All" ||
-      (statusFilter === "Active" && c.status === "active") ||
-      (statusFilter === "Upcoming" && c.status === "upcoming") ||
-      (statusFilter === "Ended" && c.status === "ended");
-    const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchStatus && matchSearch;
+    const matchesSearch = c.name?.toLowerCase().includes(search.toLowerCase()) || 
+                          c.description?.toLowerCase().includes(search.toLowerCase());
+    
+    const matchesCat = activeFilter === "All" || c.category === activeFilter;
+    
+    let matchesStatus = true;
+    if (statusFilter !== "All") {
+      matchesStatus = c.status === statusFilter.toLowerCase();
+    }
+
+    return matchesSearch && matchesCat && matchesStatus;
   });
 
   return (
     <div style={styles.page}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Poppins:wght@400;500;600&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #0f0e17; }
-        .comp-card { transition: transform .2s, border-color .2s; }
-        .comp-card:hover { transform: translateY(-3px); border-color: #a78bfa !important; }
-        .comp-card-orange::before { background: #ff6b35; }
-        .comp-card-green::before  { background: #00c896; }
-        .comp-card-blue::before   { background: #4facfe; }
-        .comp-card-gold::before   { background: #f5a623; }
-        .comp-card-pink::before   { background: #f472b6; }
-        .comp-card-red::before    { background: #ff4d6d; }
-        .comp-card::before {
-          content: ''; position: absolute; top: 0; left: 0; right: 0;
-          height: 3px; border-radius: 14px 14px 0 0;
-        }
+        .comp-card { transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease !important; }
+        .comp-card:hover { transform: translateY(-4px) !important; }
         @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.5} }
         @keyframes shimmer { 0%,100%{opacity:.4} 50%{opacity:.9} }
         @keyframes fadeIn  { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
       `}</style>
-
-      {/* NAV */}
-      <nav style={styles.nav}>
-        <div style={styles.navLogo}>⚡ TalentHive</div>
-        <div style={styles.navLinks}>
-          {["Competitions", "My Competitions", "Bookmarks"].map((l, i) => (
-            <a key={l} style={{ ...styles.navLink, ...(i === 0 ? styles.navLinkActive : {}) }}>{l}</a>
-          ))}
-        </div>
-        <div style={styles.navRight}>
-          <div style={styles.liveBadge}>
-            <span style={styles.liveDot} />
-            {activeCount} Active Now
-          </div>
-          <div style={styles.statChip}>
-            👥 {totalParticipants.toLocaleString()} Participants
-          </div>
-          <div style={styles.notifBtn}>🔔</div>
-          <div style={styles.avatarNav}>AK</div>
-        </div>
-      </nav>
 
       <div style={styles.wrap}>
         {/* Premium Page Hero */}
@@ -380,20 +365,20 @@ export default function CompetitionsPage() {
                   {activeCount} Active Now
                 </span>
               </div>
-              <div style={{ fontSize: 13, color: "#B8B8C5", fontWeight: 600 }}>
-                👥 {totalParticipants.toLocaleString()} Participants
+              <div style={{ fontSize: 13, color: "#B8B8C5", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
+                <Users size={14} color="#8b87a8" /> {totalParticipants.toLocaleString()} Participants
               </div>
             </div>
           </div>
-          <div className="th-page-hero-img-wrap">
-            🏆
+          <div className="th-page-hero-img-wrap" style={{ background: "rgba(245,166,35,0.1)", color: "#f5a623", borderRadius: "50%", width: "80px", height: "80px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Trophy size={40} />
           </div>
         </div>
 
         {/* FILTERS */}
         <div style={styles.filterRow}>
           <div style={{ position: "relative", flex: "0 0 240px" }}>
-            <span style={styles.searchIcon}>🔍</span>
+            <span style={styles.searchIcon}><Search size={14} color="#8b87a8" /></span>
             <input
               style={styles.searchInput}
               placeholder="Search competitions..."
@@ -405,7 +390,8 @@ export default function CompetitionsPage() {
           <div style={styles.filterGroup}>
             {["All","Singing","Dance","Rap","Comedy","Acting","Instrumental","Poetry"].map(f => (
               <button key={f}
-                style={{ ...styles.fb, ...(activeFilter === f ? styles.fbActive : {}) }}
+                className={activeFilter === f ? "fbActive" : "fb"}
+                style={{ border: "1px solid rgba(139,92,246,0.15)", outline: "none" }}
                 onClick={() => setActiveFilter(f)}>{f}</button>
             ))}
           </div>
@@ -414,17 +400,29 @@ export default function CompetitionsPage() {
           <div style={styles.filterGroup}>
             {["All","Active","Upcoming","Ended"].map(f => (
               <button key={f}
-                style={{ ...styles.fb, ...(statusFilter === f ? styles.fbActive : {}) }}
+                className={statusFilter === f ? "fbActive" : "fb"}
+                style={{ border: "1px solid rgba(139,92,246,0.15)", outline: "none" }}
                 onClick={() => setStatusFilter(f)}>{f}</button>
             ))}
           </div>
         </div>
 
-        {/* CARDS */}
+        {/* Challenge list */}
         {loading ? (
           <div style={{ textAlign: "center", padding: "80px 20px" }}>
             <div className="admin-spinner" style={{ width: 40, height: 40, border: "3px solid rgba(167, 139, 250, 0.15)", borderLeftColor: "#a78bfa", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
             <p style={{ color: "#8b87a8" }}>Loading competitions...</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="th-empty-state-illustrated">
+            <div className="th-empty-state-icon-wrapper" style={{ color: "#f5a623", background: "rgba(245,166,35,0.1)", borderColor: "rgba(245,166,35,0.2)" }}>
+              <Trophy size={32} />
+            </div>
+            <h3>No competitions found</h3>
+            <p>We couldn't find any challenges matching your filters. Try selecting another category or typing different keywords.</p>
+            <button className="th-empty-state-cta-btn" onClick={() => { setActiveFilter("All"); setStatusFilter("All"); setSearch(""); }}>
+              Reset Filters
+            </button>
           </div>
         ) : (
           <div style={styles.cardsGrid}>
@@ -443,12 +441,12 @@ export default function CompetitionsPage() {
         {/* FOOTER */}
         <div style={styles.footerStrip}>
           {[
-            { icon: "🛡️", color: "rgba(167,139,250,.15)", title: "Fair Play",       sub: "Transparent judging & fair evaluation" },
-            { icon: "🎁", color: "rgba(255,107,53,.15)",  title: "Exciting Rewards", sub: "Win recognition for your talent" },
-            { icon: "🌐", color: "rgba(79,172,254,.15)",  title: "Open for All",     sub: "Anyone can participate from anywhere" },
-            { icon: "🔒", color: "rgba(0,200,150,.15)",   title: "Safe & Secure",    sub: "Your data and identity are protected" },
-          ].map(item => (
-            <div key={item.title} style={styles.fi}>
+            { icon: <ShieldCheck size={20} color="#a78bfa" />, color: "rgba(167,139,250,.1)", title: "Fair Play",       sub: "Transparent judging & fair evaluation" },
+            { icon: <Gift size={20} color="#ff6b35" />, color: "rgba(255,107,53,.1)",  title: "Exciting Rewards", sub: "Win recognition for your talent" },
+            { icon: <Globe size={20} color="#4facfe" />, color: "rgba(79,172,254,.1)",  title: "Open for All",     sub: "Anyone can participate from anywhere" },
+            { icon: <Lock size={20} color="#00c896" />, color: "rgba(0,200,150,.1)",   title: "Safe & Secure",    sub: "Your data and identity are protected" },
+          ].map((item, index) => (
+            <div key={index} style={styles.fi}>
               <div style={{ ...styles.fiIcon, background: item.color }}>{item.icon}</div>
               <div>
                 <div style={styles.fiTitle}>{item.title}</div>
@@ -464,60 +462,40 @@ export default function CompetitionsPage() {
 
 // ── styles ───────────────────────────────────────────────────────────────────
 const styles = {
-  page:         { background: "#0f0e17", minHeight: "100vh", paddingBottom: 40, fontFamily: "'Poppins', sans-serif", color: "#f0edf8" },
-  wrap:         { maxWidth: 1200, margin: "0 auto", padding: "0 20px 40px" },
-  nav:          { background: "rgba(15,14,23,0.95)", borderBottom: "1px solid #2e2a45", padding: "0 24px", display: "flex", alignItems: "center", height: 56, position: "sticky", top: 0, zIndex: 100 },
-  navLogo:      { fontFamily: "'Baloo 2', cursive", fontSize: 18, fontWeight: 800, color: "#ff6b35", marginRight: 28 },
-  navLinks:     { display: "flex", gap: 4 },
-  navLink:      { padding: "6px 14px", borderRadius: 8, fontSize: 13, fontWeight: 500, color: "#8b87a8", cursor: "pointer", border: "none", background: "none", textDecoration: "none" },
-  navLinkActive:{ background: "rgba(255,107,53,.15)", color: "#ff6b35" },
-  navRight:     { marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 },
-  liveBadge:    { display: "flex", alignItems: "center", gap: 6, background: "rgba(0,200,150,.1)", border: "1px solid rgba(0,200,150,.3)", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 600, color: "#00c896" },
+  page:         { minHeight: "100vh", paddingBottom: 40, fontFamily: "'Poppins', sans-serif", color: "#f0edf8" },
+  wrap:         { maxWidth: 1200, margin: "0 auto", padding: "40px 20px 40px" },
   liveDot:      { display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "#00c896", animation: "pulse 1.5s infinite", flexShrink: 0 },
-  statChip:     { display: "flex", alignItems: "center", gap: 6, background: "#231f35", border: "1px solid #2e2a45", borderRadius: 20, padding: "4px 12px", fontSize: 12, color: "#8b87a8" },
-  notifBtn:     { width: 34, height: 34, borderRadius: "50%", background: "#231f35", border: "1px solid #2e2a45", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" },
-  avatarNav:    { width: 34, height: 34, borderRadius: "50%", background: "#a78bfa", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700 },
-  hero:         { padding: "32px 0 20px", display: "flex", alignItems: "flex-start", justifyContent: "space-between" },
-  heroLeft:     { display: "flex", alignItems: "center", gap: 18 },
-  trophyIcon:   { width: 56, height: 56, background: "#ff6b35", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 },
-  heroTitle:    { fontFamily: "'Baloo 2', cursive", fontSize: 32, fontWeight: 800, color: "#f0edf8", lineHeight: 1.1 },
-  heroSub:      { fontSize: 13, color: "#8b87a8", marginTop: 4 },
-  filterRow:    { display: "flex", alignItems: "center", gap: 12, margin: "20px 0 24px", flexWrap: "wrap" },
-  searchIcon:   { position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", fontSize: 14 },
-  searchInput:  { width: "100%", background: "#231f35", border: "1px solid #2e2a45", borderRadius: 8, padding: "9px 12px 9px 36px", fontSize: 13, color: "#f0edf8", fontFamily: "'Poppins', sans-serif", outline: "none" },
+  filterRow:    { display: "flex", alignItems: "center", gap: 12, margin: "20px 0 28px", flexWrap: "wrap" },
+  searchIcon:   { position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center" },
+  searchInput:  { width: "100%", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 12px 10px 34px", fontSize: 13, color: "#f0edf8", fontFamily: "'Poppins', sans-serif", outline: "none" },
   filterLabel:  { fontSize: 12, color: "#8b87a8", fontWeight: 500, whiteSpace: "nowrap" },
   filterGroup:  { display: "flex", gap: 6, flexWrap: "wrap" },
-  fb:           { padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 500, border: "1px solid #2e2a45", background: "#231f35", color: "#8b87a8", cursor: "pointer", fontFamily: "'Poppins', sans-serif", transition: "all .15s" },
-  fbActive:     { background: "#a78bfa", borderColor: "#a78bfa", color: "#fff" },
   dividerV:     { width: 1, height: 24, background: "#2e2a45" },
-  cardsGrid:    { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 20 },
-  card:         { background: "#1e1b2e", border: "1px solid #2e2a45", borderRadius: 14, padding: 20, position: "relative", overflow: "hidden", cursor: "pointer" },
+  cardsGrid:    { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 24 },
+  card:         { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 16, padding: 24, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transition: "all 0.3s ease" },
   cardHeader:   { display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 14 },
-  cardEmoji:    { width: 48, height: 48, borderRadius: 12, background: "#231f35", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 },
+  cardEmoji:    { width: 44, height: 44, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
   cardBadges:   { display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap" },
   badge:        { padding: "3px 8px", borderRadius: 20, fontSize: 11, fontWeight: 600 },
-  cardTitle:    { fontFamily: "'Baloo 2', cursive", fontSize: 18, fontWeight: 700, color: "#f0edf8", lineHeight: 1.2 },
+  cardTitle:    { fontSize: 18, fontWeight: 700, color: "#f0edf8", lineHeight: 1.2 },
   cardMeta:     { display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" },
-  metaTag:      { padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 500, border: "1px solid", background: "transparent" },
-  cardDesc:     { fontSize: 12.5, color: "#8b87a8", lineHeight: 1.6, marginBottom: 14 },
-  tpBox:        { borderRadius: 8, padding: "12px 14px", marginBottom: 14, border: "1px solid #2e2a45", background: "#231f35" },
+  metaTag:      { padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 500, border: "1px solid" },
+  cardDesc:     { fontSize: 12.5, color: "#8b87a8", lineHeight: 1.6, marginBottom: 14, flexGrow: 1 },
+  tpBox:        { borderRadius: 8, padding: "12px 14px", marginBottom: 14, border: "1px solid var(--border)", background: "rgba(255, 255, 255, 0.01)" },
   tpHeader:     { fontSize: 10, fontWeight: 600, color: "#8b87a8", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 },
-  skRow:        { display: "flex", alignItems: "center", gap: 10, padding: "7px 0" },
-  skCircle:     { width: 28, height: 28, borderRadius: "50%", background: "#2e2a45", flexShrink: 0, animation: "shimmer 1.4s infinite" },
-  skLine:       { height: 8, borderRadius: 4, background: "#2e2a45", animation: "shimmer 1.4s infinite", display: "block" },
-  emptyState:   { textAlign: "center", padding: "14px 10px" },
+  emptyState:   { textAlign: "center", padding: "10px 10px" },
   emptyQuote:   { fontSize: 12.5, color: "#8b87a8", lineHeight: 1.6, fontStyle: "italic", marginBottom: 6 },
   performerRow: { display: "flex", alignItems: "center", gap: 10, padding: "6px 0", animation: "fadeIn .35s ease" },
-  pAvatar:      { width: 30, height: 30, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0, color: "#fff" },
+  pAvatar:      { width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0, color: "#fff" },
   pName:        { fontSize: 12, fontWeight: 600, color: "#f0edf8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
   pChannel:     { fontSize: 11, color: "#4facfe", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "flex", alignItems: "center", gap: 3, textDecoration: "none" },
   progressMeta: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
-  progressBar:  { height: 5, background: "#1a1826", borderRadius: 99, overflow: "hidden" },
+  progressBar:  { height: 5, background: "rgba(0,0,0,0.2)", borderRadius: 99, overflow: "hidden" },
   progressFill: { height: "100%", borderRadius: 99, transition: "width .6s ease" },
-  cardActions:  { display: "flex", gap: 10 },
-  btnP:         { flex: 1, padding: "9px 0", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Poppins', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 },
-  btnS:         { padding: "9px 16px", borderRadius: 8, border: "1px solid #2e2a45", background: "#231f35", color: "#8b87a8", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'Poppins', sans-serif" },
-  footerStrip:  { background: "#1a1826", border: "1px solid #2e2a45", borderRadius: 14, padding: "20px 24px", marginTop: 28, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 },
+  cardActions:  { display: "flex", gap: 10, marginTop: "auto" },
+  btnP:         { flex: 1, padding: "10px 0", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Poppins', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 },
+  btnS:         { padding: "10px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.03)", color: "#8b87a8", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'Poppins', sans-serif" },
+  footerStrip:  { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 16, padding: "20px 24px", marginTop: 36, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 },
   fi:           { display: "flex", alignItems: "flex-start", gap: 12 },
   fiIcon:       { width: 40, height: 40, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 },
   fiTitle:      { fontSize: 13, fontWeight: 600, color: "#f0edf8", marginBottom: 2 },
