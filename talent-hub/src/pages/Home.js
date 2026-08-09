@@ -684,7 +684,7 @@ export default function Home() {
                 style={{cursor:'pointer'}}
               >
                 <div className="th-comp-icon" style={{background: c.color+'22', color: c.color}}>
-                  {typeof CompIcon === 'function' ? <CompIcon size={18} /> : c.icon}
+                  {typeof CompIcon === 'string' ? CompIcon : <CompIcon size={18} />}
                 </div>
                 <div className="th-comp-info">
                   <div className="th-comp-name">{c.name}</div>
