@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
-import { Home, Compass, Upload, MessageCircle, User } from 'lucide-react';
+import { Home as HomeIcon, Compass, Upload as UploadIcon, MessageCircle, User } from 'lucide-react';
 import './App.css';
 
 import Navbar from './components/Navbar';
@@ -81,7 +81,7 @@ function MobileBottomNav() {
     <nav className="global-mobile-bottom-nav">
       <div className="global-mobile-bottom-nav-inner">
         <Link to="/" className={`global-nav-btn ${activePage === 'home' ? 'active' : ''}`}>
-          <span className="global-icon" style={{ display: 'inline-flex', alignItems: 'center' }}><Home size={18} /></span>
+          <span className="global-icon" style={{ display: 'inline-flex', alignItems: 'center' }}><HomeIcon size={18} /></span>
           <span className="global-label">Home</span>
         </Link>
         <Link to="/explore" className={`global-nav-btn ${activePage === 'explore' ? 'active' : ''}`}>
@@ -89,7 +89,7 @@ function MobileBottomNav() {
           <span className="global-label">Explore</span>
         </Link>
         <Link to="/upload" className="global-nav-btn global-upload">
-          <span className="global-icon" style={{ display: 'inline-flex', alignItems: 'center' }}><Upload size={18} /></span>
+          <span className="global-icon" style={{ display: 'inline-flex', alignItems: 'center' }}><UploadIcon size={18} /></span>
           <span className="global-label">Upload</span>
         </Link>
         <Link to="/thoughts" className={`global-nav-btn ${activePage === 'thoughts' ? 'active' : ''}`}>
