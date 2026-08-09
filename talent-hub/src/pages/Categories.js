@@ -1,22 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Music, Activity, Laugh, Feather, Palette, Sparkles, Compass, ArrowLeft } from 'lucide-react';
+import { Feather, Palette, Sparkles, Compass, ArrowLeft } from 'lucide-react';
+import { MusicianIcon, DancerIcon, ComedianIcon } from '../components/PerformerIcons';
 import API from '../config';
 import './Categories.css';
 
+// custom: true => our own illustrated SVG icon (accepts size, accent, glow, active)
+// custom: false => lucide-react icon (accepts size only, colored via CSS)
 const CATEGORY_META = {
-  Music: { icon: Music, color: '#7c3aed', desc: 'Songs, covers, and original compositions' },
-  Dance: { icon: Activity, color: '#ec4899', desc: 'Classical, contemporary, and freestyle moves' },
-  Comedy: { icon: Laugh, color: '#f59e0b', desc: 'Stand-up, skits, and funny performances' },
-  Poetry: { icon: Feather, color: '#06b6d4', desc: 'Spoken word, shayari, and literary art' },
-  Art: { icon: Palette, color: '#10b981', desc: 'Visual art, sketching, and creative work' },
-  Other: { icon: Sparkles, color: '#8b5cf6', desc: 'Unique talents that defy categories' },
+  Music: { icon: MusicianIcon, custom: true, color: '#7c3aed', glow: '#c4b5fd', desc: 'Songs, covers, and original compositions' },
+  Dance: { icon: DancerIcon, custom: true, color: '#ec4899', glow: '#fda4af', desc: 'Classical, contemporary, and freestyle moves' },
+  Comedy: { icon: ComedianIcon, custom: true, color: '#f59e0b', glow: '#fdba74', desc: 'Stand-up, skits, and funny performances' },
+  Poetry: { icon: Feather, custom: false, color: '#06b6d4', desc: 'Spoken word, shayari, and literary art' },
+  Art: { icon: Palette, custom: false, color: '#10b981', desc: 'Visual art, sketching, and creative work' },
+  Other: { icon: Sparkles, custom: false, color: '#8b5cf6', desc: 'Unique talents that defy categories' },
 };
+
+// Renders either a custom illustrated icon or a lucide icon depending on category meta
+function CategoryIcon({ meta, size, active }) {
+  const IconComponent = meta.icon;
+  if (meta.custom) {
+    return <IconComponent size={size} accent={meta.color} glow={meta.glow} active={active} />;
+  }
+  return <IconComponent size={size} />;
+}
 
 const Categories = () => {
   const [selected, setSelected] = useState(null);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({});
+  const [hoveredCard, setHoveredCard] = useState(null);
 
   useEffect(() => {
     fetchCategoryStats();
@@ -57,7 +70,6 @@ const Categories = () => {
 
   if (selected) {
     const meta = CATEGORY_META[selected];
-    const IconComponent = meta.icon;
     return (
       <div className="categories-page">
         <button
@@ -88,7 +100,7 @@ const Categories = () => {
               border: `1px solid ${meta.color}33`
             }}
           >
-            <IconComponent size={36} />
+            <CategoryIcon meta={meta} size={36} active={true} />
           </div>
         </div>
 
@@ -101,7 +113,7 @@ const Categories = () => {
         ) : videos.length === 0 ? (
           <div className="th-empty-state-illustrated">
             <div className="th-empty-state-icon-wrapper" style={{ background: `${meta.color}15`, color: meta.color, borderColor: `${meta.color}33` }}>
-              <IconComponent size={32} />
+              <CategoryIcon meta={meta} size={32} active={false} />
             </div>
             <h3>No videos yet in {selected}</h3>
             <p>Be the first creator to upload in this category and showcase your talent to India!</p>
@@ -156,13 +168,15 @@ const Categories = () => {
 
       <div className="categories-grid">
         {Object.entries(CATEGORY_META).map(([name, meta]) => {
-          const IconComponent = meta.icon;
+          const isHovered = hoveredCard === name;
           return (
             <div
               key={name}
               className="category-card th-premium-card-redesign"
               style={{ '--cat-color': meta.color }}
               onClick={() => setSelected(name)}
+              onMouseEnter={() => setHoveredCard(name)}
+              onMouseLeave={() => setHoveredCard(null)}
             >
               <div className="cat-glow" style={{ background: meta.color }} />
               <div
@@ -177,7 +191,7 @@ const Categories = () => {
                   border: `1px solid ${meta.color}25`
                 }}
               >
-                <IconComponent size={24} />
+                <CategoryIcon meta={meta} size={24} active={isHovered} />
               </div>
               <h2 className="cat-name">{name}</h2>
               <p className="cat-desc">{meta.desc}</p>
