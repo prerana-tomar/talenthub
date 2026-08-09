@@ -4,214 +4,125 @@ import API from '../config';
 import './CollabHub.css';
 
 const SKILLS = [
-  'Singer',
-  'Lyricist',
-  'Composer',
-  'Rapper',
-  'Music Producer',
-  'Poet',
-  'Voice Artist',
-  'Instrumentalist'
+  { label: 'Singer',           icon: '🎤' },
+  { label: 'Lyricist',         icon: '✍️' },
+  { label: 'Composer',         icon: '🎼' },
+  { label: 'Rapper',           icon: '🎙️' },
+  { label: 'Music Producer',   icon: '🎛️' },
+  { label: 'Poet',             icon: '📜' },
+  { label: 'Voice Artist',     icon: '🔊' },
+  { label: 'Instrumentalist',  icon: '🎸' },
 ];
 
 const PROJECT_TYPES = [
-  'Song',
-  'Album',
-  'Jingle',
-  'Podcast',
-  'Short Film',
-  'Stage Performance'
+  { label: 'Song',              icon: '🎵' },
+  { label: 'Album',             icon: '💿' },
+  { label: 'Jingle',            icon: '🔔' },
+  { label: 'Podcast',           icon: '🎧' },
+  { label: 'Short Film',        icon: '🎬' },
+  { label: 'Stage Performance', icon: '🎭' },
+];
+
+const SKILL_LABELS   = SKILLS.map(s => s.label);
+const PROJECT_LABELS = PROJECT_TYPES.map(p => p.label);
+
+const getSkillIcon    = (label) => SKILLS.find(s => s.label === label)?.icon || '🎯';
+const getProjectIcon  = (label) => PROJECT_TYPES.find(p => p.label === label)?.icon || '📂';
+
+const STATS = [
+  { icon: '🤝', label: 'Active Collabs', value: '120+' },
+  { icon: '🎨', label: 'Creators',       value: '500+' },
+  { icon: '🎵', label: 'Projects Done',  value: '80+'  },
+  { icon: '🌟', label: 'Success Rate',   value: '94%'  },
 ];
 
 export default function CollabHub() {
   const navigate = useNavigate();
   const token = localStorage.getItem('th_token');
-  const me = JSON.parse(localStorage.getItem('th_user') || 'null');
+  const me    = JSON.parse(localStorage.getItem('th_user') || 'null');
 
-  // Tabs: 'feed' or 'my-requests'
-  const [activeTab, setActiveTab] = useState('feed');
-
-  // Filter states
-  const [filterSkill, setFilterSkill] = useState('All');
+  const [activeTab,     setActiveTab]     = useState('feed');
+  const [filterSkill,   setFilterSkill]   = useState('All');
   const [filterProject, setFilterProject] = useState('All');
-
-  // Requests states
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Form states
+  const [requests,      setRequests]      = useState([]);
+  const [loading,       setLoading]       = useState(true);
   const [showPostModal, setShowPostModal] = useState(false);
-  const [skillNeeded, setSkillNeeded] = useState(SKILLS[0]);
-  const [projectType, setProjectType] = useState(PROJECT_TYPES[0]);
-  const [description, setDescription] = useState('');
-  const [budget, setBudget] = useState('Free Collaboration');
-  const [posting, setPosting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [skillNeeded,   setSkillNeeded]   = useState(SKILL_LABELS[0]);
+  const [projectType,   setProjectType]   = useState(PROJECT_LABELS[0]);
+  const [description,   setDescription]   = useState('');
+  const [budget,        setBudget]        = useState('Free Collaboration');
+  const [posting,       setPosting]       = useState(false);
+  const [errorMsg,      setErrorMsg]      = useState('');
+  const [toast,         setToast]         = useState('');
 
-  // Fetch requests based on active tab
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2800); };
+
   const fetchRequests = async () => {
     setLoading(true);
     try {
       const endpoint = activeTab === 'feed' ? `${API}/api/collab` : `${API}/api/collab/mine`;
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      
-      const res = await fetch(endpoint, { headers });
-      if (res.ok) {
-        const data = await res.json();
-        setRequests(Array.isArray(data) ? data : []);
-      } else {
-        setRequests([]);
-      }
-    } catch {
-      setRequests([]);
-    } finally {
-      setLoading(false);
-    }
+      const headers  = token ? { Authorization: `Bearer ${token}` } : {};
+      const res      = await fetch(endpoint, { headers });
+      if (res.ok) { const data = await res.json(); setRequests(Array.isArray(data) ? data : []); }
+      else setRequests([]);
+    } catch { setRequests([]); }
+    finally  { setLoading(false); }
   };
 
-  useEffect(() => {
-    fetchRequests();
-  }, [activeTab]);
+  useEffect(() => { fetchRequests(); }, [activeTab]);
 
-  // Handle post request submission
   const handlePostSubmit = async (e) => {
     e.preventDefault();
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-    if (!description.trim()) {
-      setErrorMsg('Please enter a description for your collaboration project.');
-      return;
-    }
-
-    setPosting(true);
-    setErrorMsg('');
+    if (!token) { navigate('/login'); return; }
+    if (!description.trim()) { setErrorMsg('Please enter a description.'); return; }
+    setPosting(true); setErrorMsg('');
     try {
       const res = await fetch(`${API}/api/collab`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          skillNeeded,
-          projectType,
-          description: description.trim(),
-          budget
-        })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ skillNeeded, projectType, description: description.trim(), budget }),
       });
-
       if (res.ok) {
-        // Clear form and close modal
-        setDescription('');
-        setSkillNeeded(SKILLS[0]);
-        setProjectType(PROJECT_TYPES[0]);
-        setBudget('Free Collaboration');
-        setShowPostModal(false);
-        // Refresh requests
-        fetchRequests();
-      } else {
-        const data = await res.json();
-        setErrorMsg(data.message || 'Failed to post collaboration request.');
-      }
-    } catch {
-      setErrorMsg('Network error. Please try again.');
-    } finally {
-      setPosting(false);
-    }
+        setDescription(''); setSkillNeeded(SKILL_LABELS[0]); setProjectType(PROJECT_LABELS[0]);
+        setBudget('Free Collaboration'); setShowPostModal(false);
+        showToast('✅ Collab request posted!'); fetchRequests();
+      } else { const d = await res.json(); setErrorMsg(d.message || 'Failed to post.'); }
+    } catch { setErrorMsg('Network error. Try again.'); }
+    finally { setPosting(false); }
   };
 
-  // Handle deletion of own request
   const handleDeleteRequest = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this collab request?')) return;
+    if (!window.confirm('Delete this collab request?')) return;
     try {
       const res = await fetch(`${API}/api/collab/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) {
-        setRequests(prev => prev.filter(r => r._id !== id));
-      } else {
-        alert('Failed to delete request.');
-      }
-    } catch {
-      alert('Network error.');
-    }
+      if (res.ok) { setRequests(prev => prev.filter(r => r._id !== id)); showToast('🗑 Request deleted'); }
+      else showToast('❌ Failed to delete');
+    } catch { showToast('❌ Network error'); }
   };
 
-  // Handle Send Request (message generation & redirection)
   const handleSendRequest = async (req) => {
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-    
+    if (!token) { navigate('/login'); return; }
     const targetUser = req.author || req.user;
-    if (!targetUser || !targetUser._id) return;
-
-    // Prevent collaborating with oneself
-    if (targetUser._id === me?._id) {
-      alert('This is your own collaboration request!');
-      return;
-    }
-
-    const mySkill = me?.skill || me?.category || 'artist';
-    const messageText = `Hi! Maine aapki collab request dekhi. Main ${mySkill} hoon aur aapke saath kaam karna chahta/chahti hoon. Kya hum connect kar sakte hain?`;
-
+    if (!targetUser?._id) return;
+    if (targetUser._id === me?._id) { showToast('⚠️ This is your own request!'); return; }
+    const mySkill   = me?.skill || me?.category || 'artist';
+    const msgText   = `Hi! Maine aapki collab request dekhi. Main ${mySkill} hoon aur aapke saath kaam karna chahta/chahti hoon. Kya hum connect kar sakte hain?`;
     try {
-      // Post direct message via socket/REST fallback API
-      const res = await fetch(`${API}/api/messages/send`, {
+      await fetch(`${API}/api/messages/send`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          receiverId: targetUser._id,
-          text: messageText
-        })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ receiverId: targetUser._id, text: msgText }),
       });
-
-      if (res.ok) {
-        // Redirect to messages page to view the conversation
-        navigate('/messages', {
-          state: {
-            startChat: {
-              _id: targetUser._id,
-              username: targetUser.username
-            }
-          }
-        });
-      } else {
-        alert('Failed to initiate conversation. Opening chat fallback.');
-        navigate('/messages', {
-          state: {
-            startChat: {
-              _id: targetUser._id,
-              username: targetUser.username
-            }
-          }
-        });
-      }
-    } catch {
-      // Fallback redirect
-      navigate('/messages', {
-        state: {
-          startChat: {
-            _id: targetUser._id,
-            username: targetUser.username
-          }
-        }
-      });
-    }
+    } catch {}
+    navigate('/messages', { state: { startChat: { _id: targetUser._id, username: targetUser.username } } });
   };
 
-  // Filter requests locally
   const filteredRequests = requests.filter(req => {
-    const matchesSkill = filterSkill === 'All' || req.skillNeeded === filterSkill;
-    const matchesProject = filterProject === 'All' || req.projectType === filterProject;
-    return matchesSkill && matchesProject;
+    const matchSkill   = filterSkill   === 'All' || req.skillNeeded  === filterSkill;
+    const matchProject = filterProject === 'All' || req.projectType  === filterProject;
+    return matchSkill && matchProject;
   });
 
   const formatTime = (d) => {
@@ -224,130 +135,166 @@ export default function CollabHub() {
   };
 
   return (
-    <div className="collab-hub">
-      <div className="collab-header-section">
-        <div className="collab-header-content">
-          <h1>🤝 Collaboration Hub</h1>
-          <p>Connect with other creators, share skills, and build amazing projects together.</p>
+    <div className="ch-page">
+
+      {/* Global toast */}
+      {toast && <div className="ch-toast">{toast}</div>}
+
+      {/* ── HERO HEADER ── */}
+      <div className="ch-hero">
+        <div className="ch-hero-bg" />
+        <div className="ch-hero-content">
+          <div className="ch-hero-left">
+            <div className="ch-hero-badge">🤝 Collaboration Hub</div>
+            <h1 className="ch-hero-title">
+              Find Your Perfect<br />
+              <span className="ch-hero-accent">Creative Partner</span>
+            </h1>
+            <p className="ch-hero-desc">
+              Connect with singers, producers, poets & more. Build something amazing together!
+            </p>
+            <div className="ch-hero-btns">
+              <button className="ch-btn-primary" onClick={() => token ? setShowPostModal(true) : navigate('/login')}>
+                ➕ Post Collab Request
+              </button>
+              <button className="ch-btn-outline" onClick={() => setActiveTab('feed')}>
+                🔍 Browse Creators
+              </button>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="ch-stats-grid">
+            {STATS.map((s, i) => (
+              <div key={i} className="ch-stat-card">
+                <div className="ch-stat-icon">{s.icon}</div>
+                <div className="ch-stat-val">{s.value}</div>
+                <div className="ch-stat-label">{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
-        <button className="collab-post-trigger" onClick={() => token ? setShowPostModal(true) : navigate('/login')}>
-          ➕ Post Collab Request
-        </button>
       </div>
 
-      {/* Tabs */}
-      <div className="collab-tabs">
-        <button 
-          className={`collab-tab ${activeTab === 'feed' ? 'active' : ''}`}
-          onClick={() => setActiveTab('feed')}
-        >
-          Browse Requests
-        </button>
-        {token && (
-          <button 
-            className={`collab-tab ${activeTab === 'my-requests' ? 'active' : ''}`}
-            onClick={() => setActiveTab('my-requests')}
-          >
-            My Requests
+      {/* ── SKILL PILLS ── */}
+      <div className="ch-skills-row">
+        <div className="ch-skills-label">Filter by Skill:</div>
+        <div className="ch-skills-pills">
+          <button className={`ch-skill-pill ${filterSkill === 'All' ? 'active' : ''}`} onClick={() => setFilterSkill('All')}>
+            🌟 All
           </button>
+          {SKILLS.map(s => (
+            <button
+              key={s.label}
+              className={`ch-skill-pill ${filterSkill === s.label ? 'active' : ''}`}
+              onClick={() => setFilterSkill(s.label)}
+            >
+              {s.icon} {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── TABS + PROJECT FILTER ── */}
+      <div className="ch-toolbar">
+        <div className="ch-tabs">
+          <button className={`ch-tab ${activeTab === 'feed' ? 'active' : ''}`} onClick={() => setActiveTab('feed')}>
+            🌐 Browse Requests
+          </button>
+          {token && (
+            <button className={`ch-tab ${activeTab === 'my-requests' ? 'active' : ''}`} onClick={() => setActiveTab('my-requests')}>
+              👤 My Requests
+            </button>
+          )}
+        </div>
+
+        {activeTab === 'feed' && (
+          <div className="ch-project-filter">
+            <span className="ch-filter-label">📂 Project:</span>
+            <select value={filterProject} onChange={e => setFilterProject(e.target.value)} className="ch-select">
+              <option value="All">All Types</option>
+              {PROJECT_TYPES.map(p => <option key={p.label} value={p.label}>{p.icon} {p.label}</option>)}
+            </select>
+          </div>
         )}
       </div>
 
-      {/* Filters (only visible on Browse Feed tab) */}
-      {activeTab === 'feed' && (
-        <div className="collab-filters">
-          <div className="collab-filter-item">
-            <label htmlFor="filter-skill-select">Required Skill:</label>
-            <select 
-              id="filter-skill-select"
-              value={filterSkill} 
-              onChange={e => setFilterSkill(e.target.value)}
-            >
-              <option value="All">All Skills</option>
-              {SKILLS.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </div>
-
-          <div className="collab-filter-item">
-            <label htmlFor="filter-project-select">Project Type:</label>
-            <select 
-              id="filter-project-select"
-              value={filterProject} 
-              onChange={e => setFilterProject(e.target.value)}
-            >
-              <option value="All">All Projects</option>
-              {PROJECT_TYPES.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
-          </div>
-        </div>
-      )}
-
-      {/* Requests Feed Container */}
-      <div className="collab-feed">
+      {/* ── FEED ── */}
+      <div className="ch-feed">
         {loading ? (
-          <div className="collab-loading">
-            <div className="collab-spinner" />
-            <span>Loading collaboration requests...</span>
+          <div className="ch-loading">
+            <div className="ch-spinner" />
+            <span>Finding creators for you...</span>
           </div>
         ) : filteredRequests.length === 0 ? (
-          <div className="collab-empty">
-            <div className="collab-empty-icon">🤝</div>
-            <h3>No requests found</h3>
-            <p>Be the first to post a collaboration request for your next creative project!</p>
-            {activeTab === 'feed' && (
-              <button className="collab-post-trigger" style={{ marginTop: 16 }} onClick={() => token ? setShowPostModal(true) : navigate('/login')}>
-                Post Request Now
-              </button>
-            )}
+          <div className="ch-empty">
+            <div className="ch-empty-icon">🎵</div>
+            <h3>No collab requests yet!</h3>
+            <p>Be the first to post and find your creative partner.</p>
+            <button className="ch-btn-primary" style={{ marginTop: 16 }}
+              onClick={() => token ? setShowPostModal(true) : navigate('/login')}
+            >
+              ➕ Post First Request
+            </button>
           </div>
         ) : (
-          <div className="collab-grid">
+          <div className="ch-grid">
             {filteredRequests.map(req => {
               const uploader = req.author || req.user || {};
-              const isMine = uploader._id === me?._id;
-              
+              const isMine   = uploader._id === me?._id;
               return (
-                <div key={req._id} className="collab-card">
-                  <div className="collab-card-header">
-                    <div className="collab-user-info">
-                      <div className="collab-avatar">
-                        {uploader.profilePic ? (
-                          <img src={uploader.profilePic} alt={uploader.username} className="collab-avatar-img" />
-                        ) : (
-                          uploader.username?.[0]?.toUpperCase() || '?'
-                        )}
+                <div key={req._id} className={`ch-card ${isMine ? 'ch-card-mine' : ''}`}>
+
+                  {/* Card top accent */}
+                  <div className="ch-card-accent" />
+
+                  {/* Header */}
+                  <div className="ch-card-header">
+                    <div className="ch-user-row">
+                      <div className="ch-avatar">
+                        {uploader.profilePic
+                          ? <img src={uploader.profilePic} alt={uploader.username} />
+                          : uploader.username?.[0]?.toUpperCase() || '?'}
                       </div>
-                      <div>
-                        <div className="collab-username">{uploader.username || 'Creator'}</div>
-                        <div className="collab-time">{formatTime(req.createdAt)}</div>
+                      <div className="ch-user-info">
+                        <div className="ch-username">{uploader.username || 'Creator'}</div>
+                        <div className="ch-time">🕐 {formatTime(req.createdAt)}</div>
                       </div>
                     </div>
-                    {isMine && activeTab === 'my-requests' && (
-                      <button className="collab-delete-btn" onClick={() => handleDeleteRequest(req._id)} title="Delete request">
+                    {isMine && (
+                      <button className="ch-delete-btn" onClick={() => handleDeleteRequest(req._id)} title="Delete">
                         🗑
                       </button>
                     )}
                   </div>
 
-                  <div className="collab-badges">
-                    <span className="collab-badge skill-badge">🎯 {req.skillNeeded}</span>
-                    <span className="collab-badge project-badge">📂 {req.projectType}</span>
-                    <span className={`collab-badge budget-badge ${req.budget === 'Paid' ? 'paid' : 'free'}`}>
-                      💰 {req.budget}
+                  {/* Badges */}
+                  <div className="ch-badges">
+                    <span className="ch-badge ch-badge-skill">
+                      {getSkillIcon(req.skillNeeded)} {req.skillNeeded}
+                    </span>
+                    <span className="ch-badge ch-badge-project">
+                      {getProjectIcon(req.projectType)} {req.projectType}
+                    </span>
+                    <span className={`ch-badge ch-badge-budget ${req.budget === 'Paid' ? 'paid' : 'free'}`}>
+                      {req.budget === 'Paid' ? '💰 Paid' : '🤝 Free'}
                     </span>
                   </div>
 
-                  <p className="collab-description">{req.description}</p>
+                  {/* Description */}
+                  <p className="ch-desc">{req.description}</p>
 
-                  <div className="collab-card-footer">
+                  {/* Footer */}
+                  <div className="ch-card-footer">
                     {!isMine ? (
-                      <button className="collab-action-btn" onClick={() => handleSendRequest(req)}>
-                        ✉ Send Request
+                      <button className="ch-connect-btn" onClick={() => handleSendRequest(req)}>
+                        ✉️ Send Request
                       </button>
                     ) : (
-                      <span className="collab-own-tag">Your Request</span>
+                      <div className="ch-own-tag">✅ Your Request</div>
                     )}
                   </div>
+
                 </div>
               );
             })}
@@ -355,71 +302,71 @@ export default function CollabHub() {
         )}
       </div>
 
-      {/* Post Modal Form */}
+      {/* ── POST MODAL ── */}
       {showPostModal && (
-        <div className="collab-modal-overlay" onClick={() => setShowPostModal(false)}>
-          <div className="collab-modal" onClick={e => e.stopPropagation()}>
-            <div className="collab-modal-header">
-              <h2>Post Collab Request</h2>
-              <button className="collab-modal-close" onClick={() => setShowPostModal(false)}>✕</button>
+        <div className="ch-modal-overlay" onClick={() => setShowPostModal(false)}>
+          <div className="ch-modal" onClick={e => e.stopPropagation()}>
+
+            <div className="ch-modal-header">
+              <div>
+                <h2>🤝 Post Collab Request</h2>
+                <p>Tell creators what you need</p>
+              </div>
+              <button className="ch-modal-close" onClick={() => setShowPostModal(false)}>✕</button>
             </div>
-            
-            <form onSubmit={handlePostSubmit} className="collab-form">
-              {errorMsg && <div className="collab-error-alert">{errorMsg}</div>}
 
-              <div className="collab-form-group">
-                <label htmlFor="form-skill-select">Skill Needed:</label>
-                <select 
-                  id="form-skill-select"
-                  value={skillNeeded} 
-                  onChange={e => setSkillNeeded(e.target.value)}
-                >
-                  {SKILLS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
+            <form onSubmit={handlePostSubmit} className="ch-form">
+              {errorMsg && <div className="ch-error">{errorMsg}</div>}
+
+              <div className="ch-form-row">
+                <div className="ch-form-group">
+                  <label>🎤 Skill Needed</label>
+                  <select value={skillNeeded} onChange={e => setSkillNeeded(e.target.value)}>
+                    {SKILLS.map(s => <option key={s.label} value={s.label}>{s.icon} {s.label}</option>)}
+                  </select>
+                </div>
+                <div className="ch-form-group">
+                  <label>📂 Project Type</label>
+                  <select value={projectType} onChange={e => setProjectType(e.target.value)}>
+                    {PROJECT_TYPES.map(p => <option key={p.label} value={p.label}>{p.icon} {p.label}</option>)}
+                  </select>
+                </div>
               </div>
 
-              <div className="collab-form-group">
-                <label htmlFor="form-project-select">Project Type:</label>
-                <select 
-                  id="form-project-select"
-                  value={projectType} 
-                  onChange={e => setProjectType(e.target.value)}
-                >
-                  {PROJECT_TYPES.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
+              <div className="ch-form-group">
+                <label>💰 Compensation</label>
+                <div className="ch-budget-pills">
+                  {['Free Collaboration', 'Paid'].map(b => (
+                    <button
+                      key={b} type="button"
+                      className={`ch-budget-pill ${budget === b ? 'active' : ''}`}
+                      onClick={() => setBudget(b)}
+                    >
+                      {b === 'Paid' ? '💰 Paid Project' : '🤝 Free Collaboration'}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div className="collab-form-group">
-                <label htmlFor="form-budget-select">Compensation / Budget:</label>
-                <select 
-                  id="form-budget-select"
-                  value={budget} 
-                  onChange={e => setBudget(e.target.value)}
-                >
-                  <option value="Free Collaboration">Free Collaboration</option>
-                  <option value="Paid">Paid Project</option>
-                </select>
-              </div>
-
-              <div className="collab-form-group">
-                <label htmlFor="form-desc-textarea">Project Description:</label>
+              <div className="ch-form-group">
+                <label>📝 Project Description</label>
                 <textarea
-                  id="form-desc-textarea"
                   rows={4}
-                  placeholder="Describe your project, reference tracks, ideas, and what kind of collaboration you want..."
+                  placeholder="Describe your project, ideas, reference tracks, timeline..."
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                   maxLength={1000}
                   required
                 />
+                <span className="ch-char-count">{description.length}/1000</span>
               </div>
 
-              <div className="collab-form-actions">
-                <button type="button" className="collab-btn-secondary" onClick={() => setShowPostModal(false)} disabled={posting}>
+              <div className="ch-form-actions">
+                <button type="button" className="ch-btn-secondary" onClick={() => setShowPostModal(false)} disabled={posting}>
                   Cancel
                 </button>
-                <button type="submit" className="collab-btn-primary" disabled={posting}>
-                  {posting ? 'Posting...' : 'Post Request'}
+                <button type="submit" className="ch-btn-primary" disabled={posting}>
+                  {posting ? '⏳ Posting...' : '🚀 Post Request'}
                 </button>
               </div>
             </form>
