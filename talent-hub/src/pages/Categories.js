@@ -182,16 +182,26 @@ const Categories = () => {
               <div
                 className="cat-icon"
                 style={{
-                  background: `${meta.color}15`,
-                  color: meta.color,
-                  padding: '12px',
-                  borderRadius: '50%',
-                  display: 'inline-flex',
-                  marginBottom: '16px',
-                  border: `1px solid ${meta.color}25`
+                  width: '68px',
+                  height: '68px',
+                  alignSelf: 'flex-start',
+                  flexShrink: 0,
+                  overflow: 'hidden',
+                  background: `linear-gradient(135deg, ${meta.color}30, ${meta.color}08)`,
+                  borderRadius: '18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '18px',
+                  border: `1px solid ${meta.color}45`,
+                  boxShadow: isHovered
+                    ? `0 0 28px ${meta.color}77, 0 0 10px ${meta.color}99 inset`
+                    : `0 0 10px ${meta.color}22`,
+                  transform: isHovered ? 'scale(1.06) translateY(-2px)' : 'scale(1)',
+                  transition: 'box-shadow 0.35s ease, transform 0.35s ease, background 0.35s ease'
                 }}
               >
-                <CategoryIcon meta={meta} size={24} active={isHovered} />
+                <CategoryIcon meta={meta} size={42} active={isHovered} />
               </div>
               <h2 className="cat-name">{name}</h2>
               <p className="cat-desc">{meta.desc}</p>
