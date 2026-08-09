@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, NavLink } from 'react-router-dom';
+import { User, FolderUp, MessageCircle, Bookmark, ClipboardList, Settings, LogOut, Home, Compass, Upload, Film } from 'lucide-react';
 import API from '../config';
 import './Navbar.css';
 
@@ -271,7 +272,7 @@ function Navbar() {
           <Link to="/collab"            className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('collab'); }}>Collab Hub</Link>
           <Link to="/upload"            className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('upload'); }}>Upload</Link>
           <NavLink to="/highlight-studio" className="nav-link" onClick={() => setMenuOpen(false)}>✦ AI Highlights</NavLink>
-          <NavLink to="/video-editor"   className="nav-link" onClick={() => setMenuOpen(false)}>🎬 Video Editor</NavLink>
+          <NavLink to="/video-editor"   className="nav-link" onClick={() => setMenuOpen(false)} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Film size={14} /> Video Editor</NavLink>
           <Link to="/competitions"      className="nav-link" onClick={() => { setMenuOpen(false); setActivePage('compete'); }}>
             Competitions <span className="nav-badge">New</span>
           </Link>
@@ -373,14 +374,14 @@ function Navbar() {
                     </div>
                   </div>
                   <div className="navbar-dropdown-divider" />
-                  <button className="navbar-dropdown-item" onClick={() => { navigate('/profile');  setDropdownOpen(false); }}>👤 My Profile</button>
-                  <button className="navbar-dropdown-item" onClick={() => { navigate('/uploads');  setDropdownOpen(false); }}>📤 My Uploads</button>
-                  <button className="navbar-dropdown-item" onClick={() => { navigate('/thoughts'); setDropdownOpen(false); }}>💭 Thoughts</button>
-                  <button className="navbar-dropdown-item" onClick={() => { navigate('/saved');    setDropdownOpen(false); }}>🔖 Saved</button>
-                  <button className="navbar-dropdown-item" onClick={() => { navigate('/my-requests'); setDropdownOpen(false); }}>📋 My Requests</button>
-                  <button className="navbar-dropdown-item" onClick={() => { navigate('/settings'); setDropdownOpen(false); }}>⚙️ Settings</button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/profile');  setDropdownOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><User size={14} /> My Profile</button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/uploads');  setDropdownOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><FolderUp size={14} /> My Uploads</button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/thoughts'); setDropdownOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MessageCircle size={14} /> Thoughts</button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/saved');    setDropdownOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Bookmark size={14} /> Saved</button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/my-requests'); setDropdownOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><ClipboardList size={14} /> My Requests</button>
+                  <button className="navbar-dropdown-item" onClick={() => { navigate('/settings'); setDropdownOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Settings size={14} /> Settings</button>
                   <div className="navbar-dropdown-divider" />
-                  <button className="navbar-dropdown-item navbar-dropdown-logout" onClick={handleLogout}>↩ Logout</button>
+                  <button className="navbar-dropdown-item navbar-dropdown-logout" onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><LogOut size={14} /> Logout</button>
                 </div>
               )}
             </div>
@@ -411,7 +412,7 @@ function Navbar() {
             className={`nb-nav-btn ${activePage === 'home' ? 'active' : ''}`}
             onClick={() => setActivePage('home')}
           >
-            <span className="nb-icon">🏠</span>
+            <span className="nb-icon" style={{ display: 'inline-flex', alignItems: 'center' }}><Home size={18} /></span>
             <span className="nb-label">Home</span>
           </Link>
 
@@ -419,12 +420,12 @@ function Navbar() {
             className={`nb-nav-btn ${activePage === 'explore' ? 'active' : ''}`}
             onClick={() => setActivePage('explore')}
           >
-            <span className="nb-icon">🔍</span>
+            <span className="nb-icon" style={{ display: 'inline-flex', alignItems: 'center' }}><Compass size={18} /></span>
             <span className="nb-label">Explore</span>
           </Link>
 
           <Link to="/upload" className="nb-nav-btn nb-upload" onClick={() => setActivePage('upload')}>
-            <span className="nb-icon">⬆</span>
+            <span className="nb-icon" style={{ display: 'inline-flex', alignItems: 'center' }}><Upload size={18} /></span>
             <span className="nb-label">Upload</span>
           </Link>
 
@@ -432,7 +433,7 @@ function Navbar() {
             className={`nb-nav-btn ${activePage === 'thoughts' ? 'active' : ''}`}
             onClick={() => setActivePage('thoughts')}
           >
-            <span className="nb-icon">💭</span>
+            <span className="nb-icon" style={{ display: 'inline-flex', alignItems: 'center' }}><MessageCircle size={18} /></span>
             <span className="nb-label">Thoughts</span>
           </Link>
 
@@ -440,7 +441,7 @@ function Navbar() {
             className={`nb-nav-btn ${activePage === 'profile' ? 'active' : ''}`}
             onClick={() => setActivePage('profile')}
           >
-            <span className="nb-icon">👤</span>
+            <span className="nb-icon" style={{ display: 'inline-flex', alignItems: 'center' }}><User size={18} /></span>
             <span className="nb-label">Profile</span>
           </Link>
 

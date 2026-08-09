@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import {
+  Home as HomeIcon, Compass, LayoutGrid, Users, Radio, Trophy, Star,
+  BarChart3, MessageCircle, Wand2, UserCircle, UploadCloud, Sparkles,
+  Bookmark, UserPlus, MessageSquare, Settings, Crown, Video, Eye,
+  ThumbsUp, Upload, Flame, Clapperboard, Send, Mic, Music2
+} from 'lucide-react';
 import VideoCard from '../components/VideoCard';
 import OnboardingTour from '../components/OnboardingTour';
 import { useTheme } from '../App';
@@ -113,32 +119,33 @@ const TOUR_STEPS = [
 const CATEGORIES = ['All','Singing','Dance','Rap','Comedy','Acting','Instrumental','Poetry'];
 
 const FALLBACK_COMPETITIONS = [
-  { icon:'🎤', name:'Singing Superstar', date:'Coming Soon', color:'#a78bfa', status:'upcoming' },
-  { icon:'💃', name:'Dance Battle',      date:'Coming Soon', color:'#f472b6', status:'upcoming' },
-  { icon:'🎙', name:'Rap Showdown',      date:'Coming Soon', color:'#34d399', status:'active'   },
+  { icon: Mic,    name:'Singing Superstar', date:'Coming Soon', color:'#a78bfa', status:'upcoming' },
+  { icon: Music2, name:'Dance Battle',      date:'Coming Soon', color:'#f472b6', status:'upcoming' },
+  { icon: Send,   name:'Rap Showdown',      date:'Coming Soon', color:'#34d399', status:'active'   },
 ];
 
+// Sidebar main navigation — icon is now a lucide-react component (not emoji)
 const NAV_ITEMS = [
-  { icon:'🏠', label:'Home',              path:'/' },
-  { icon:'🔍', label:'Explore',           path:'/explore' },
-  { icon:'📂', label:'Categories',        path:'/categories' },
-  { icon:'🤝', label:'Collab Hub',         path:'/collab' },
-  { icon:'🔴', label:'Live Performances', path:'/live', live:true },
-  { icon:'🏆', label:'Competitions',      path:'/competitions' },
-  { icon:'⭐', label:'Top Performers',    path:'/top' },
-  { icon:'📊', label:'Leaderboard',       path:'/leaderboard' },
-  { icon:'💭', label:'Thoughts',          path:'/thoughts' },
-  { icon:'✍️', label:'Creative Studio', path:'/creative-studio' },
+  { icon: HomeIcon,     label:'Home',              path:'/' },
+  { icon: Compass,      label:'Explore',           path:'/explore' },
+  { icon: LayoutGrid,   label:'Categories',        path:'/categories' },
+  { icon: Users,        label:'Collab Hub',         path:'/collab' },
+  { icon: Radio,        label:'Live Performances', path:'/live', live:true },
+  { icon: Trophy,       label:'Competitions',      path:'/competitions' },
+  { icon: Star,         label:'Top Performers',    path:'/top' },
+  { icon: BarChart3,    label:'Leaderboard',       path:'/leaderboard' },
+  { icon: MessageCircle,label:'Thoughts',          path:'/thoughts' },
+  { icon: Wand2,        label:'Creative Studio', path:'/creative-studio' },
 ];
 
 const BOTTOM_NAV = [
-  { icon:'👤', label:'My Profile',    path:'/profile' },
-  { icon:'📤', label:'My Uploads',    path:'/uploads' },
-  { icon:'✦',  label:'AI Highlights', path:'/highlight-studio' },
-  { icon:'🔖', label:'Saved',         path:'/saved' },
-  { icon:'➕', label:'Following',     path:'/following' },
-  { icon:'💬', label:'Messages',      path:'/messages' },
-  { icon:'⚙️', label:'Settings',      path:'/settings' },
+  { icon: UserCircle,   label:'My Profile',    path:'/profile' },
+  { icon: UploadCloud,  label:'My Uploads',    path:'/uploads' },
+  { icon: Sparkles,     label:'AI Highlights', path:'/highlight-studio' },
+  { icon: Bookmark,     label:'Saved',         path:'/saved' },
+  { icon: UserPlus,     label:'Following',     path:'/following' },
+  { icon: MessageSquare,label:'Messages',      path:'/messages' },
+  { icon: Settings,     label:'Settings',      path:'/settings' },
 ];
 
 
@@ -302,37 +309,43 @@ export default function Home() {
         </div>
 
         <button className="th-upload-btn" onClick={() => navigate('/upload')}>
-          <span>⬆</span> Upload Performance
+          <UploadCloud size={16} /> Upload Performance
         </button>
 
         <nav className="th-sidenav">
-          {NAV_ITEMS.map(item => (
-            <Link
-              key={item.label}
-              to={item.path}
-              className={`th-sidenav-item${activePage === item.label ? ' active' : ''}`}
-              onClick={() => setActivePage(item.label)}
-            >
-              <span className="th-nav-icon">{item.icon}</span>
-              <span>{item.label}</span>
-              {item.live && <span className="th-live-pill">LIVE</span>}
-            </Link>
-          ))}
+          {NAV_ITEMS.map(item => {
+            const IconComp = item.icon;
+            return (
+              <Link
+                key={item.label}
+                to={item.path}
+                className={`th-sidenav-item${activePage === item.label ? ' active' : ''}`}
+                onClick={() => setActivePage(item.label)}
+              >
+                <span className="th-nav-icon"><IconComp size={18} /></span>
+                <span>{item.label}</span>
+                {item.live && <span className="th-live-pill">LIVE</span>}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="th-sidebar-divider" />
 
         <nav className="th-sidenav">
-          {BOTTOM_NAV.map(item => (
-            <Link key={item.label} to={item.path} className="th-sidenav-item">
-              <span className="th-nav-icon">{item.icon}</span>
-              <span>{item.label}</span>
-            </Link>
-          ))}
+          {BOTTOM_NAV.map(item => {
+            const IconComp = item.icon;
+            return (
+              <Link key={item.label} to={item.path} className="th-sidenav-item">
+                <span className="th-nav-icon"><IconComp size={18} /></span>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="th-premium-card">
-          <div className="th-premium-icon">👑</div>
+          <div className="th-premium-icon"><Crown size={20} /></div>
           <div className="th-premium-text">
             <strong>Go Premium</strong>
             <span>Unlock exclusive features and get more visibility.</span>
@@ -482,29 +495,29 @@ export default function Home() {
         <section className="th-hero">
           <div className="th-hero-inner">
             <div className="th-hero-text">
-              <div className="th-hero-badge">⭐ INDIA'S TALENT STAGE</div>
+              <div className="th-hero-badge"><Star size={13} /> INDIA'S TALENT STAGE</div>
               <h1 className="th-hero-title">
                 SHOW YOUR<br />
                 <span className="th-hero-accent">TALENT</span>
               </h1>
               <p className="th-hero-desc">
-                <span className="th-desc-highlight">Show Your Talent. Inspire the World.</span> ✨
+                <span className="th-desc-highlight">Show Your Talent. Inspire the World.</span> <Sparkles size={16} style={{display:'inline', verticalAlign:'middle'}} />
                 <br /><br />
                 Upload videos, grow your audience, earn recognition, and become part of
                 <span className="th-desc-highlight"> India's creative talent community.</span>
                 <br /><br />
-                <span className="th-desc-cta">🚀 Start your journey with TalentHub today!</span>
+                <span className="th-desc-cta"><Send size={14} style={{display:'inline', verticalAlign:'middle', marginRight:'6px'}} />Start your journey with TalentHub today!</span>
               </p>
               <div className="th-hero-btns">
-                <button className="th-btn-primary" onClick={() => navigate('/upload')}>⬆ Upload Now</button>
+                <button className="th-btn-primary" onClick={() => navigate('/upload')}><UploadCloud size={16} /> Upload Now</button>
                 <button className="th-btn-outline" onClick={() => window.scrollTo({top:700,behavior:'smooth'})}>▶ Explore Performances</button>
               </div>
               <div className="th-social-proof">
                 <span style={{display:'flex', alignItems:'center', gap:8, fontSize:15}}>
-                  <span style={{fontSize:22}}>👥</span>
+                  <Users size={20} color="#f5a623" />
                   <span>
                     <strong style={{color:'#f5a623'}}>{realUserCount !== null ? realUserCount : '...'}</strong>{' '}
-                    performers already shining ✨
+                    performers already shining <Sparkles size={14} style={{display:'inline', verticalAlign:'middle'}} />
                   </span>
                 </span>
               </div>
@@ -533,22 +546,25 @@ export default function Home() {
           {/* Stats Row */}
           <div className="th-stats-row">
             {[
-              { icon:'👥', val: fmt(realStats.users),  label:'Performers',        accent:'#a855f7', className: 'stat-icon-performers' },
-              { icon:'📹', val: fmt(realStats.videos), label:'Videos',            accent:'#f472b6', className: 'stat-icon-videos' },
-              { icon:'👁',  val: fmt(realStats.views),  label:'Views',             accent:'#34d399', className: 'stat-icon-views' },
-              { icon:'👍', val: '95%',                  label:'Positive Feedback', accent:'#f5a623', className: 'stat-icon-feedback' },
-            ].map((s,i) => (
-              <div key={i} className="th-stat-box">
-                <div className={`th-stat-icon-wrap ${s.className}`}>
-                  <span className="th-stat-icon">{s.icon}</span>
+              { icon: Users,     val: fmt(realStats.users),  label:'Performers',        accent:'#a855f7', className: 'stat-icon-performers' },
+              { icon: Video,     val: fmt(realStats.videos), label:'Videos',            accent:'#f472b6', className: 'stat-icon-videos' },
+              { icon: Eye,       val: fmt(realStats.views),  label:'Views',             accent:'#34d399', className: 'stat-icon-views' },
+              { icon: ThumbsUp,  val: '95%',                  label:'Positive Feedback', accent:'#f5a623', className: 'stat-icon-feedback' },
+            ].map((s,i) => {
+              const StatIcon = s.icon;
+              return (
+                <div key={i} className="th-stat-box">
+                  <div className={`th-stat-icon-wrap ${s.className}`}>
+                    <StatIcon size={20} color={s.accent} />
+                  </div>
+                  <div className="th-stat-val" style={{ color: s.accent }}>{s.val}</div>
+                  <div className="th-stat-label">{s.label}</div>
+                  <div className="th-stat-bar-wrap">
+                    <div className="th-stat-bar-fill" style={{ background: s.accent, width: i === 3 ? '95%' : '60%' }} />
+                  </div>
                 </div>
-                <div className="th-stat-val" style={{ color: s.accent }}>{s.val}</div>
-                <div className="th-stat-label">{s.label}</div>
-                <div className="th-stat-bar-wrap">
-                  <div className="th-stat-bar-fill" style={{ background: s.accent, width: i === 3 ? '95%' : '60%' }} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
@@ -574,7 +590,7 @@ export default function Home() {
         <section className="th-section th-two-col">
           <div className="th-trending">
             <div className="th-section-header">
-              <h2 className="th-section-title">🔥 Trending Now</h2>
+              <h2 className="th-section-title"><Flame size={19} style={{display:'inline', verticalAlign:'middle', marginRight:'6px', color:'#f97316'}} />Trending Now</h2>
               <Link to="/explore" className="th-view-all">View All</Link>
             </div>
 
@@ -584,11 +600,11 @@ export default function Home() {
               </div>
             ) : videos.length === 0 ? (
               <div className="th-empty">
-                <div style={{fontSize:48,marginBottom:12}}>🎬</div>
+                <div style={{fontSize:48,marginBottom:12, display:'flex', justifyContent:'center'}}><Clapperboard size={48} /></div>
                 <h3>No videos yet!</h3>
                 <p>Be the first to upload your performance.</p>
                 <button className="th-btn-primary" style={{marginTop:16}} onClick={() => navigate('/upload')}>
-                  ⬆ Upload Now
+                  <UploadCloud size={16} /> Upload Now
                 </button>
               </div>
             ) : (
@@ -608,19 +624,19 @@ export default function Home() {
           {/* TOP PERFORMERS */}
           <div className="th-performers-panel">
             <div className="th-section-header">
-              <h2 className="th-section-title">🏆 Top Performers</h2>
+              <h2 className="th-section-title"><Trophy size={19} style={{display:'inline', verticalAlign:'middle', marginRight:'6px', color:'#f5a623'}} />Top Performers</h2>
               <Link to="/leaderboard" className="th-view-all">View All</Link>
             </div>
 
             {topPerformers.length === 0 ? (
               <div className="th-performers-empty">
-                <div className="th-performers-empty-icon">🌟</div>
+                <div className="th-performers-empty-icon"><Star size={32} /></div>
                 <h4>No Top Performers Yet!</h4>
                 <p>Upload your performance and get likes to appear here!</p>
                 <button className="th-btn-primary"
                   style={{marginTop:14, fontSize:13, padding:'9px 20px'}}
                   onClick={() => navigate('/upload')}
-                >⬆ Upload & Shine</button>
+                ><UploadCloud size={14} /> Upload & Shine</button>
               </div>
             ) : (
               <div className="th-performers-list">
@@ -660,42 +676,45 @@ export default function Home() {
             <span className="th-panel-title">Upcoming Competitions</span>
             <Link to="/competitions" className="th-view-all">View All</Link>
           </div>
-          {competitions.map((c, i) => (
-            <div key={i} className="th-comp-row"
-              onClick={() => navigate('/competitions')}
-              style={{cursor:'pointer'}}
-            >
-              <div className="th-comp-icon" style={{background: c.color+'22', color: c.color}}>
-                {c.icon}
-              </div>
-              <div className="th-comp-info">
-                <div className="th-comp-name">{c.name}</div>
-                <div className="th-comp-date">
-                  {c.status === 'active' ? '🟢 Active' : '⏳ Upcoming'}
-                  {c.date ? ` · ${c.date}` : ''}
-                </div>
-              </div>
-              <button className="th-participate-btn"
-                onClick={(e) => { e.stopPropagation(); navigate('/competitions'); }}
+          {competitions.map((c, i) => {
+            const CompIcon = c.icon;
+            return (
+              <div key={i} className="th-comp-row"
+                onClick={() => navigate('/competitions')}
+                style={{cursor:'pointer'}}
               >
-                {c.status === 'active' ? 'Join' : 'Soon'}
-              </button>
-            </div>
-          ))}
+                <div className="th-comp-icon" style={{background: c.color+'22', color: c.color}}>
+                  {typeof CompIcon === 'function' ? <CompIcon size={18} /> : c.icon}
+                </div>
+                <div className="th-comp-info">
+                  <div className="th-comp-name">{c.name}</div>
+                  <div className="th-comp-date">
+                    {c.status === 'active' ? 'Active' : 'Upcoming'}
+                    {c.date ? ` · ${c.date}` : ''}
+                  </div>
+                </div>
+                <button className="th-participate-btn"
+                  onClick={(e) => { e.stopPropagation(); navigate('/competitions'); }}
+                >
+                  {c.status === 'active' ? 'Join' : 'Soon'}
+                </button>
+              </div>
+            );
+          })}
         </div>
 
         {/* Thoughts Widget */}
         <div className="th-panel-section th-thoughts-widget">
           <div className="th-panel-header">
-            <span className="th-panel-title">💭 Thoughts</span>
+            <span className="th-panel-title"><MessageCircle size={16} style={{display:'inline', verticalAlign:'middle', marginRight:'6px'}} />Thoughts</span>
             <Link to="/thoughts" className="th-view-all">View All</Link>
           </div>
 
           {recentThoughts.length === 0 ? (
             <div className="th-thoughts-empty-widget">
-              <p>No thoughts yet. Be the first! 💬</p>
+              <p>No thoughts yet. Be the first!</p>
               <button className="th-thought-share-btn" onClick={() => navigate('/thoughts')}>
-                ✨ Share a Thought
+                <Sparkles size={14} /> Share a Thought
               </button>
             </div>
           ) : (
@@ -721,7 +740,7 @@ export default function Home() {
                 </div>
               ))}
               <button className="th-thought-share-btn" onClick={() => navigate('/thoughts')}>
-                ✨ Share a Thought
+                <Sparkles size={14} /> Share a Thought
               </button>
             </div>
           )}
@@ -749,37 +768,43 @@ export default function Home() {
         </div>
 
         <button className="th-upload-btn" onClick={() => { navigate('/upload'); setMobileMenuOpen(false); }}>
-          <span>⬆</span> Upload Performance
+          <UploadCloud size={16} /> Upload Performance
         </button>
 
         <nav className="th-sidenav">
-          {NAV_ITEMS.map(item => (
-            <Link
-              key={item.label}
-              to={item.path}
-              className={`th-sidenav-item${activePage === item.label ? ' active' : ''}`}
-              onClick={() => { setActivePage(item.label); setMobileMenuOpen(false); }}
-            >
-              <span className="th-nav-icon">{item.icon}</span>
-              <span>{item.label}</span>
-              {item.live && <span className="th-live-pill">LIVE</span>}
-            </Link>
-          ))}
+          {NAV_ITEMS.map(item => {
+            const IconComp = item.icon;
+            return (
+              <Link
+                key={item.label}
+                to={item.path}
+                className={`th-sidenav-item${activePage === item.label ? ' active' : ''}`}
+                onClick={() => { setActivePage(item.label); setMobileMenuOpen(false); }}
+              >
+                <span className="th-nav-icon"><IconComp size={18} /></span>
+                <span>{item.label}</span>
+                {item.live && <span className="th-live-pill">LIVE</span>}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="th-sidebar-divider" />
 
         <nav className="th-sidenav">
-          {BOTTOM_NAV.map(item => (
-            <Link key={item.label} to={item.path} className="th-sidenav-item" onClick={() => setMobileMenuOpen(false)}>
-              <span className="th-nav-icon">{item.icon}</span>
-              <span>{item.label}</span>
-            </Link>
-          ))}
+          {BOTTOM_NAV.map(item => {
+            const IconComp = item.icon;
+            return (
+              <Link key={item.label} to={item.path} className="th-sidenav-item" onClick={() => setMobileMenuOpen(false)}>
+                <span className="th-nav-icon"><IconComp size={18} /></span>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="th-premium-card">
-          <div className="th-premium-icon">👑</div>
+          <div className="th-premium-icon"><Crown size={20} /></div>
           <div className="th-premium-text">
             <strong>Go Premium</strong>
             <span>Unlock exclusive features and get more visibility.</span>
@@ -800,23 +825,23 @@ export default function Home() {
       <nav className="th-mobile-bottom-nav">
         <div className="th-mobile-bottom-nav-inner">
           <Link to="/" className={`th-mobile-nav-btn ${activePage==='Home'?'active':''}`} onClick={()=>setActivePage('Home')}>
-            <span className="mob-icon">🏠</span>
+            <span className="mob-icon"><HomeIcon size={18} /></span>
             <span className="mob-label">Home</span>
           </Link>
           <Link to="/explore" className={`th-mobile-nav-btn ${activePage==='Explore'?'active':''}`} onClick={()=>setActivePage('Explore')}>
-            <span className="mob-icon">🔍</span>
+            <span className="mob-icon"><Compass size={18} /></span>
             <span className="mob-label">Explore</span>
           </Link>
           <Link to="/upload" className="th-mobile-nav-btn upload-mob">
-            <span className="mob-icon">⬆</span>
+            <span className="mob-icon"><Upload size={18} /></span>
             <span className="mob-label">Upload</span>
           </Link>
           <Link to="/thoughts" className={`th-mobile-nav-btn ${activePage==='Thoughts'?'active':''}`} onClick={()=>setActivePage('Thoughts')}>
-            <span className="mob-icon">💭</span>
+            <span className="mob-icon"><MessageCircle size={18} /></span>
             <span className="mob-label">Thoughts</span>
           </Link>
           <Link to="/profile" className="th-mobile-nav-btn">
-            <span className="mob-icon">👤</span>
+            <span className="mob-icon"><UserCircle size={18} /></span>
             <span className="mob-label">Profile</span>
           </Link>
         </div>
