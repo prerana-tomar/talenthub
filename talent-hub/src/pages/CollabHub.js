@@ -26,15 +26,16 @@ const PROJECT_TYPES = [
 const SKILL_LABELS   = SKILLS.map(s => s.label);
 const PROJECT_LABELS = PROJECT_TYPES.map(p => p.label);
 
-const getSkillIcon    = (label) => SKILLS.find(s => s.label === label)?.icon || '🎯';
-const getProjectIcon  = (label) => PROJECT_TYPES.find(p => p.label === label)?.icon || '📂';
+const getSkillIcon   = (label) => SKILLS.find(s => s.label === label)?.icon || '🎯';
+const getProjectIcon = (label) => PROJECT_TYPES.find(p => p.label === label)?.icon || '📂';
 
-const STATS = [
-  { icon: '🤝', label: 'Active Collabs', value: '120+' },
-  { icon: '🎨', label: 'Creators',       value: '500+' },
-  { icon: '🎵', label: 'Projects Done',  value: '80+'  },
-  { icon: '🌟', label: 'Success Rate',   value: '94%'  },
-];
+// Format numbers: 1200 → 1.2K
+const fmtNum = (n) => {
+  if (!n && n !== 0) return '0';
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000)    return `${(n / 1000).toFixed(1)}K`;
+  return String(n);
+};
 
 export default function CollabHub() {
   const navigate = useNavigate();
@@ -55,7 +56,60 @@ export default function CollabHub() {
   const [errorMsg,      setErrorMsg]      = useState('');
   const [toast,         setToast]         = useState('');
 
+  // ── REAL STATS STATE ──
+  const [realStats, setRealStats] = useState({
+    activeCollabs: null,
+    creators:      null,
+    projectsDone:  null,
+    successRate:   null,
+  });
+
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2800); };
+
+  // ── FETCH REAL STATS ──
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // 1. All collab requests
+        const collabRes = await fetch(`${API}/api/collab`);
+        const collabData = collabRes.ok ? await collabRes.json() : [];
+        const allRequests = Array.isArray(collabData) ? collabData : [];
+
+        // Active collabs = total requests posted
+        const activeCollabs = allRequests.length;
+
+        // Unique creators = unique authors who posted requests
+        const uniqueCreators = new Set(
+          allRequests.map(r => r.author?._id || r.user?._id).filter(Boolean)
+        ).size;
+
+        // Projects done = paid requests (as a proxy for completed projects)
+        const projectsDone = allRequests.filter(r => r.budget === 'Paid').length;
+
+        // Success rate = if there are requests, show % that have descriptions > 100 chars (quality posts)
+        // as a logical proxy — or just show real unique creators ratio
+        const qualityPosts = allRequests.filter(r => (r.description || '').length > 50).length;
+        const successRate  = allRequests.length > 0
+          ? Math.round((qualityPosts / allRequests.length) * 100)
+          : 0;
+
+        // 2. Total registered creators from auth count
+        const usersRes  = await fetch(`${API}/api/auth/count`);
+        const usersData = usersRes.ok ? await usersRes.json() : {};
+        const totalUsers = usersData.count || uniqueCreators;
+
+        setRealStats({
+          activeCollabs,
+          creators:     totalUsers,
+          projectsDone,
+          successRate,
+        });
+      } catch {
+        // silent fallback — keep null so "..." shows
+      }
+    };
+    fetchStats();
+  }, []);
 
   const fetchRequests = async () => {
     setLoading(true);
@@ -107,8 +161,8 @@ export default function CollabHub() {
     const targetUser = req.author || req.user;
     if (!targetUser?._id) return;
     if (targetUser._id === me?._id) { showToast('⚠️ This is your own request!'); return; }
-    const mySkill   = me?.skill || me?.category || 'artist';
-    const msgText   = `Hi! Maine aapki collab request dekhi. Main ${mySkill} hoon aur aapke saath kaam karna chahta/chahti hoon. Kya hum connect kar sakte hain?`;
+    const mySkill = me?.skill || me?.category || 'artist';
+    const msgText = `Hi! Maine aapki collab request dekhi. Main ${mySkill} hoon aur aapke saath kaam karna chahta/chahti hoon. Kya hum connect kar sakte hain?`;
     try {
       await fetch(`${API}/api/messages/send`, {
         method: 'POST',
@@ -120,8 +174,8 @@ export default function CollabHub() {
   };
 
   const filteredRequests = requests.filter(req => {
-    const matchSkill   = filterSkill   === 'All' || req.skillNeeded  === filterSkill;
-    const matchProject = filterProject === 'All' || req.projectType  === filterProject;
+    const matchSkill   = filterSkill   === 'All' || req.skillNeeded === filterSkill;
+    const matchProject = filterProject === 'All' || req.projectType === filterProject;
     return matchSkill && matchProject;
   });
 
@@ -133,6 +187,30 @@ export default function CollabHub() {
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
     return `${Math.floor(diff / 86400)}d ago`;
   };
+
+  // Build stats array from real data
+  const STATS_DISPLAY = [
+    {
+      icon:  '🤝',
+      label: 'Active Collabs',
+      value: realStats.activeCollabs !== null ? fmtNum(realStats.activeCollabs) : '...',
+    },
+    {
+      icon:  '🎨',
+      label: 'Creators',
+      value: realStats.creators !== null ? fmtNum(realStats.creators) : '...',
+    },
+    {
+      icon:  '🎵',
+      label: 'Projects Done',
+      value: realStats.projectsDone !== null ? fmtNum(realStats.projectsDone) : '...',
+    },
+    {
+      icon:  '🌟',
+      label: 'Success Rate',
+      value: realStats.successRate !== null ? `${realStats.successRate}%` : '...',
+    },
+  ];
 
   return (
     <div className="ch-page">
@@ -163,9 +241,9 @@ export default function CollabHub() {
             </div>
           </div>
 
-          {/* Stats */}
+          {/* ── REAL STATS ── */}
           <div className="ch-stats-grid">
-            {STATS.map((s, i) => (
+            {STATS_DISPLAY.map((s, i) => (
               <div key={i} className="ch-stat-card">
                 <div className="ch-stat-icon">{s.icon}</div>
                 <div className="ch-stat-val">{s.value}</div>
@@ -244,11 +322,7 @@ export default function CollabHub() {
               const isMine   = uploader._id === me?._id;
               return (
                 <div key={req._id} className={`ch-card ${isMine ? 'ch-card-mine' : ''}`}>
-
-                  {/* Card top accent */}
                   <div className="ch-card-accent" />
-
-                  {/* Header */}
                   <div className="ch-card-header">
                     <div className="ch-user-row">
                       <div className="ch-avatar">
@@ -267,8 +341,6 @@ export default function CollabHub() {
                       </button>
                     )}
                   </div>
-
-                  {/* Badges */}
                   <div className="ch-badges">
                     <span className="ch-badge ch-badge-skill">
                       {getSkillIcon(req.skillNeeded)} {req.skillNeeded}
@@ -280,11 +352,7 @@ export default function CollabHub() {
                       {req.budget === 'Paid' ? '💰 Paid' : '🤝 Free'}
                     </span>
                   </div>
-
-                  {/* Description */}
                   <p className="ch-desc">{req.description}</p>
-
-                  {/* Footer */}
                   <div className="ch-card-footer">
                     {!isMine ? (
                       <button className="ch-connect-btn" onClick={() => handleSendRequest(req)}>
@@ -294,7 +362,6 @@ export default function CollabHub() {
                       <div className="ch-own-tag">✅ Your Request</div>
                     )}
                   </div>
-
                 </div>
               );
             })}
@@ -306,7 +373,6 @@ export default function CollabHub() {
       {showPostModal && (
         <div className="ch-modal-overlay" onClick={() => setShowPostModal(false)}>
           <div className="ch-modal" onClick={e => e.stopPropagation()}>
-
             <div className="ch-modal-header">
               <div>
                 <h2>🤝 Post Collab Request</h2>
@@ -314,10 +380,8 @@ export default function CollabHub() {
               </div>
               <button className="ch-modal-close" onClick={() => setShowPostModal(false)}>✕</button>
             </div>
-
             <form onSubmit={handlePostSubmit} className="ch-form">
               {errorMsg && <div className="ch-error">{errorMsg}</div>}
-
               <div className="ch-form-row">
                 <div className="ch-form-group">
                   <label>🎤 Skill Needed</label>
@@ -332,7 +396,6 @@ export default function CollabHub() {
                   </select>
                 </div>
               </div>
-
               <div className="ch-form-group">
                 <label>💰 Compensation</label>
                 <div className="ch-budget-pills">
@@ -347,7 +410,6 @@ export default function CollabHub() {
                   ))}
                 </div>
               </div>
-
               <div className="ch-form-group">
                 <label>📝 Project Description</label>
                 <textarea
@@ -360,7 +422,6 @@ export default function CollabHub() {
                 />
                 <span className="ch-char-count">{description.length}/1000</span>
               </div>
-
               <div className="ch-form-actions">
                 <button type="button" className="ch-btn-secondary" onClick={() => setShowPostModal(false)} disabled={posting}>
                   Cancel
