@@ -7,7 +7,6 @@ import './VideoCard.css';
 const VideoCard = ({ video, currentUserId, onDelete }) => {
   const navigate = useNavigate();
 
-  // ✅ Hooks pehle — guard baad mein
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting,   setDeleting]   = useState(false);
   const [videoError, setVideoError] = useState(false);
@@ -20,12 +19,12 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
   const [progress,   setProgress]   = useState(0);
   const [duration,   setDuration]   = useState(0);
   const [muted,      setMuted]      = useState(false);
+  const [showReactions, setShowReactions] = useState(false);
   const videoRef = useRef(null);
+  const reactionRef = useRef(null);
 
   const token = localStorage.getItem('th_token');
   const me    = JSON.parse(localStorage.getItem('th_user') || 'null');
-
-
 
   useEffect(() => {
     if (!video || !token || !currentUserId) return;
@@ -39,7 +38,17 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
     setFollowing(isFollowing);
   }, [video, currentUserId, token]);
 
-  // ✅ Guard — saare hooks ke BAAD
+  // Close reaction popup on outside click
+  useEffect(() => {
+    const handleOutside = (e) => {
+      if (reactionRef.current && !reactionRef.current.contains(e.target)) {
+        setShowReactions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, []);
+
   if (!video) return null;
 
   const uploaderName = video.uploader?.username || 'Unknown';
@@ -92,8 +101,6 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
     } catch { showToast('❌ Network error'); }
     setFollowLoad(false);
   };
-
-
 
   const handleSave = async (e) => {
     e.stopPropagation();
@@ -182,6 +189,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
     <div className="video-card">
       {toast && <div className="vc-toast">{toast}</div>}
 
+      {/* ── THUMBNAIL ── */}
       <div className="video-thumbnail" onClick={() => navigate(`/video/${video._id}`)}>
         {video.category && (
           <span className="video-category-badge">{video.category}</span>
@@ -259,6 +267,7 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
         )}
       </div>
 
+      {/* ── CARD BODY ── */}
       <div className="video-card-body">
         <h3 className="video-title" onClick={() => navigate(`/video/${video._id}`)}>
           {video.title}
@@ -287,29 +296,48 @@ const VideoCard = ({ video, currentUserId, onDelete }) => {
           </div>
         </div>
 
-        <div className="video-actions">
-          <AppreciationBar
-            targetId={video._id}
-            type="video"
-            initialAppreciations={video.appreciations || video.likes}
-            isCompact={true}
-          />
-          <div className="vc-secondary-actions">
+        {/* ── ACTIONS ROW ── */}
+        <div className="video-actions-row">
+
+          {/* Reaction button — click pe popup */}
+          <div className="vc-reaction-wrap" ref={reactionRef}>
             <button
-              className={`action-btn save-btn${saved ? ' saved' : ''}`}
-              onClick={handleSave}
-              disabled={savingVid}
+              className="action-btn reaction-trigger-btn"
+              onClick={e => { e.stopPropagation(); setShowReactions(r => !r); }}
             >
-              {saved ? '🔖' : '➕'} <span>{saved ? 'Saved' : 'Save'}</span>
+              😊 React
             </button>
-            {!isMyVideo && (
-              <button className="action-btn msg-btn" onClick={handleMessage}>💬</button>
+
+            {showReactions && (
+              <div className="vc-reaction-popup" onClick={e => e.stopPropagation()}>
+                <AppreciationBar
+                  targetId={video._id}
+                  type="video"
+                  initialAppreciations={video.appreciations || video.likes}
+                  isCompact={false}
+                />
+              </div>
             )}
-            <button className="action-btn share-btn" onClick={handleShare}>↗</button>
           </div>
+
+          {/* Save button */}
+          <button
+            className={`action-btn save-btn${saved ? ' saved' : ''}`}
+            onClick={handleSave}
+            disabled={savingVid}
+          >
+            {saved ? '🔖' : '➕'} {saved ? 'Saved' : 'Save'}
+          </button>
+
+          {/* Share button */}
+          <button className="action-btn share-btn" onClick={handleShare}>
+            ↗ Share
+          </button>
+
         </div>
       </div>
 
+      {/* ── DELETE MODAL ── */}
       {showDeleteConfirm && (
         <div className="delete-modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
           <div className="delete-modal" onClick={e => e.stopPropagation()}>

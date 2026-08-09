@@ -45,7 +45,6 @@
   background: rgba(124, 58, 237, 0.35);
   border: 1px solid rgba(167, 139, 250, 0.45);
   backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   color: #fff;
   font-size: 11px;
   font-weight: 600;
@@ -62,7 +61,6 @@
   background: rgba(239, 68, 68, 0.45);
   border: 1px solid rgba(239, 68, 68, 0.65);
   backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   color: #fff;
   width: 30px; height: 30px;
   border-radius: 50%;
@@ -91,7 +89,6 @@
   display: block;
   transition: transform 0.4s ease;
 }
-
 .video-thumbnail video.vc-playing { transform: scale(1.02); }
 
 .video-placeholder {
@@ -156,7 +153,6 @@
   background: rgba(255,255,255,0.25);
   border-radius: 2px;
   cursor: pointer;
-  position: relative;
   overflow: hidden;
 }
 .vc-progress-fill {
@@ -189,14 +185,14 @@
 
 /* ── CARD BODY ─────────────────────────────────────────── */
 .video-card-body {
-  padding: 20px 20px 20px;
+  padding: 14px 14px 14px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .video-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: #fff;
   margin: 0;
@@ -246,24 +242,12 @@
   flex-shrink: 0;
 }
 
-/* ══ ACTIONS — fully redesigned ════════════════════════════ */
-.video-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 6px;
-  width: 100%;
-}
-
-.vc-secondary-actions {
+/* ══ ACTIONS ROW — ek hi line mein sab ════════════════════ */
+.video-actions-row {
   display: flex;
   align-items: center;
   gap: 6px;
   width: 100%;
-}
-
-.vc-secondary-actions .save-btn {
-  flex: 1;
 }
 
 /* Base action button */
@@ -272,11 +256,11 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  height: 34px;
+  height: 32px;
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.6);
   font-size: 12px;
   font-weight: 600;
   font-family: 'Poppins', sans-serif;
@@ -284,79 +268,76 @@
   transition: all 0.18s;
   white-space: nowrap;
   padding: 0 10px;
+  flex-shrink: 0;
 }
 
-/* ✅ Like button */
-.like-btn {
-  background: rgba(239,68,68,0.07);
-  border-color: rgba(239,68,68,0.15);
-  color: rgba(255,255,255,0.6);
+/* ── Reaction trigger button ── */
+.reaction-trigger-btn {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.65);
 }
-.like-btn:hover {
-  background: rgba(239,68,68,0.15);
-  border-color: rgba(239,68,68,0.4);
-  color: #ef4444;
+.reaction-trigger-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+  color: #fff;
   transform: scale(1.03);
 }
-.like-btn.liked {
-  background: rgba(239,68,68,0.18);
-  border-color: rgba(239,68,68,0.45);
-  color: #ef4444;
-  box-shadow: 0 2px 10px rgba(239,68,68,0.2);
+
+/* ── Reaction popup ── */
+.vc-reaction-wrap {
+  position: relative;
 }
 
-/* ✅ Save button */
+.vc-reaction-popup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  background: #1a1a2e;
+  border: 1px solid rgba(124,58,237,0.35);
+  border-radius: 14px;
+  padding: 10px 12px;
+  z-index: 50;
+  min-width: 200px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  animation: popupIn 0.15s ease;
+}
+@keyframes popupIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Save button ── */
 .save-btn {
-  background: rgba(124,58,237,0.07);
-  border-color: rgba(124,58,237,0.15);
-  color: rgba(255,255,255,0.6);
+  flex: 1;
+  background: rgba(124,58,237,0.08);
+  border-color: rgba(124,58,237,0.2);
+  color: rgba(255,255,255,0.65);
 }
 .save-btn:hover {
-  background: rgba(124,58,237,0.18);
-  border-color: rgba(124,58,237,0.45);
+  background: rgba(124,58,237,0.2);
+  border-color: rgba(124,58,237,0.5);
   color: #a78bfa;
   transform: scale(1.03);
 }
 .save-btn.saved {
-  background: rgba(124,58,237,0.2);
-  border-color: rgba(124,58,237,0.5);
+  background: rgba(124,58,237,0.22);
+  border-color: rgba(124,58,237,0.55);
   color: #a78bfa;
   box-shadow: 0 2px 10px rgba(124,58,237,0.2);
 }
 
-/* ✅ Message/Comment button — icon only */
-.msg-btn {
-  width: 36px;
-  height: 34px;
-  padding: 0;
-  background: rgba(52,211,153,0.07);
-  border-color: rgba(52,211,153,0.15);
-  color: rgba(255,255,255,0.55);
-  border-radius: 8px;
-}
-.msg-btn:hover {
-  background: rgba(52,211,153,0.15);
-  border-color: rgba(52,211,153,0.4);
-  color: #34d399;
-  transform: scale(1.08);
-}
-
-/* ✅ Share button — icon only */
+/* ── Share button ── */
 .share-btn {
-  width: 36px;
-  height: 34px;
-  padding: 0;
   background: rgba(245,166,35,0.07);
-  border-color: rgba(245,166,35,0.15);
-  color: rgba(255,255,255,0.55);
-  border-radius: 8px;
-  margin-left: 0;
+  border-color: rgba(245,166,35,0.18);
+  color: rgba(255,255,255,0.6);
 }
 .share-btn:hover {
-  background: rgba(245,166,35,0.15);
-  border-color: rgba(245,166,35,0.4);
+  background: rgba(245,166,35,0.18);
+  border-color: rgba(245,166,35,0.45);
   color: #f5a623;
-  transform: scale(1.08);
+  transform: scale(1.03);
 }
 
 /* ── DELETE MODAL ──────────────────────────────────────── */
@@ -420,32 +401,6 @@
 .confirm-delete-btn:hover    { opacity: 0.88; }
 .confirm-delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── LIGHT MODE ────────────────────────────────────────── */
-body.light-mode .video-card       { background: #fff; border-color: rgba(0,0,0,0.08); }
-body.light-mode .video-title      { color: #0f0f1a; }
-body.light-mode .uploader-name    { color: #555; }
-body.light-mode .video-date       { color: #aaa; }
-body.light-mode .action-btn       { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: #555; }
-body.light-mode .action-btn:hover { background: rgba(0,0,0,0.08); color: #111; }
-body.light-mode .delete-modal     { background: #fff; border-color: rgba(239,68,68,0.2); }
-body.light-mode .delete-modal h3  { color: #0f0f1a; }
-body.light-mode .cancel-btn       { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #555; }
-body.light-mode .vc-toast         { background: rgba(255,255,255,0.95); color: #7c3aed; border-color: rgba(124,58,237,0.3); }
-
-/* ── RESPONSIVE ────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .video-actions {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
-  .action-btn span {
-    display: none !important;
-  }
-  .action-btn {
-    padding: 0 !important;
-    font-size: 14px !important;
-  }
-}
-
 /* ── VideoCard follow button ───────────────────────────── */
 .vc-follow-btn {
   display: inline-flex;
@@ -478,8 +433,22 @@ body.light-mode .vc-toast         { background: rgba(255,255,255,0.95); color: #
 }
 .vc-follow-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-body.light-mode .vc-follow-btn.following {
-  background: rgba(0,0,0,0.05);
-  border-color: rgba(0,0,0,0.1);
-  color: #555;
+/* ── LIGHT MODE ────────────────────────────────────────── */
+body.light-mode .video-card       { background: #fff; border-color: rgba(0,0,0,0.08); }
+body.light-mode .video-title      { color: #0f0f1a; }
+body.light-mode .uploader-name    { color: #555; }
+body.light-mode .video-date       { color: #aaa; }
+body.light-mode .action-btn       { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: #555; }
+body.light-mode .action-btn:hover { background: rgba(0,0,0,0.08); color: #111; }
+body.light-mode .delete-modal     { background: #fff; border-color: rgba(239,68,68,0.2); }
+body.light-mode .delete-modal h3  { color: #0f0f1a; }
+body.light-mode .cancel-btn       { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #555; }
+body.light-mode .vc-toast         { background: rgba(255,255,255,0.95); color: #7c3aed; border-color: rgba(124,58,237,0.3); }
+body.light-mode .vc-reaction-popup { background: #fff; border-color: rgba(124,58,237,0.2); }
+body.light-mode .vc-follow-btn.following { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #555; }
+
+/* ── RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .video-actions-row { gap: 5px; }
+  .action-btn { font-size: 11px; padding: 0 8px; height: 30px; }
 }
