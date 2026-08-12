@@ -767,3 +767,11 @@
   object-fit: cover;
   flex-shrink: 0;
 }
+
+.brand-logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  margin-right: 6px;
+  vertical-align: middle;
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -11,6 +11,8 @@ import {
 import VideoCard from '../components/VideoCard';
 import OnboardingTour from '../components/OnboardingTour';
 import { useTheme } from '../App';
+import { LogoRefContext } from '../App';
+import logo from '../assets/logo.png';
 import API from '../config';
 import './Home.css';
 
@@ -89,6 +91,7 @@ export default function Home() {
   const [videos,         setVideos]         = useState([]);
   const [loading,        setLoading]        = useState(true);
   const { darkMode, toggleTheme }           = useTheme();
+  const { registerLogoNode }                = useContext(LogoRefContext);
   const [competitions,   setCompetitions]   = useState(FALLBACK_COMPETITIONS);
 
   const [realUserCount,  setRealUserCount]  = useState(null);
@@ -230,6 +233,7 @@ export default function Home() {
       {/* ══ SIDEBAR ══ */}
       <aside className="th-sidebar">
         <div className="th-sidebar-logo" onClick={() => navigate('/')}>
+          <img ref={registerLogoNode} src={logo} alt="Talent Hub" className="th-logo-img" />
           <span className="th-logo-text">TALENT<span className="th-logo-accent">HUB</span></span>
           <span className="th-logo-sub">India's Talent Stage</span>
         </div>
@@ -296,6 +300,7 @@ export default function Home() {
           </button>
 
           <div className="th-mobile-logo" onClick={() => navigate('/')}>
+            <img ref={registerLogoNode} src={logo} alt="Talent Hub" className="th-logo-img-mobile" />
             TALENT<span>HUB</span>
           </div>
 

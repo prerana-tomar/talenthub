@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link, useNavigate, NavLink } from 'react-router-dom';
 import { User, FolderUp, MessageCircle, Bookmark, ClipboardList, Settings, LogOut, Home, Compass, Upload, Film } from 'lucide-react';
 import API from '../config';
+import { LogoRefContext } from '../App';
+import logo from '../assets/logo.png';
 import './Navbar.css';
 
 function Navbar() {
@@ -15,6 +17,7 @@ function Navbar() {
   const searchRef  = useRef(null);
   const dropdownRef = useRef(null);
   const navigate   = useNavigate();
+  const { registerLogoNode } = useContext(LogoRefContext);
 
   // Notification States
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
@@ -204,6 +207,7 @@ function Navbar() {
 
         {/* Logo */}
         <Link to="/" className="navbar-brand" onClick={() => setActivePage('home')}>
+          <img ref={registerLogoNode} src={logo} alt="Talent Hub" className="brand-logo-img" />
           <span className="brand-talent">TALENT</span>
           <span className="brand-hub">HUB</span>
           <span className="brand-tagline">✦ INDIA'S TALENT STAGE</span>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { Home as HomeIcon, Compass, Upload as UploadIcon, MessageCircle, User } from 'lucide-react';
 import './App.css';
@@ -28,6 +28,7 @@ import AdminRequests from './pages/AdminRequests';
 import MyRequests from './pages/MyRequests';
 import Notifications from './pages/Notifications';
 import VideoEditor from './pages/VideoEditor';
+import SplashIntro from './components/SplashIntro';
 
 
 
@@ -44,6 +45,9 @@ export const ThemeContext = createContext();
 export function useTheme() {
   return useContext(ThemeContext);
 }
+
+// ── Global Logo Ref Context (splash animation ke liye) ────
+export const LogoRefContext = createContext(null);
 
 // ── Protected Route ───────────────────────────────────────
 const ProtectedRoute = ({ children }) => {
@@ -111,6 +115,16 @@ function App() {
     return saved !== null ? saved === 'true' : true; // default dark
   });
 
+  // ── Splash Intro State ────────────────────────────────
+  const [showSplash, setShowSplash] = useState(true);
+  const logoNodesRef = useRef([]);
+
+  const registerLogoNode = (node) => {
+    if (node && !logoNodesRef.current.includes(node)) {
+      logoNodesRef.current.push(node);
+    }
+  };
+
   // Apply theme to <body> whenever darkMode changes
   useEffect(() => {
     document.body.classList.toggle('light-mode', !darkMode);
@@ -122,56 +136,61 @@ function App() {
 
   return (
     <ThemeContext.Provider value={{ darkMode, toggleTheme }}>
-      <Router>
-        <Routes>
-          <Route path="/"          element={<Home />} />
-          <Route path="/video/:id" element={<VideoPlayer />} />
-          <Route path="/live"      element={<Live />} />
+      <LogoRefContext.Provider value={{ registerLogoNode }}>
+        {showSplash && (
+          <SplashIntro logoNodesRef={logoNodesRef} onFinish={() => setShowSplash(false)} />
+        )}
+        <Router>
+          <Routes>
+            <Route path="/"          element={<Home />} />
+            <Route path="/video/:id" element={<VideoPlayer />} />
+            <Route path="/live"      element={<Live />} />
 
-          <Route path="/explore"      element={<WithNavbar><Explore /></WithNavbar>} />
-          <Route path="/leaderboard"  element={<WithNavbar><Leaderboard /></WithNavbar>} />
-          <Route path="/categories"   element={<WithNavbar><Categories /></WithNavbar>} />
-          <Route path="/thoughts"     element={<WithNavbar><Thoughts /></WithNavbar>} />
-          <Route path="/competitions" element={<WithNavbar><Competitions /></WithNavbar>} />
-          <Route path="/uploads" element={<WithNavbar><ProtectedRoute><MyUploads /></ProtectedRoute></WithNavbar>} />
-          <Route path="/following" element={<WithNavbar><ProtectedRoute><Following /></ProtectedRoute></WithNavbar>} />
-          <Route path="/saved"    element={<WithNavbar><ProtectedRoute><Saved /></ProtectedRoute></WithNavbar>} />
-          <Route path="/messages" element={<WithNavbar><ProtectedRoute><Messages /></ProtectedRoute></WithNavbar>} />
-          <Route path="/highlight-studio" element={<WithNavbar><ProtectedRoute><HighlightStudio /></ProtectedRoute></WithNavbar>} />
-          <Route path="/creative-studio" element={<WithNavbar><CreativeStudio /></WithNavbar>} />
-          <Route path="/video-editor" element={<WithNavbar><ProtectedRoute><VideoEditor /></ProtectedRoute></WithNavbar>} />
-          <Route path="/collab" element={<WithNavbar><CollabHub /></WithNavbar>} />
-          <Route path="/admin/requests" element={<WithNavbar><AdminRequests /></WithNavbar>} />
-          <Route path="/my-requests" element={<WithNavbar><ProtectedRoute><MyRequests /></ProtectedRoute></WithNavbar>} />
-          <Route path="/notifications" element={<WithNavbar><ProtectedRoute><Notifications /></ProtectedRoute></WithNavbar>} />
-          
+            <Route path="/explore"      element={<WithNavbar><Explore /></WithNavbar>} />
+            <Route path="/leaderboard"  element={<WithNavbar><Leaderboard /></WithNavbar>} />
+            <Route path="/categories"   element={<WithNavbar><Categories /></WithNavbar>} />
+            <Route path="/thoughts"     element={<WithNavbar><Thoughts /></WithNavbar>} />
+            <Route path="/competitions" element={<WithNavbar><Competitions /></WithNavbar>} />
+            <Route path="/uploads" element={<WithNavbar><ProtectedRoute><MyUploads /></ProtectedRoute></WithNavbar>} />
+            <Route path="/following" element={<WithNavbar><ProtectedRoute><Following /></ProtectedRoute></WithNavbar>} />
+            <Route path="/saved"    element={<WithNavbar><ProtectedRoute><Saved /></ProtectedRoute></WithNavbar>} />
+            <Route path="/messages" element={<WithNavbar><ProtectedRoute><Messages /></ProtectedRoute></WithNavbar>} />
+            <Route path="/highlight-studio" element={<WithNavbar><ProtectedRoute><HighlightStudio /></ProtectedRoute></WithNavbar>} />
+            <Route path="/creative-studio" element={<WithNavbar><CreativeStudio /></WithNavbar>} />
+            <Route path="/video-editor" element={<WithNavbar><ProtectedRoute><VideoEditor /></ProtectedRoute></WithNavbar>} />
+            <Route path="/collab" element={<WithNavbar><CollabHub /></WithNavbar>} />
+            <Route path="/admin/requests" element={<WithNavbar><AdminRequests /></WithNavbar>} />
+            <Route path="/my-requests" element={<WithNavbar><ProtectedRoute><MyRequests /></ProtectedRoute></WithNavbar>} />
+            <Route path="/notifications" element={<WithNavbar><ProtectedRoute><Notifications /></ProtectedRoute></WithNavbar>} />
+            
 
-          
+            
 
 
 
-          <Route path="/login"    element={<Login />} />
-          <Route path="/register" element={<Register />} />
+            <Route path="/login"    element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          <Route path="/upload" element={
-            <WithNavbar><ProtectedRoute><Upload /></ProtectedRoute></WithNavbar>
-          } />
-         
-          <Route path="/profile/:id" element={
-          <WithNavbar><Profile /></WithNavbar>
-          } />
+            <Route path="/upload" element={
+              <WithNavbar><ProtectedRoute><Upload /></ProtectedRoute></WithNavbar>
+            } />
+           
+            <Route path="/profile/:id" element={
+            <WithNavbar><Profile /></WithNavbar>
+            } />
 
-          <Route path="/profile" element={
-            <WithNavbar><ProtectedRoute><Profile /></ProtectedRoute></WithNavbar>
-          } />
-          <Route path="/settings" element={
-            <WithNavbar><ProtectedRoute><Settings /></ProtectedRoute></WithNavbar>
-          } />
+            <Route path="/profile" element={
+              <WithNavbar><ProtectedRoute><Profile /></ProtectedRoute></WithNavbar>
+            } />
+            <Route path="/settings" element={
+              <WithNavbar><ProtectedRoute><Settings /></ProtectedRoute></WithNavbar>
+            } />
 
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-        <MobileBottomNav />
-      </Router>
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+          <MobileBottomNav />
+        </Router>
+      </LogoRefContext.Provider>
     </ThemeContext.Provider>
   );
 }

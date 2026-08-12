@@ -2576,4 +2576,21 @@ body.light-mode .th-guide-quick-links .divider {
     display: none; /* Hide divider dots on mobile and let them wrap naturally */
   }
 }
-
+
+
+.th-logo-img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.th-logo-img-mobile {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
