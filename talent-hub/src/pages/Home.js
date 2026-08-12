@@ -5,7 +5,8 @@ import {
   Home as HomeIcon, Compass, LayoutGrid, Users, Radio, Trophy, Star,
   BarChart3, MessageCircle, Wand2, UserCircle, UploadCloud, Sparkles,
   Bookmark, UserPlus, MessageSquare, Settings, Crown, Video, Eye,
-  ThumbsUp, Upload, Flame, Clapperboard, Send, Mic, Music2
+  ThumbsUp, Upload, Flame, Clapperboard, Send, Mic, Music2,
+  Zap, Laugh, Guitar, BookOpen
 } from 'lucide-react';
 import VideoCard from '../components/VideoCard';
 import OnboardingTour from '../components/OnboardingTour';
@@ -14,175 +15,102 @@ import API from '../config';
 import './Home.css';
 
 const TOUR_STEPS = [
-  {
-    target: '.th-topnav',
-    fallbackText: 'Home',
-    text: 'Yahan se apna pura top menu panel access karein.'
-  },
-  {
-    target: '.th-upload-btn',
-    fallbackText: 'Upload',
-    text: 'Apni videos aur performances ko yahan se website par direct upload karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/"]',
-    fallbackText: 'Home',
-    text: 'Home page par popular performances aur trending community updates ko track karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/explore"]',
-    fallbackText: 'Explore',
-    text: 'India ke best performance videos ko search aur browse yahan se karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/categories"]',
-    fallbackText: 'Categories',
-    text: 'Singing, Dance, Rap, Comedy jaisi different categories ke videos directly filter karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/collab"]',
-    fallbackText: 'Collab Hub',
-    text: 'Dushre performance creators ke sath collaborate karne ke liye requests yahan post karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/live"]',
-    fallbackText: 'Live Performances',
-    text: 'Live streams perform karein ya dushre creators ko live perform karte hue dekhein.'
-  },
-  {
-    target: '.th-sidebar a[href="/competitions"]',
-    fallbackText: 'Competitions',
-    text: 'Active tournaments aur competitions mein register karke exciting titles jeetein.'
-  },
-  {
-    target: '.th-sidebar a[href="/top"]',
-    fallbackText: 'Top Performers',
-    text: 'Humare platform ke highly-rated aur famous stars ko yahan checkout karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/leaderboard"]',
-    fallbackText: 'Leaderboard',
-    text: 'Weekly ranks dekhein aur check karein ki trending performers list me lead kaun kar raha hai.'
-  },
-  {
-    target: '.th-sidebar a[href="/thoughts"]',
-    fallbackText: 'Thoughts',
-    text: 'Apni status lines, poetry, shayari ya general announcements share karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/creative-studio"]',
-    fallbackText: 'Creative Studio',
-    text: 'Multi-track options aur creative AI features ke sath apna new content model karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/profile"]',
-    fallbackText: 'My Profile',
-    text: 'Apna user profile stats, biography description aur personal links manage karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/uploads"]',
-    fallbackText: 'My Uploads',
-    text: 'Apne upload kiye gaye saare performance videos ka record aur metrics yahan check karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/highlight-studio"]',
-    fallbackText: 'AI Highlights',
-    text: 'AI Highlight Studio se apne upload videos ke crop & peak shorts reels automatic banayein.'
-  },
-  {
-    target: '.th-sidebar a[href="/saved"]',
-    fallbackText: 'Saved',
-    text: 'Apne bookmark aur save kiye gaye videos ko ek jagah yahan manage karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/following"]',
-    fallbackText: 'Following',
-    text: 'Jin creators ko aap follow karte hain unki latest performance feeds yahan dekhein.'
-  },
-  {
-    target: '.th-sidebar a[href="/messages"]',
-    fallbackText: 'Messages',
-    text: 'Fans aur other creators ke sath chat conversations aur messages yahan read karein.'
-  },
-  {
-    target: '.th-sidebar a[href="/settings"]',
-    fallbackText: 'Settings',
-    text: 'Apna login password change karein aur other account details configure karein.'
-  },
-  {
-    target: '.th-premium-card',
-    fallbackText: 'Premium',
-    text: 'Premium stage membership lekar dushro se jyada reach, views aur exclusive search visibility payein!'
-  }
+  { target: '.th-topnav', fallbackText: 'Home', text: 'Yahan se apna pura top menu panel access karein.' },
+  { target: '.th-upload-btn', fallbackText: 'Upload', text: 'Apni videos aur performances ko yahan se website par direct upload karein.' },
+  { target: '.th-sidebar a[href="/"]', fallbackText: 'Home', text: 'Home page par popular performances aur trending community updates ko track karein.' },
+  { target: '.th-sidebar a[href="/explore"]', fallbackText: 'Explore', text: 'India ke best performance videos ko search aur browse yahan se karein.' },
+  { target: '.th-sidebar a[href="/categories"]', fallbackText: 'Categories', text: 'Singing, Dance, Rap, Comedy jaisi different categories ke videos directly filter karein.' },
+  { target: '.th-sidebar a[href="/collab"]', fallbackText: 'Collab Hub', text: 'Dushre performance creators ke sath collaborate karne ke liye requests yahan post karein.' },
+  { target: '.th-sidebar a[href="/live"]', fallbackText: 'Live Performances', text: 'Live streams perform karein ya dushre creators ko live perform karte hue dekhein.' },
+  { target: '.th-sidebar a[href="/competitions"]', fallbackText: 'Competitions', text: 'Active tournaments aur competitions mein register karke exciting titles jeetein.' },
+  { target: '.th-sidebar a[href="/top"]', fallbackText: 'Top Performers', text: 'Humare platform ke highly-rated aur famous stars ko yahan checkout karein.' },
+  { target: '.th-sidebar a[href="/leaderboard"]', fallbackText: 'Leaderboard', text: 'Weekly ranks dekhein aur check karein ki trending performers list me lead kaun kar raha hai.' },
+  { target: '.th-sidebar a[href="/thoughts"]', fallbackText: 'Thoughts', text: 'Apni status lines, poetry, shayari ya general announcements share karein.' },
+  { target: '.th-sidebar a[href="/creative-studio"]', fallbackText: 'Creative Studio', text: 'Multi-track options aur creative AI features ke sath apna new content model karein.' },
+  { target: '.th-sidebar a[href="/profile"]', fallbackText: 'My Profile', text: 'Apna user profile stats, biography description aur personal links manage karein.' },
+  { target: '.th-sidebar a[href="/uploads"]', fallbackText: 'My Uploads', text: 'Apne upload kiye gaye saare performance videos ka record aur metrics yahan check karein.' },
+  { target: '.th-sidebar a[href="/highlight-studio"]', fallbackText: 'AI Highlights', text: 'AI Highlight Studio se apne upload videos ke crop & peak shorts reels automatic banayein.' },
+  { target: '.th-sidebar a[href="/saved"]', fallbackText: 'Saved', text: 'Apne bookmark aur save kiye gaye videos ko ek jagah yahan manage karein.' },
+  { target: '.th-sidebar a[href="/following"]', fallbackText: 'Following', text: 'Jin creators ko aap follow karte hain unki latest performance feeds yahan dekhein.' },
+  { target: '.th-sidebar a[href="/messages"]', fallbackText: 'Messages', text: 'Fans aur other creators ke sath chat conversations aur messages yahan read karein.' },
+  { target: '.th-sidebar a[href="/settings"]', fallbackText: 'Settings', text: 'Apna login password change karein aur other account details configure karein.' },
+  { target: '.th-premium-card', fallbackText: 'Premium', text: 'Premium stage membership lekar dushro se jyada reach, views aur exclusive search visibility payein!' },
 ];
 
 const CATEGORIES = ['All','Singing','Dance','Rap','Comedy','Acting','Instrumental','Poetry'];
 
+// ✅ Icon helper — name se lucide icon match karo
+const getCompIcon = (comp) => {
+  const name = (comp?.name || comp?.title || '').toLowerCase();
+  if (name.includes('sing'))                        return Mic;
+  if (name.includes('dance'))                       return Music2;
+  if (name.includes('rap'))                         return Zap;
+  if (name.includes('comedy'))                      return Laugh;
+  if (name.includes('guitar') || name.includes('instrument')) return Guitar;
+  if (name.includes('poet'))                        return BookOpen;
+  if (name.includes('music') || name.includes('song')) return Music2;
+  return Trophy;
+};
+
+// ✅ Fallback competitions — no icon field needed
 const FALLBACK_COMPETITIONS = [
-  { icon: Mic,    name:'Singing Superstar', date:'Coming Soon', color:'#a78bfa', status:'upcoming' },
-  { icon: Music2, name:'Dance Battle',      date:'Coming Soon', color:'#f472b6', status:'upcoming' },
-  { icon: Send,   name:'Rap Showdown',      date:'Coming Soon', color:'#34d399', status:'active'   },
+  { name:'Singing Superstar', date:'Coming Soon', color:'#a78bfa', status:'upcoming' },
+  { name:'Dance Battle',      date:'Coming Soon', color:'#f472b6', status:'upcoming' },
+  { name:'Rap Showdown',      date:'Coming Soon', color:'#34d399', status:'active'   },
 ];
 
-// Sidebar main navigation — icon is now a lucide-react component (not emoji)
 const NAV_ITEMS = [
-  { icon: HomeIcon,     label:'Home',              path:'/' },
-  { icon: Compass,      label:'Explore',           path:'/explore' },
-  { icon: LayoutGrid,   label:'Categories',        path:'/categories' },
-  { icon: Users,        label:'Collab Hub',         path:'/collab' },
-  { icon: Radio,        label:'Live Performances', path:'/live', live:true },
-  { icon: Trophy,       label:'Competitions',      path:'/competitions' },
-  { icon: Star,         label:'Top Performers',    path:'/top' },
-  { icon: BarChart3,    label:'Leaderboard',       path:'/leaderboard' },
-  { icon: MessageCircle,label:'Thoughts',          path:'/thoughts' },
-  { icon: Wand2,        label:'Creative Studio', path:'/creative-studio' },
+  { icon: HomeIcon,      label:'Home',              path:'/' },
+  { icon: Compass,       label:'Explore',           path:'/explore' },
+  { icon: LayoutGrid,    label:'Categories',        path:'/categories' },
+  { icon: Users,         label:'Collab Hub',        path:'/collab' },
+  { icon: Radio,         label:'Live Performances', path:'/live', live:true },
+  { icon: Trophy,        label:'Competitions',      path:'/competitions' },
+  { icon: Star,          label:'Top Performers',    path:'/top' },
+  { icon: BarChart3,     label:'Leaderboard',       path:'/leaderboard' },
+  { icon: MessageCircle, label:'Thoughts',          path:'/thoughts' },
+  { icon: Wand2,         label:'Creative Studio',   path:'/creative-studio' },
 ];
 
 const BOTTOM_NAV = [
-  { icon: UserCircle,   label:'My Profile',    path:'/profile' },
-  { icon: UploadCloud,  label:'My Uploads',    path:'/uploads' },
-  { icon: Sparkles,     label:'AI Highlights', path:'/highlight-studio' },
-  { icon: Bookmark,     label:'Saved',         path:'/saved' },
-  { icon: UserPlus,     label:'Following',     path:'/following' },
-  { icon: MessageSquare,label:'Messages',      path:'/messages' },
-  { icon: Settings,     label:'Settings',      path:'/settings' },
+  { icon: UserCircle,    label:'My Profile',    path:'/profile' },
+  { icon: UploadCloud,   label:'My Uploads',    path:'/uploads' },
+  { icon: Sparkles,      label:'AI Highlights', path:'/highlight-studio' },
+  { icon: Bookmark,      label:'Saved',         path:'/saved' },
+  { icon: UserPlus,      label:'Following',     path:'/following' },
+  { icon: MessageSquare, label:'Messages',      path:'/messages' },
+  { icon: Settings,      label:'Settings',      path:'/settings' },
 ];
-
-
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState('All');
-  const [activePage, setActivePage]         = useState('Home');
-  const [showTour, setShowTour]             = useState(false);
-  const [videos, setVideos]                 = useState([]);
-  const [loading, setLoading]               = useState(true);
+  const [activePage,     setActivePage]     = useState('Home');
+  const [showTour,       setShowTour]       = useState(false);
+  const [videos,         setVideos]         = useState([]);
+  const [loading,        setLoading]        = useState(true);
   const { darkMode, toggleTheme }           = useTheme();
-  const [competitions, setCompetitions]     = useState(FALLBACK_COMPETITIONS);
+  const [competitions,   setCompetitions]   = useState(FALLBACK_COMPETITIONS);
 
-  // Auto-trigger tour on every page refresh/load
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowTour(true);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const [realUserCount, setRealUserCount]   = useState(null);
-  const [realStats, setRealStats]           = useState({ users:0, videos:0, views:0 });
-  const [topPerformers, setTopPerformers]   = useState([]);
+  const [realUserCount,  setRealUserCount]  = useState(null);
+  const [realStats,      setRealStats]      = useState({ users:0, videos:0, views:0 });
+  const [topPerformers,  setTopPerformers]  = useState([]);
   const [recentThoughts, setRecentThoughts] = useState([]);
 
-  const [searchQuery,   setSearchQuery]     = useState('');
-  const [searchResults, setSearchResults]   = useState([]);
-  const [searchOpen,    setSearchOpen]      = useState(false);
-  const [searching,     setSearching]       = useState(false);
+  const [searchQuery,    setSearchQuery]    = useState('');
+  const [searchResults,  setSearchResults]  = useState([]);
+  const [searchOpen,     setSearchOpen]     = useState(false);
+  const [searching,      setSearching]      = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const searchRef = useRef(null);
 
-
-
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('th_user') || 'null');
+
+  // Auto-trigger tour on first load
+  useEffect(() => {
+    const timer = setTimeout(() => setShowTour(true), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     fetch(`${API}/api/auth/count`)
@@ -226,8 +154,6 @@ export default function Home() {
       })
       .catch(() => {});
   }, []);
-
-
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -316,9 +242,7 @@ export default function Home() {
           {NAV_ITEMS.map(item => {
             const IconComp = item.icon;
             return (
-              <Link
-                key={item.label}
-                to={item.path}
+              <Link key={item.label} to={item.path}
                 className={`th-sidenav-item${activePage === item.label ? ' active' : ''}`}
                 onClick={() => setActivePage(item.label)}
               >
@@ -367,19 +291,10 @@ export default function Home() {
 
         {/* ══ TOPBAR ══ */}
         <header className="th-topbar">
-
-          {/* Hamburger button for mobile menu drawer */}
-          <button
-            className="th-hamburger-btn"
-            onClick={() => setMobileMenuOpen(prev => !prev)}
-            aria-label="Open menu"
-          >
-            <span />
-            <span />
-            <span />
+          <button className="th-hamburger-btn" onClick={() => setMobileMenuOpen(prev => !prev)} aria-label="Open menu">
+            <span /><span /><span />
           </button>
 
-          {/* ✅ Mobile pe logo dikhega — desktop pe CSS se hide hoga */}
           <div className="th-mobile-logo" onClick={() => navigate('/')}>
             TALENT<span>HUB</span>
           </div>
@@ -450,10 +365,7 @@ export default function Home() {
                 {link === 'Competitions' && <span className="th-new-badge">NEW</span>}
               </Link>
             ))}
-            <button
-              className="th-topnav-link th-guide-nav-btn"
-              onClick={() => setShowTour(true)}
-            >
+            <button className="th-topnav-link th-guide-nav-btn" onClick={() => setShowTour(true)}>
               Guide 💡
             </button>
           </nav>
@@ -466,21 +378,17 @@ export default function Home() {
               </svg>
               <span className="th-notif-dot">3</span>
             </button>
-
             <button className="th-icon-btn" aria-label="Messages">
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
             </button>
-
             {user ? (
               <div className="th-user-pill">
                 <div className="th-user-avatar">
-                  {user.profilePic ? (
-                    <img src={user.profilePic} alt={user.username} className="th-user-avatar-img" />
-                  ) : (
-                    user.username?.[0]?.toUpperCase() || 'U'
-                  )}
+                  {user.profilePic
+                    ? <img src={user.profilePic} alt={user.username} className="th-user-avatar-img" />
+                    : user.username?.[0]?.toUpperCase() || 'U'}
                 </div>
                 <span className="th-user-name">{user.username}</span>
                 <button className="th-logout-btn" onClick={handleLogout}>↩</button>
@@ -501,16 +409,24 @@ export default function Home() {
                 <span className="th-hero-accent">TALENT</span>
               </h1>
               <p className="th-hero-desc">
-                <span className="th-desc-highlight">Show Your Talent. Inspire the World.</span> <Sparkles size={16} style={{display:'inline', verticalAlign:'middle'}} />
+                <span className="th-desc-highlight">Show Your Talent. Inspire the World.</span>{' '}
+                <Sparkles size={16} style={{display:'inline', verticalAlign:'middle'}} />
                 <br /><br />
                 Upload videos, grow your audience, earn recognition, and become part of
                 <span className="th-desc-highlight"> India's creative talent community.</span>
                 <br /><br />
-                <span className="th-desc-cta"><Send size={14} style={{display:'inline', verticalAlign:'middle', marginRight:'6px'}} />Start your journey with TalentHub today!</span>
+                <span className="th-desc-cta">
+                  <Send size={14} style={{display:'inline', verticalAlign:'middle', marginRight:6}} />
+                  Start your journey with TalentHub today!
+                </span>
               </p>
               <div className="th-hero-btns">
-                <button className="th-btn-primary" onClick={() => navigate('/upload')}><UploadCloud size={16} /> Upload Now</button>
-                <button className="th-btn-outline" onClick={() => window.scrollTo({top:700,behavior:'smooth'})}>▶ Explore Performances</button>
+                <button className="th-btn-primary" onClick={() => navigate('/upload')}>
+                  <UploadCloud size={16} /> Upload Now
+                </button>
+                <button className="th-btn-outline" onClick={() => window.scrollTo({top:700,behavior:'smooth'})}>
+                  ▶ Explore Performances
+                </button>
               </div>
               <div className="th-social-proof">
                 <span style={{display:'flex', alignItems:'center', gap:8, fontSize:15}}>
@@ -524,16 +440,10 @@ export default function Home() {
             </div>
 
             <div className="th-hero-img-wrap">
-              <img
-                src="/singer_hero_neon.png"
-                alt="Concert Stage"
-                className="th-hero-img"
-              />
+              <img src="/singer_hero_neon.png" alt="Concert Stage" className="th-hero-img" />
               <div className="th-hero-img-overlay" />
               <div className="th-live-card">
-                <div className="th-live-badge">
-                  <span className="th-live-dot" /> LIVE NOW
-                </div>
+                <div className="th-live-badge"><span className="th-live-dot" /> LIVE NOW</div>
                 <div className="th-live-title">India's Talent Stage</div>
                 <div className="th-live-by">Live Performances</div>
                 <div className="th-live-footer">
@@ -546,11 +456,11 @@ export default function Home() {
           {/* Stats Row */}
           <div className="th-stats-row">
             {[
-              { icon: Users,     val: fmt(realStats.users),  label:'Performers',        accent:'#a855f7', className: 'stat-icon-performers' },
-              { icon: Video,     val: fmt(realStats.videos), label:'Videos',            accent:'#f472b6', className: 'stat-icon-videos' },
-              { icon: Eye,       val: fmt(realStats.views),  label:'Views',             accent:'#34d399', className: 'stat-icon-views' },
-              { icon: ThumbsUp,  val: '95%',                  label:'Positive Feedback', accent:'#f5a623', className: 'stat-icon-feedback' },
-            ].map((s,i) => {
+              { icon: Users,    val: fmt(realStats.users),  label:'Performers',        accent:'#a855f7', className:'stat-icon-performers' },
+              { icon: Video,    val: fmt(realStats.videos), label:'Videos',            accent:'#f472b6', className:'stat-icon-videos' },
+              { icon: Eye,      val: fmt(realStats.views),  label:'Views',             accent:'#34d399', className:'stat-icon-views' },
+              { icon: ThumbsUp, val: '95%',                  label:'Positive Feedback', accent:'#f5a623', className:'stat-icon-feedback' },
+            ].map((s, i) => {
               const StatIcon = s.icon;
               return (
                 <div key={i} className="th-stat-box">
@@ -567,8 +477,6 @@ export default function Home() {
             })}
           </div>
         </section>
-
-        {/* Guided tour card section removed as spotlight onboarding tour is integrated */}
 
         {/* ══ EXPLORE BY CATEGORY ══ */}
         <section className="th-section">
@@ -590,7 +498,10 @@ export default function Home() {
         <section className="th-section th-two-col">
           <div className="th-trending">
             <div className="th-section-header">
-              <h2 className="th-section-title"><Flame size={19} style={{display:'inline', verticalAlign:'middle', marginRight:'6px', color:'#f97316'}} />Trending Now</h2>
+              <h2 className="th-section-title">
+                <Flame size={19} style={{display:'inline', verticalAlign:'middle', marginRight:6, color:'#f97316'}} />
+                Trending Now
+              </h2>
               <Link to="/explore" className="th-view-all">View All</Link>
             </div>
 
@@ -600,7 +511,9 @@ export default function Home() {
               </div>
             ) : videos.length === 0 ? (
               <div className="th-empty">
-                <div style={{fontSize:48,marginBottom:12, display:'flex', justifyContent:'center'}}><Clapperboard size={48} /></div>
+                <div style={{fontSize:48, marginBottom:12, display:'flex', justifyContent:'center'}}>
+                  <Clapperboard size={48} />
+                </div>
                 <h3>No videos yet!</h3>
                 <p>Be the first to upload your performance.</p>
                 <button className="th-btn-primary" style={{marginTop:16}} onClick={() => navigate('/upload')}>
@@ -624,7 +537,10 @@ export default function Home() {
           {/* TOP PERFORMERS */}
           <div className="th-performers-panel">
             <div className="th-section-header">
-              <h2 className="th-section-title"><Trophy size={19} style={{display:'inline', verticalAlign:'middle', marginRight:'6px', color:'#f5a623'}} />Top Performers</h2>
+              <h2 className="th-section-title">
+                <Trophy size={19} style={{display:'inline', verticalAlign:'middle', marginRight:6, color:'#f5a623'}} />
+                Top Performers
+              </h2>
               <Link to="/leaderboard" className="th-view-all">View All</Link>
             </div>
 
@@ -636,7 +552,9 @@ export default function Home() {
                 <button className="th-btn-primary"
                   style={{marginTop:14, fontSize:13, padding:'9px 20px'}}
                   onClick={() => navigate('/upload')}
-                ><UploadCloud size={14} /> Upload & Shine</button>
+                >
+                  <UploadCloud size={14} /> Upload & Shine
+                </button>
               </div>
             ) : (
               <div className="th-performers-list">
@@ -647,17 +565,13 @@ export default function Home() {
                   >
                     <div className={`th-rank th-rank-${i+1}`}>{i+1}</div>
                     <div className="th-perf-avatar-initial">
-                      {p.profilePic ? (
-                        <img src={p.profilePic} alt={p.username} className="th-perf-avatar-img" />
-                      ) : (
-                        p.username?.[0]?.toUpperCase() || 'U'
-                      )}
+                      {p.profilePic
+                        ? <img src={p.profilePic} alt={p.username} className="th-perf-avatar-img" />
+                        : p.username?.[0]?.toUpperCase() || 'U'}
                     </div>
                     <div className="th-perf-info">
                       <div className="th-perf-name">{p.username}</div>
-                      <div className="th-perf-followers">
-                        {fmt(p.followers?.length || 0)} Followers
-                      </div>
+                      <div className="th-perf-followers">{fmt(p.followers?.length || 0)} Followers</div>
                     </div>
                   </div>
                 ))}
@@ -670,26 +584,27 @@ export default function Home() {
       {/* ══ RIGHT PANEL ══ */}
       <aside className="th-right-panel">
 
-        {/* Upcoming Competitions */}
+        {/* ✅ Upcoming Competitions — Lucide icons */}
         <div className="th-panel-section">
           <div className="th-panel-header">
-            <span className="th-panel-title">Upcoming Competitions</span>
+            <span className="th-panel-title">UPCOMING COMPETITIONS</span>
             <Link to="/competitions" className="th-view-all">View All</Link>
           </div>
           {competitions.map((c, i) => {
-            const CompIcon = c.icon;
+            const CompIcon = getCompIcon(c);
+            const color    = c.color || '#7c3aed';
             return (
               <div key={i} className="th-comp-row"
                 onClick={() => navigate('/competitions')}
                 style={{cursor:'pointer'}}
               >
-                <div className="th-comp-icon" style={{background: c.color+'22', color: c.color}}>
-                  {typeof CompIcon === 'string' ? CompIcon : <CompIcon size={18} />}
+                <div className="th-comp-icon" style={{background: color+'22', color}}>
+                  <CompIcon size={16} />
                 </div>
                 <div className="th-comp-info">
-                  <div className="th-comp-name">{c.name}</div>
+                  <div className="th-comp-name">{c.name || c.title}</div>
                   <div className="th-comp-date">
-                    {c.status === 'active' ? 'Active' : 'Upcoming'}
+                    {c.status === 'active' ? '🟢 Active' : '⏳ Upcoming'}
                     {c.date ? ` · ${c.date}` : ''}
                   </div>
                 </div>
@@ -706,13 +621,16 @@ export default function Home() {
         {/* Thoughts Widget */}
         <div className="th-panel-section th-thoughts-widget">
           <div className="th-panel-header">
-            <span className="th-panel-title"><MessageCircle size={16} style={{display:'inline', verticalAlign:'middle', marginRight:'6px'}} />Thoughts</span>
+            <span className="th-panel-title">
+              <MessageCircle size={16} style={{display:'inline', verticalAlign:'middle', marginRight:6}} />
+              THOUGHTS
+            </span>
             <Link to="/thoughts" className="th-view-all">View All</Link>
           </div>
 
           {recentThoughts.length === 0 ? (
             <div className="th-thoughts-empty-widget">
-              <p>No thoughts yet. Be the first!</p>
+              <p>No thoughts yet. Be the first! 💬</p>
               <button className="th-thought-share-btn" onClick={() => navigate('/thoughts')}>
                 <Sparkles size={14} /> Share a Thought
               </button>
@@ -722,11 +640,9 @@ export default function Home() {
               {recentThoughts.slice(0, 3).map(t => (
                 <div key={t._id} className="th-thought-item" onClick={() => navigate('/thoughts')}>
                   <div className="th-thought-item-avatar">
-                    {t.author?.profilePic ? (
-                      <img src={t.author.profilePic} alt={t.author.username} className="th-user-avatar-img" />
-                    ) : (
-                      t.author?.username?.[0]?.toUpperCase() || 'U'
-                    )}
+                    {t.author?.profilePic
+                      ? <img src={t.author.profilePic} alt={t.author.username} className="th-user-avatar-img" />
+                      : t.author?.username?.[0]?.toUpperCase() || 'U'}
                   </div>
                   <div className="th-thought-item-content">
                     <div className="th-thought-item-author">{t.author?.username}</div>
@@ -775,9 +691,7 @@ export default function Home() {
           {NAV_ITEMS.map(item => {
             const IconComp = item.icon;
             return (
-              <Link
-                key={item.label}
-                to={item.path}
+              <Link key={item.label} to={item.path}
                 className={`th-sidenav-item${activePage === item.label ? ' active' : ''}`}
                 onClick={() => { setActivePage(item.label); setMobileMenuOpen(false); }}
               >
@@ -795,7 +709,9 @@ export default function Home() {
           {BOTTOM_NAV.map(item => {
             const IconComp = item.icon;
             return (
-              <Link key={item.label} to={item.path} className="th-sidenav-item" onClick={() => setMobileMenuOpen(false)}>
+              <Link key={item.label} to={item.path} className="th-sidenav-item"
+                onClick={() => setMobileMenuOpen(false)}
+              >
                 <span className="th-nav-icon"><IconComp size={18} /></span>
                 <span>{item.label}</span>
               </Link>
@@ -812,7 +728,7 @@ export default function Home() {
           <button className="th-premium-btn">Upgrade Now</button>
         </div>
 
-        <div className="th-darkmode-row" style={{ marginTop: 'auto', padding: '16px 16px 24px' }}>
+        <div className="th-darkmode-row" style={{ marginTop:'auto', padding:'16px 16px 24px' }}>
           <span className="th-nav-icon">{darkMode ? '🌙' : '☀️'}</span>
           <span>{darkMode ? 'Dark Mode' : 'Light Mode'}</span>
           <div className={`th-toggle${darkMode ? ' on' : ''}`} onClick={toggleTheme}>
@@ -846,23 +762,17 @@ export default function Home() {
           </Link>
         </div>
       </nav>
-      {/* ══ ONBOARDING SPOTLIGHT TOUR ══ */}
+
+      {/* ══ ONBOARDING TOUR ══ */}
       <OnboardingTour
         steps={TOUR_STEPS}
         run={showTour}
-        onClose={() => {
-          setShowTour(false);
-          setMobileMenuOpen(false);
-        }}
+        onClose={() => { setShowTour(false); setMobileMenuOpen(false); }}
         onStepChange={(stepIndex) => {
           if (window.innerWidth <= 768) {
-            // Only open drawer for hidden sidebar navigation items
-            const drawerSteps = [4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 18, 19];
-            if (drawerSteps.includes(stepIndex)) {
-              setMobileMenuOpen(true);
-            } else {
-              setMobileMenuOpen(false);
-            }
+            const drawerSteps = [4,5,6,7,8,9,11,13,14,15,16,17,18,19];
+            if (drawerSteps.includes(stepIndex)) setMobileMenuOpen(true);
+            else setMobileMenuOpen(false);
           }
         }}
       />
