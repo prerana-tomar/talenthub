@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  User, Lock, Video, AlertTriangle, Save, CheckCircle2, XCircle,
+  Upload, Play, Trash2, LogOut, Eye, Heart, Calendar, Clapperboard,
+  ShieldAlert, KeyRound
+} from 'lucide-react';
 import API from '../config';
 import './Settings.css';
 
@@ -71,11 +76,11 @@ const Settings = () => {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      showMsg('❌ Please select a valid image file.', 'error');
+      showMsg('Please select a valid image file.', 'error');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      showMsg('❌ Image size should be less than 5MB.', 'error');
+      showMsg('Image size should be less than 5MB.', 'error');
       return;
     }
 
@@ -96,14 +101,14 @@ const Settings = () => {
         const updated = { ...currentUser, profilePic: data.user.profilePic };
         localStorage.setItem('th_user', JSON.stringify(updated));
         setCurrentUser(updated);
-        showMsg('✅ Profile picture updated successfully!');
+        showMsg('Profile picture updated successfully!');
         // Dispatch event for other components like Navbar to update immediately
         window.dispatchEvent(new Event('storage'));
       } else {
-        showMsg(data.message || '❌ Upload failed.', 'error');
+        showMsg(data.message || 'Upload failed.', 'error');
       }
     } catch {
-      showMsg('❌ Cannot connect to server.', 'error');
+      showMsg('Cannot connect to server.', 'error');
     } finally {
       setUploadingPic(false);
     }
@@ -126,13 +131,13 @@ const Settings = () => {
         const updated = data.user || { ...currentUser, username: formData.username, email: formData.email };
         localStorage.setItem('th_user', JSON.stringify(updated));
         setCurrentUser(updated);
-        showMsg('✅ Profile updated successfully!');
+        showMsg('Profile updated successfully!');
         window.dispatchEvent(new Event('storage'));
       } else {
         showMsg(data.message || 'Update failed', 'error');
       }
     } catch {
-      showMsg('❌ Cannot connect to server.', 'error');
+      showMsg('Cannot connect to server.', 'error');
     } finally {
       setLoading(false);
     }
@@ -141,10 +146,10 @@ const Settings = () => {
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (formData.newPassword !== formData.confirmPassword) {
-      showMsg('❌ Passwords do not match!', 'error'); return;
+      showMsg('Passwords do not match!', 'error'); return;
     }
     if (formData.newPassword.length < 6) {
-      showMsg('❌ Min 6 characters required!', 'error'); return;
+      showMsg('Min 6 characters required!', 'error'); return;
     }
     setLoading(true);
     try {
@@ -161,13 +166,13 @@ const Settings = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        showMsg('✅ Password changed successfully!');
+        showMsg('Password changed successfully!');
         setFormData(prev => ({ ...prev, currentPassword: '', newPassword: '', confirmPassword: '' }));
       } else {
         showMsg(data.message || 'Failed to change password', 'error');
       }
     } catch {
-      showMsg('❌ Cannot connect to server.', 'error');
+      showMsg('Cannot connect to server.', 'error');
     } finally {
       setLoading(false);
     }
@@ -175,7 +180,7 @@ const Settings = () => {
 
   const handleDeleteAccount = async () => {
     const confirmed = window.confirm(
-      '⚠️ Are you sure you want to DELETE your account?\n\nThis will permanently delete:\n• Your account\n• All your uploaded videos\n• All your data\n\nThis CANNOT be undone!'
+      'Are you sure you want to DELETE your account?\n\nThis will permanently delete:\n• Your account\n• All your uploaded videos\n• All your data\n\nThis CANNOT be undone!'
     );
     if (!confirmed) return;
 
@@ -195,10 +200,10 @@ const Settings = () => {
         setTimeout(() => { window.location.href = '/login'; }, 1500);
       } else {
         const data = await res.json();
-        showMsg(data.message || '❌ Delete failed!', 'error');
+        showMsg(data.message || 'Delete failed!', 'error');
       }
     } catch {
-      showMsg('❌ Cannot connect to server.', 'error');
+      showMsg('Cannot connect to server.', 'error');
     } finally {
       setLoading(false);
     }
@@ -214,13 +219,13 @@ const Settings = () => {
       });
       if (res.ok) {
         setVideos(prev => prev.filter(v => v._id !== videoId));
-        showMsg('✅ Video deleted successfully!');
+        showMsg('Video deleted successfully!');
       } else {
         const data = await res.json();
-        showMsg(data.message || '❌ Delete failed!', 'error');
+        showMsg(data.message || 'Delete failed!', 'error');
       }
     } catch {
-      showMsg('❌ Cannot connect to server.', 'error');
+      showMsg('Cannot connect to server.', 'error');
     } finally {
       setDeleting(null);
     }
@@ -231,10 +236,10 @@ const Settings = () => {
   });
 
   const TABS = [
-    { id: 'account',  icon: '👤', label: 'Account'     },
-    { id: 'password', icon: '🔒', label: 'Password'    },
-    { id: 'videos',   icon: '📹', label: 'My Videos'   },
-    { id: 'danger',   icon: '⚠️', label: 'Danger Zone' },
+    { id: 'account',  icon: User,          label: 'Account'     },
+    { id: 'password', icon: Lock,          label: 'Password'    },
+    { id: 'videos',   icon: Video,         label: 'My Videos'   },
+    { id: 'danger',   icon: AlertTriangle, label: 'Danger Zone' },
   ];
 
   return (
@@ -242,27 +247,32 @@ const Settings = () => {
       <div className="settings-container">
 
         <div className="settings-header-row">
-          <h1 className="settings-title">⚙️ Settings</h1>
+          <h1 className="settings-title">Settings</h1>
           <button className="settings-back-btn" onClick={() => navigate('/')}>← Back to Home</button>
         </div>
 
         {/* TABS */}
         <div className="settings-tabs">
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              className={`tab-btn ${activeTab === tab.id ? 'active' : ''} ${tab.id === 'danger' ? 'danger-tab' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.icon} {tab.label}
-            </button>
-          ))}
+          {TABS.map(tab => {
+            const TabIcon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                className={`tab-btn ${activeTab === tab.id ? 'active' : ''} ${tab.id === 'danger' ? 'danger-tab' : ''}`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <TabIcon size={15} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* MESSAGE */}
         {message.text && (
           <div className={`settings-message ${message.type}`}>
-            {message.text}
+            {message.type === 'error' ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
+            <span>{message.text}</span>
           </div>
         )}
 
@@ -298,6 +308,7 @@ const Settings = () => {
                 />
                 <div className="avatar-upload-btn-row">
                   <label htmlFor="avatar-file-input" className="avatar-upload-label">
+                    <Upload size={12} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
                     Upload Picture
                   </label>
                 </div>
@@ -328,7 +339,8 @@ const Settings = () => {
                 />
               </div>
               <button type="submit" className="save-btn" disabled={loading}>
-                {loading ? 'Saving...' : '💾 Save Changes'}
+                <Save size={16} />
+                {loading ? 'Saving...' : 'Save Changes'}
               </button>
             </form>
           </div>
@@ -372,7 +384,8 @@ const Settings = () => {
                 />
               </div>
               <button type="submit" className="save-btn" disabled={loading}>
-                {loading ? 'Changing...' : '🔒 Change Password'}
+                <KeyRound size={16} />
+                {loading ? 'Changing...' : 'Change Password'}
               </button>
             </form>
           </div>
@@ -382,7 +395,7 @@ const Settings = () => {
         {activeTab === 'videos' && (
           <div className="settings-card">
             <div className="videos-tab-header">
-              <h3>📹 My Uploaded Videos</h3>
+              <h3><Video size={17} style={{ marginRight: '8px', verticalAlign: 'middle' }} />My Uploaded Videos</h3>
               <span className="videos-count">{videos.length} video{videos.length !== 1 ? 's' : ''}</span>
             </div>
 
@@ -392,11 +405,11 @@ const Settings = () => {
               </div>
             ) : videos.length === 0 ? (
               <div className="videos-empty">
-                <div className="videos-empty-icon">🎬</div>
+                <div className="videos-empty-icon"><Clapperboard size={44} /></div>
                 <h4>No videos uploaded yet</h4>
                 <p>Start sharing your talent with the world!</p>
                 <button className="save-btn" style={{marginTop:16}} onClick={() => navigate('/upload')}>
-                  ⬆ Upload Now
+                  <Upload size={16} /> Upload Now
                 </button>
               </div>
             ) : (
@@ -419,9 +432,9 @@ const Settings = () => {
                     <div className="video-row-info">
                       <div className="video-row-title">{video.title}</div>
                       <div className="video-row-meta">
-                        <span>👁 {video.views || 0} views</span>
-                        <span>❤️ {Array.isArray(video.likes) ? video.likes.length : 0} likes</span>
-                        <span>📅 {formatDate(video.createdAt)}</span>
+                        <span><Eye size={12} /> {video.views || 0} views</span>
+                        <span><Heart size={12} /> {Array.isArray(video.likes) ? video.likes.length : 0} likes</span>
+                        <span><Calendar size={12} /> {formatDate(video.createdAt)}</span>
                       </div>
                     </div>
 
@@ -431,14 +444,14 @@ const Settings = () => {
                         className="video-view-btn"
                         onClick={() => navigate(`/video/${video._id}`)}
                       >
-                        ▶ View
+                        <Play size={12} /> View
                       </button>
                       <button
                         className="video-delete-btn"
                         onClick={() => handleDeleteVideo(video._id, video.title)}
                         disabled={deleting === video._id}
                       >
-                        {deleting === video._id ? '...' : '🗑 Delete'}
+                        <Trash2 size={12} /> {deleting === video._id ? '...' : 'Delete'}
                       </button>
                     </div>
                   </div>
@@ -455,7 +468,7 @@ const Settings = () => {
             {/* Logout */}
             <div className="danger-item">
               <div className="danger-item-left">
-                <div className="danger-item-title">🚪 Log Out</div>
+                <div className="danger-item-title"><LogOut size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />Log Out</div>
                 <div className="danger-item-sub">Log out from your account on this device</div>
               </div>
               <button
@@ -475,7 +488,8 @@ const Settings = () => {
             <div className="danger-item">
               <div className="danger-item-left">
                 <div className="danger-item-title" style={{color:'#ef4444'}}>
-                  🗑️ Delete Account
+                  <ShieldAlert size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+                  Delete Account
                 </div>
                 <div className="danger-item-sub">
                   Permanently delete your account, all videos, and data.<br/>
@@ -487,7 +501,7 @@ const Settings = () => {
                 onClick={handleDeleteAccount}
                 disabled={loading}
               >
-                {loading ? 'Deleting...' : '🗑️ Delete My Account'}
+                <Trash2 size={14} /> {loading ? 'Deleting...' : 'Delete My Account'}
               </button>
             </div>
 
