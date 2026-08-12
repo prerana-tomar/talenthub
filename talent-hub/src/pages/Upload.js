@@ -1,112 +1,105 @@
 import './Upload.css';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UploadCloud, Film, Image, Music, Tag, ChevronRight, X, Check } from 'lucide-react';
 import API from '../config';
 
 const PRESET_TRACKS = [
-  { name: "🎵 Acoustic Calm", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-  { name: "🎵 Lo-Fi Chill Beat", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-  { name: "🎵 Cinematic Vibe", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-  { name: "🎵 Smooth Jazz", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
-  { name: "🎵 Upbeat Rhythm", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" }
+  { name: "Acoustic Calm",   url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+  { name: "Lo-Fi Chill",     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+  { name: "Cinematic Vibe",  url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+  { name: "Smooth Jazz",     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
+  { name: "Upbeat Rhythm",   url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" },
 ];
 
+const CATEGORIES = ['Music','Dance','Hip-Hop','Comedy','Poetry','Acting','Instrumental','Other'];
+
 function Upload() {
-  const [title, setTitle]       = useState('');
-  const [category, setCategory] = useState('Music');
-  const [file, setFile]         = useState(null);
+  const [title,         setTitle]         = useState('');
+  const [category,      setCategory]      = useState('Music');
+  const [file,          setFile]          = useState(null);
   const [thumbnailFile, setThumbnailFile] = useState(null);
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
-  const [progress, setProgress] = useState(0);
-  const [musicUrl, setMusicUrl]   = useState('');
-  const [musicName, setMusicName] = useState('');
+  const [thumbnailPreview, setThumbnailPreview] = useState('');
+  const [loading,       setLoading]       = useState(false);
+  const [error,         setError]         = useState('');
+  const [progress,      setProgress]      = useState(0);
+  const [musicUrl,      setMusicUrl]      = useState('');
+  const [musicName,     setMusicName]     = useState('');
   const [uploadingAudio, setUploadingAudio] = useState(false);
-  const audioInputRef             = useRef(null);
-  const navigate = useNavigate();
+  const [isDragging,    setIsDragging]    = useState(false);
+  const [heroVisible,   setHeroVisible]   = useState(false);
+  const [step,          setStep]          = useState(1); // 1=video, 2=details, 3=music
+
+  const audioInputRef = useRef(null);
+  const navigate      = useNavigate();
+
+  useEffect(() => {
+    const t = setTimeout(() => setHeroVisible(true), 80);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleDrop = (e) => {
     e.preventDefault();
+    setIsDragging(false);
     const dropped = e.dataTransfer.files[0];
-    if (dropped) setFile(dropped);
+    if (dropped && dropped.type.startsWith('video/')) {
+      setFile(dropped);
+      setStep(2);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const f = e.target.files[0];
+    if (f) { setFile(f); setStep(2); }
+  };
+
+  const handleThumbnailChange = (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    setThumbnailFile(f);
+    const reader = new FileReader();
+    reader.onload = (ev) => setThumbnailPreview(ev.target.result);
+    reader.readAsDataURL(f);
   };
 
   const handleAudioSelect = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 15 * 1024 * 1024) {
-      alert('Audio file size 15MB se kam honi chahiye');
-      return;
-    }
-    setUploadingAudio(true);
-    setError('');
+    const f = e.target.files[0];
+    if (!f) return;
+    if (f.size > 15 * 1024 * 1024) { alert('Audio file 15MB se kam honi chahiye'); return; }
+    setUploadingAudio(true); setError('');
     try {
       const token = localStorage.getItem('th_token') || localStorage.getItem('token');
       const audioFormData = new FormData();
-      audioFormData.append('audio', file);
-      const res = await fetch(`${API}/api/videos/upload-audio`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: audioFormData
+      audioFormData.append('audio', f);
+      const res  = await fetch(`${API}/api/videos/upload-audio`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: audioFormData
       });
       const data = await res.json();
-      if (res.ok) {
-        setMusicUrl(data.url);
-        setMusicName(file.name);
-      } else {
-        setError(data.message || 'Audio upload failed.');
-      }
-    } catch {
-      setError('Audio upload connection error.');
-    } finally {
-      setUploadingAudio(false);
-      e.target.value = '';
-    }
+      if (res.ok) { setMusicUrl(data.url); setMusicName(f.name); }
+      else setError(data.message || 'Audio upload failed.');
+    } catch { setError('Audio upload error.'); }
+    finally { setUploadingAudio(false); e.target.value = ''; }
   };
 
   const handleSubmit = async () => {
     setError('');
-
-    if (!title || !file) {
-      setError('Please add a title and choose a video file.');
-      return;
-    }
-
+    if (!title || !file) { setError('Title aur video file zaroori hai.'); return; }
     const token = localStorage.getItem('th_token') || localStorage.getItem('token');
-    if (!token) {
-      setError('You must be logged in to upload. Please sign in first.');
-      return;
-    }
+    if (!token) { setError('Pehle login karein.'); return; }
+    setLoading(true); setProgress(0);
 
-    setLoading(true);
-    setProgress(0);
-
-    let thumbnailUrl = '';
-    let thumbnailFilename = '';
-
+    let thumbnailUrl = '', thumbnailFilename = '';
     if (thumbnailFile) {
       try {
         const thumbFormData = new FormData();
         thumbFormData.append('thumbnail', thumbnailFile);
-        const thumbRes = await fetch(`${API}/api/videos/upload-thumbnail`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: thumbFormData
+        const thumbRes  = await fetch(`${API}/api/videos/upload-thumbnail`, {
+          method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: thumbFormData
         });
         const thumbData = await thumbRes.json();
-        if (thumbRes.ok) {
-          thumbnailUrl = thumbData.url;
-          thumbnailFilename = thumbData.filename;
-        } else {
-          setError(thumbData.message || 'Failed to upload thumbnail image.');
-          setLoading(false);
-          return;
-        }
-      } catch (err) {
-        setError('Thumbnail upload failed.');
-        setLoading(false);
-        return;
-      }
+        if (thumbRes.ok) { thumbnailUrl = thumbData.url; thumbnailFilename = thumbData.filename; }
+        else { setError(thumbData.message || 'Thumbnail upload failed.'); setLoading(false); return; }
+      } catch { setError('Thumbnail upload failed.'); setLoading(false); return; }
     }
 
     const formData = new FormData();
@@ -115,250 +108,271 @@ function Upload() {
     formData.append('category', category);
     formData.append('musicUrl', musicUrl);
     formData.append('musicName', musicName);
-    if (thumbnailUrl) {
-      formData.append('thumbnailUrl', thumbnailUrl);
-      formData.append('thumbnailFilename', thumbnailFilename);
-    }
+    if (thumbnailUrl) { formData.append('thumbnailUrl', thumbnailUrl); formData.append('thumbnailFilename', thumbnailFilename); }
 
     try {
       const result = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-
         xhr.upload.onprogress = (e) => {
-          if (e.lengthComputable) {
-            const pct = Math.round((e.loaded / e.total) * 100);
-            setProgress(pct);
-          }
+          if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
         };
-
         xhr.onload = () => {
           try {
             const data = JSON.parse(xhr.responseText);
-            if (xhr.status === 201) {
-              resolve(data);
-            } else {
-              reject(new Error(data.message || 'Upload failed.'));
-            }
-          } catch {
-            reject(new Error('Server returned invalid response.'));
-          }
+            if (xhr.status === 201) resolve(data);
+            else reject(new Error(data.message || 'Upload failed.'));
+          } catch { reject(new Error('Invalid server response.')); }
         };
-
-        xhr.onerror = () => reject(new Error('Network error. Cannot connect to server.'));
-
+        xhr.onerror = () => reject(new Error('Network error.'));
         xhr.open('POST', `${API}/api/videos`);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.send(formData);
       });
-
-      alert(`"${result.title}" published successfully! 🎉`);
       navigate('/');
-
     } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.');
+      setError(err.message || 'Kuch galat hua. Try again.');
       setProgress(0);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
+  const steps = [
+    { num: 1, label: 'Video',   icon: <Film size={14} /> },
+    { num: 2, label: 'Details', icon: <Tag size={14} /> },
+    { num: 3, label: 'Music',   icon: <Music size={14} /> },
+  ];
+
   return (
-    <div className="th-upload-page">
-      {/* Premium Hero Section */}
-      <div className="th-page-hero">
-        <div className="th-page-hero-text">
-          <h1 className="th-page-hero-title">UPLOAD YOUR <span>TALENT</span></h1>
-          <p className="th-page-hero-subtitle">Share your unique talent with the world. Upload your performance now and inspire creators worldwide.</p>
-        </div>
-        <div className="th-page-hero-img-wrap">
-          📤
-        </div>
-      </div>
+    <div className="up-page">
 
-      {error && (
-        <div style={{
-          background: 'rgba(220,53,69,0.12)',
-          border: '1px solid rgba(220,53,69,0.35)',
-          color: '#ff6b6b',
-          fontSize: '13px',
-          padding: '10px 14px',
-          borderRadius: '8px',
-          marginBottom: '16px',
-        }}>
-          ⚠ {error}
-        </div>
-      )}
-
-      <div
-        className="th-dropzone"
-        onDragOver={e => e.preventDefault()}
-        onDrop={handleDrop}
-        onClick={() => !loading && document.getElementById('file-input').click()}
-        style={{ cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
-      >
-        <div className="th-dropzone-icon">🎬</div>
-        {file ? (
-          <p><strong style={{ color: '#f5c842' }}>{file.name}</strong></p>
-        ) : (
-          <p><strong>Click or drag</strong> your video here<br />MP4, MOV up to 100MB</p>
-        )}
-        <input
-          id="file-input"
-          type="file"
-          accept="video/*"
-          style={{ display: 'none' }}
-          onChange={e => setFile(e.target.files[0])}
-        />
-      </div>
-
-      {/* Thumbnail Upload */}
-      <div className="th-thumbnail-upload-box">
-        <label className="th-thumb-upload-label">🖼️ Custom Thumbnail (Optional)</label>
-        <div className="th-thumb-upload-row">
-          <input
-            type="file"
-            accept="image/*"
-            id="thumbnail-input"
-            onChange={e => setThumbnailFile(e.target.files[0])}
-            disabled={loading}
-            className="th-thumb-file-input"
-          />
-          {thumbnailFile && (
-            <span className="th-thumb-selected-name">✓ Selected</span>
-          )}
-        </div>
-      </div>
-
-      {loading && (
-        <div style={{ margin: '16px 0' }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            fontSize: '12px',
-            color: '#7a7f94',
-            marginBottom: '6px',
-          }}>
-            <span>Uploading to Cloudinary...</span>
-            <span>{progress}%</span>
+      {/* ── COMPACT HERO ── */}
+      <div className={`up-hero ${heroVisible ? 'visible' : ''}`}>
+        <div className="up-hero-left">
+          <div className="up-hero-badge">
+            <UploadCloud size={12} /> Upload Performance
           </div>
-          <div style={{
-            background: 'rgba(255,255,255,0.08)',
-            borderRadius: '99px',
-            height: '6px',
-            overflow: 'hidden',
-          }}>
-            <div style={{
-              width: `${progress}%`,
-              height: '100%',
-              background: '#f5c842',
-              borderRadius: '99px',
-              transition: 'width 0.3s ease',
-            }} />
-          </div>
+          <h1 className="up-hero-title">
+            Share Your <span>Talent</span>
+          </h1>
+          <p className="up-hero-sub">
+            Upload your performance and inspire creators worldwide.
+          </p>
         </div>
-      )}
-
-      <div className="th-upload-form">
-        <div className="th-field">
-          <label>Video Title</label>
-          <input
-            type="text"
-            placeholder="Give your performance a name..."
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            disabled={loading}
-          />
+        <div className="up-hero-icon">
+          <UploadCloud size={26} className="up-float" />
         </div>
+      </div>
 
-        <div className="th-field">
-          <label>Category</label>
-          <select
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-            disabled={loading}
-          >
-            <option>Music</option>
-            <option>Dance</option>
-            <option>Hip-Hop</option>
-            <option>Comedy</option>
-            <option>Other</option>
-          </select>
-        </div>
-
-        <div className="th-field" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '16px', marginTop: '8px' }}>
-          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>🎵 Background Music (Optional)</span>
-            {musicName ? (
-              <span style={{ color: '#34d399', fontSize: '12px' }}>{musicName}</span>
-            ) : (
-              <span style={{ color: '#555a6e', fontSize: '12px' }}>None</span>
-            )}
-          </label>
-          
-          {musicName ? (
-            <button
-              type="button"
-              onClick={() => { setMusicUrl(''); setMusicName(''); }}
-              style={{
-                background: 'rgba(244, 63, 94, 0.1)',
-                border: '1px solid rgba(244, 63, 94, 0.2)',
-                color: '#f43f5e',
-                padding: '8px 12px',
-                borderRadius: '8px',
-                fontSize: '13px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                textAlign: 'center',
-                width: 'fit-content'
-              }}
+      {/* ── STEP INDICATOR ── */}
+      <div className="up-steps">
+        {steps.map((s, i) => (
+          <React.Fragment key={s.num}>
+            <div
+              className={`up-step ${step === s.num ? 'active' : ''} ${step > s.num ? 'done' : ''}`}
+              onClick={() => step > s.num && setStep(s.num)}
             >
-              ✕ Remove Music
+              <div className="up-step-circle">
+                {step > s.num ? <Check size={13} /> : s.icon}
+              </div>
+              <span>{s.label}</span>
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`up-step-line ${step > s.num ? 'done' : ''}`} />
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* ── ERROR ── */}
+      {error && (
+        <div className="up-error">⚠ {error}</div>
+      )}
+
+      {/* ── STEP 1: VIDEO DROP ── */}
+      {step === 1 && (
+        <div
+          className={`up-dropzone ${isDragging ? 'dragging' : ''} ${file ? 'has-file' : ''}`}
+          onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          onClick={() => document.getElementById('up-file-input').click()}
+        >
+          <input id="up-file-input" type="file" accept="video/*" style={{ display: 'none' }} onChange={handleFileChange} />
+
+          <div className="up-dropzone-inner">
+            <div className="up-dropzone-icon">
+              <UploadCloud size={36} />
+              <div className="up-dropzone-ring up-ring1" />
+              <div className="up-dropzone-ring up-ring2" />
+            </div>
+            {file ? (
+              <>
+                <p className="up-file-name">✓ {file.name}</p>
+                <span className="up-file-size">{(file.size / (1024*1024)).toFixed(1)} MB</span>
+                <button className="up-next-btn" onClick={e => { e.stopPropagation(); setStep(2); }}>
+                  Continue <ChevronRight size={15} />
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="up-drop-title">Drop your video here</p>
+                <p className="up-drop-sub">or click to browse • MP4, MOV up to 100MB</p>
+                <div className="up-drop-formats">
+                  <span>MP4</span><span>MOV</span><span>WEBM</span><span>AVI</span>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── STEP 2: DETAILS ── */}
+      {step === 2 && (
+        <div className="up-card">
+          <div className="up-card-header">
+            <Film size={16} />
+            <span>Video Details</span>
+          </div>
+
+          {/* File info bar */}
+          <div className="up-file-bar">
+            <div className="up-file-bar-icon"><Film size={14} /></div>
+            <span className="up-file-bar-name">{file?.name}</span>
+            <button className="up-file-bar-change" onClick={() => { setFile(null); setStep(1); }}>Change</button>
+          </div>
+
+          <div className="up-field">
+            <label>Video Title *</label>
+            <input
+              type="text"
+              placeholder="Give your performance a name..."
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+
+          <div className="up-field">
+            <label>Category *</label>
+            <div className="up-cat-grid">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  type="button"
+                  className={`up-cat-btn ${category === cat ? 'active' : ''}`}
+                  onClick={() => setCategory(cat)}
+                  disabled={loading}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Thumbnail */}
+          <div className="up-field">
+            <label><Image size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} /> Custom Thumbnail (Optional)</label>
+            <div className="up-thumb-row">
+              {thumbnailPreview ? (
+                <div className="up-thumb-preview">
+                  <img src={thumbnailPreview} alt="thumbnail" />
+                  <button className="up-thumb-remove" onClick={() => { setThumbnailFile(null); setThumbnailPreview(''); }}>
+                    <X size={12} />
+                  </button>
+                </div>
+              ) : (
+                <label className="up-thumb-drop" htmlFor="up-thumb-input">
+                  <Image size={20} />
+                  <span>Add Thumbnail</span>
+                  <input id="up-thumb-input" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleThumbnailChange} disabled={loading} />
+                </label>
+              )}
+            </div>
+          </div>
+
+          <div className="up-step-actions">
+            <button className="up-back-btn" onClick={() => setStep(1)}>← Back</button>
+            <button className="up-next-btn2" onClick={() => setStep(3)} disabled={!title.trim()}>
+              Next: Music <ChevronRight size={15} />
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── STEP 3: MUSIC + PUBLISH ── */}
+      {step === 3 && (
+        <div className="up-card">
+          <div className="up-card-header">
+            <Music size={16} />
+            <span>Background Music (Optional)</span>
+          </div>
+
+          {musicName ? (
+            <div className="up-music-selected">
+              <div className="up-music-selected-icon">🎵</div>
+              <div className="up-music-selected-info">
+                <span className="up-music-selected-name">{musicName}</span>
+                <span className="up-music-selected-sub">Background track selected</span>
+              </div>
+              <button className="up-music-remove" onClick={() => { setMusicUrl(''); setMusicName(''); }}>
+                <X size={14} />
+              </button>
+            </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
+            <>
+              <p className="up-music-label">Choose a preset track:</p>
+              <div className="up-presets">
                 {PRESET_TRACKS.map(track => (
                   <button
                     key={track.name}
                     type="button"
+                    className="up-preset-btn"
                     onClick={() => { setMusicUrl(track.url); setMusicName(track.name); }}
-                    className="explore-cat-btn"
-                    style={{ whiteSpace: 'nowrap', padding: '6px 12px', fontSize: '11px' }}
                   >
-                    {track.name}
+                    🎵 {track.name}
                   </button>
                 ))}
               </div>
-              
+
+              <div className="up-music-divider"><span>or upload your own</span></div>
+
               <button
                 type="button"
+                className="up-audio-upload-btn"
                 onClick={() => audioInputRef.current.click()}
-                className="th-dropzone"
                 disabled={uploadingAudio}
-                style={{ padding: '12px', margin: 0, fontSize: '13px', borderStyle: 'dashed', background: 'rgba(255,255,255,0.02)' }}
               >
-                📁 {uploadingAudio ? 'Uploading Music...' : 'Upload Custom MP3/Audio'}
+                <UploadCloud size={15} />
+                {uploadingAudio ? 'Uploading...' : 'Upload MP3 / Audio File'}
               </button>
-              <input
-                ref={audioInputRef}
-                type="file"
-                accept="audio/*"
-                style={{ display: 'none' }}
-                onChange={handleAudioSelect}
-              />
+              <input ref={audioInputRef} type="file" accept="audio/*" style={{ display: 'none' }} onChange={handleAudioSelect} />
+            </>
+          )}
+
+          {/* Progress bar */}
+          {loading && (
+            <div className="up-progress-wrap">
+              <div className="up-progress-info">
+                <span>Uploading to Cloudinary...</span>
+                <span>{progress}%</span>
+              </div>
+              <div className="up-progress-bar">
+                <div className="up-progress-fill" style={{ width: `${progress}%` }} />
+              </div>
             </div>
           )}
-        </div>
 
-        <button
-          className="th-btn-main"
-          onClick={handleSubmit}
-          disabled={loading}
-          style={{ opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
-        >
-          {loading ? `Uploading... ${progress}%` : 'Publish Performance 🚀'}
-        </button>
-      </div>
+          <div className="up-step-actions">
+            <button className="up-back-btn" onClick={() => setStep(2)}>← Back</button>
+            <button
+              className="up-publish-btn"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? `Uploading... ${progress}%` : '🚀 Publish Performance'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
