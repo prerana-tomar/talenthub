@@ -12,7 +12,7 @@ import VideoCard from '../components/VideoCard';
 import OnboardingTour from '../components/OnboardingTour';
 import { useTheme } from '../App';
 import { LogoRefContext } from '../App';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo.jpg';
 import API from '../config';
 import './Home.css';
 

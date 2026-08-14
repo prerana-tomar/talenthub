@@ -3,7 +3,7 @@ import { Link, useNavigate, NavLink } from 'react-router-dom';
 import { User, FolderUp, MessageCircle, Bookmark, ClipboardList, Settings, LogOut, Home, Compass, Upload, Film } from 'lucide-react';
 import API from '../config';
 import { LogoRefContext } from '../App';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo.jpg';
 import './Navbar.css';
 
 function Navbar() {
