@@ -499,8 +499,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ══ TRENDING + TOP PERFORMERS ══ */}
-        <section className="th-section th-two-col">
+        {/* ══ TRENDING VIDEOS ══ */}
+        <section className="th-section">
           <div className="th-trending">
             <div className="th-section-header">
               <h2 className="th-section-title">
@@ -538,89 +538,47 @@ export default function Home() {
               </div>
             )}
           </div>
-
-          {/* TOP PERFORMERS */}
-          <div className="th-performers-panel">
-            <div className="th-section-header">
-              <h2 className="th-section-title">
-                <Trophy size={19} style={{display:'inline', verticalAlign:'middle', marginRight:6, color:'#f5a623'}} />
-                Top Performers
-              </h2>
-              <Link to="/leaderboard" className="th-view-all">View All</Link>
-            </div>
-
-            {topPerformers.length === 0 ? (
-              <div className="th-performers-empty">
-                <div className="th-performers-empty-icon"><Star size={32} /></div>
-                <h4>No Top Performers Yet!</h4>
-                <p>Upload your performance and get likes to appear here!</p>
-                <button className="th-btn-primary"
-                  style={{marginTop:14, fontSize:13, padding:'9px 20px'}}
-                  onClick={() => navigate('/upload')}
-                >
-                  <UploadCloud size={14} /> Upload & Shine
-                </button>
-              </div>
-            ) : (
-              <div className="th-performers-list">
-                {topPerformers.slice(0, 3).map((p, i) => (
-                  <div key={p._id || i} className="th-performer-row"
-                    style={{cursor:'pointer'}}
-                    onClick={() => navigate(`/profile/${p._id}`)}
-                  >
-                    <div className={`th-rank th-rank-${i+1}`}>{i+1}</div>
-                    <div className="th-perf-avatar-initial">
-                      {p.profilePic
-                        ? <img src={p.profilePic} alt={p.username} className="th-perf-avatar-img" />
-                        : p.username?.[0]?.toUpperCase() || 'U'}
-                    </div>
-                    <div className="th-perf-info">
-                      <div className="th-perf-name">{p.username}</div>
-                      <div className="th-perf-followers">{fmt(p.followers?.length || 0)} Followers</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </section>
       </main>
 
       {/* ══ RIGHT PANEL ══ */}
       <aside className="th-right-panel">
 
-        {/* ✅ Upcoming Competitions — Lucide icons */}
-        <div className="th-panel-section">
+        {/* Top Three Performers */}
+        <div className="th-panel-section th-performers-panel">
           <div className="th-panel-header">
-            <span className="th-panel-title">UPCOMING COMPETITIONS</span>
-            <Link to="/competitions" className="th-view-all">View All</Link>
+            <span className="th-panel-title">
+              <Trophy size={15} style={{display:'inline', verticalAlign:'middle', marginRight:6, color:'#f5a623'}} />
+              TOP PERFORMERS
+            </span>
+            <Link to="/leaderboard" className="th-view-all">View All</Link>
           </div>
-          {competitions.map((c, i) => {
-            const CompIcon = getCompIcon(c);
-            const color    = c.color || '#7c3aed';
-            return (
-              <div key={i} className="th-comp-row"
-                onClick={() => navigate('/competitions')}
-                style={{cursor:'pointer'}}
-              >
-                <div className="th-comp-icon" style={{background: color+'22', color}}>
-                  <CompIcon size={16} />
-                </div>
-                <div className="th-comp-info">
-                  <div className="th-comp-name">{c.name || c.title}</div>
-                  <div className="th-comp-date">
-                    {c.status === 'active' ? '🟢 Active' : '⏳ Upcoming'}
-                    {c.date ? ` · ${c.date}` : ''}
+
+          {topPerformers.length === 0 ? (
+            <div className="th-performers-empty">
+              <p style={{fontSize: 12, color: '#8b87a8'}}>No Top Performers yet. 🏆</p>
+            </div>
+          ) : (
+            <div className="th-performers-list">
+              {topPerformers.slice(0, 3).map((p, i) => (
+                <div key={p._id || i} className="th-performer-row"
+                  style={{cursor:'pointer'}}
+                  onClick={() => navigate(`/profile/${p._id}`)}
+                >
+                  <div className={`th-rank th-rank-${i+1}`}>{i+1}</div>
+                  <div className="th-perf-avatar-initial">
+                    {p.profilePic
+                      ? <img src={p.profilePic} alt={p.username} className="th-perf-avatar-img" />
+                      : p.username?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                  <div className="th-perf-info">
+                    <div className="th-perf-name">{p.username}</div>
+                    <div className="th-perf-followers">{fmt(p.followers?.length || 0)} Followers</div>
                   </div>
                 </div>
-                <button className="th-participate-btn"
-                  onClick={(e) => { e.stopPropagation(); navigate('/competitions'); }}
-                >
-                  {c.status === 'active' ? 'Join' : 'Soon'}
-                </button>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Thoughts Widget */}
