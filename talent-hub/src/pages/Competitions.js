@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Trophy, Users, Award, Search, ShieldCheck, Gift, Globe, Lock, Star,
-  Medal, Youtube, Instagram, Twitter, Bell, Sparkles, CheckCircle2, Calendar
+  Medal, Video, Camera, AtSign, Bell, Sparkles, CheckCircle2, Calendar
 } from "lucide-react";
 import API from "../config";
 
@@ -23,9 +23,9 @@ const AVATAR_BG = {
 };
 
 function PlatformIcon({ platform, size = 11 }) {
-  if (platform === "instagram") return <Instagram size={size} />;
-  if (platform === "twitter")   return <Twitter size={size} />;
-  return <Youtube size={size} />;
+  if (platform === "instagram") return <Camera size={size} />;
+  if (platform === "twitter")   return <AtSign size={size} />;
+  return <Video size={size} />;
 }
 
 // ── helpers ──────────────────────────────────────────────────────────────────
