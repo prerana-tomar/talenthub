@@ -224,7 +224,14 @@ function CompCard({ comp, joined, onRegister, registeringId }) {
   }
 
   return (
-    <div style={{ ...styles.card, borderTop: `3px solid ${accentColor}` }} className="comp-card th-premium-card-redesign">
+    <div 
+      style={{ 
+        ...styles.card, 
+        "--accent-glow": accentColor,
+        "--accent-glow-alpha": `${accentColor}20`
+      }} 
+      className="comp-card th-premium-card-redesign"
+    >
       <div style={styles.cardHeader}>
         <div style={{ ...styles.cardEmoji, background: `${accentColor}10`, color: accentColor }}>
           <Trophy size={16} />
@@ -404,6 +411,7 @@ export default function CompetitionsPage() {
             <span style={styles.searchIcon}><Search size={13} color="#8b87a8" /></span>
             <input
               style={styles.searchInput}
+              className="comp-search-input"
               placeholder="Search competitions..."
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -485,43 +493,43 @@ export default function CompetitionsPage() {
 
 // ── styles ───────────────────────────────────────────────────────────────────
 const styles = {
-  page:         { minHeight: "100vh", paddingBottom: 32, fontFamily: "'Poppins', sans-serif", color: "#f0edf8" },
-  wrap:         { maxWidth: 1200, margin: "0 auto", padding: "28px 20px 32px" },
+  page:         { minHeight: "100vh", paddingBottom: 40, fontFamily: "'Poppins', sans-serif", color: "#f0edf8" },
+  wrap:         { maxWidth: 1200, margin: "0 auto", padding: "32px 20px 48px" },
   liveDot:      { display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "#00c896", animation: "pulse 1.5s infinite", flexShrink: 0 },
   statusDot:    { display: "inline-block", width: 6, height: 6, borderRadius: "50%" },
-  filterRow:    { display: "flex", alignItems: "center", gap: 10, margin: "18px 0 24px", flexWrap: "wrap" },
-  searchIcon:   { position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center" },
-  searchInput:  { width: "100%", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 10px 8px 30px", fontSize: 12.5, color: "#f0edf8", fontFamily: "'Poppins', sans-serif", outline: "none" },
-  filterLabel:  { fontSize: 11.5, color: "#8b87a8", fontWeight: 500, whiteSpace: "nowrap" },
-  filterGroup:  { display: "flex", gap: 5, flexWrap: "wrap" },
-  dividerV:     { width: 1, height: 22, background: "#2e2a45" },
-  cardsGrid:    { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 18 },
-  card:         { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 14, padding: 18, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transition: "all 0.3s ease" },
-  cardHeader:   { display: "flex", alignItems: "flex-start", gap: 11, marginBottom: 11 },
+  filterRow:    { display: "flex", alignItems: "center", gap: 12, margin: "24px 0 32px", flexWrap: "wrap" },
+  searchIcon:   { position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center" },
+  searchInput:  { width: "100%", background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.05)", borderRadius: 20, padding: "8px 10px 8px 34px", fontSize: 13, color: "#f0edf8", fontFamily: "'Poppins', sans-serif", outline: "none", transition: "all 0.25s ease" },
+  filterLabel:  { fontSize: 12, color: "#8b87a8", fontWeight: 500, whiteSpace: "nowrap" },
+  filterGroup:  { display: "flex", gap: 6, flexWrap: "wrap" },
+  dividerV:     { width: 1, height: 22, background: "rgba(255, 255, 255, 0.08)" },
+  cardsGrid:    { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(310px, 1fr))", gap: 24 },
+  card:         { background: "rgba(20, 18, 30, 0.55)", border: "1px solid rgba(255, 255, 255, 0.05)", borderRadius: 16, padding: 20, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)" },
+  cardHeader:   { display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 12 },
   cardEmoji:    { width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  cardBadges:   { display: "flex", gap: 5, marginBottom: 5, flexWrap: "wrap" },
-  badge:        { padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 },
-  cardTitle:    { fontSize: 15.5, fontWeight: 700, color: "#f0edf8", lineHeight: 1.25 },
-  cardMeta:     { display: "flex", gap: 5, marginBottom: 9, flexWrap: "wrap" },
-  metaTag:      { padding: "2px 9px", borderRadius: 20, fontSize: 10, fontWeight: 500, border: "1px solid" },
-  cardDesc:     { fontSize: 12, color: "#8b87a8", lineHeight: 1.55, marginBottom: 12, flexGrow: 1 },
-  tpBox:        { borderRadius: 8, padding: "10px 12px", marginBottom: 12, border: "1px solid var(--border)", background: "rgba(255, 255, 255, 0.01)" },
+  cardBadges:   { display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap" },
+  badge:        { padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4, textTransform: "uppercase", letterSpacing: "0.5px" },
+  cardTitle:    { fontSize: 16, fontWeight: 700, color: "#f0edf8", lineHeight: 1.3 },
+  cardMeta:     { display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" },
+  metaTag:      { padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 500, border: "1px solid", textTransform: "uppercase", letterSpacing: "0.3px" },
+  cardDesc:     { fontSize: 12.5, color: "#8b87a8", lineHeight: 1.6, marginBottom: 16, flexGrow: 1 },
+  tpBox:        { borderRadius: 12, padding: "10px 14px", marginBottom: 14, background: "rgba(255, 255, 255, 0.02)", border: "none" },
   tpHeader:     { fontSize: 9.5, fontWeight: 600, color: "#8b87a8", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 },
-  emptyState:   { textAlign: "center", padding: "6px 6px" },
-  emptyQuote:   { fontSize: 12, color: "#8b87a8", lineHeight: 1.55, fontStyle: "italic", marginBottom: 5 },
-  performerRow: { display: "flex", alignItems: "center", gap: 9, padding: "5px 0", animation: "fadeIn .35s ease" },
+  emptyState:   { textAlign: "center", padding: "8px 6px" },
+  emptyQuote:   { fontSize: 12.5, color: "#8b87a8", lineHeight: 1.6, fontStyle: "italic", marginBottom: 6 },
+  performerRow: { display: "flex", alignItems: "center", gap: 10, padding: "6px 0", animation: "fadeIn .35s ease" },
   pAvatar:      { width: 24, height: 24, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, flexShrink: 0, color: "#fff" },
-  pName:        { fontSize: 11.5, fontWeight: 600, color: "#f0edf8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
-  pChannel:     { fontSize: 10.5, color: "#4facfe", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "flex", alignItems: "center", gap: 3, textDecoration: "none" },
-  progressMeta: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 },
-  progressBar:  { height: 5, background: "rgba(0,0,0,0.2)", borderRadius: 99, overflow: "hidden" },
+  pName:        { fontSize: 12, fontWeight: 600, color: "#f0edf8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
+  pChannel:     { fontSize: 11, color: "#4facfe", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "flex", alignItems: "center", gap: 3, textDecoration: "none" },
+  progressMeta: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
+  progressBar:  { height: 4, background: "rgba(0,0,0,0.3)", borderRadius: 99, overflow: "hidden" },
   progressFill: { height: "100%", borderRadius: 99, transition: "width .6s ease" },
-  cardActions:  { display: "flex", gap: 8, marginTop: "auto" },
-  btnP:         { flex: 1, padding: "9px 0", borderRadius: 8, border: "none", fontSize: 12.5, fontWeight: 600, cursor: "pointer", fontFamily: "'Poppins', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 },
-  btnS:         { padding: "9px 14px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.03)", color: "#8b87a8", fontSize: 12.5, fontWeight: 500, cursor: "pointer", fontFamily: "'Poppins', sans-serif" },
-  footerStrip:  { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 22px", marginTop: 30, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18 },
-  fi:           { display: "flex", alignItems: "flex-start", gap: 11 },
+  cardActions:  { display: "flex", gap: 10, marginTop: "auto" },
+  btnP:         { flex: 1, padding: "10px 0", borderRadius: 20, border: "none", fontSize: 12.5, fontWeight: 600, cursor: "pointer", fontFamily: "'Poppins', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, transition: "all 0.2s ease" },
+  btnS:         { padding: "10px 16px", borderRadius: 20, border: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.02)", color: "#8b87a8", fontSize: 12.5, fontWeight: 500, cursor: "pointer", fontFamily: "'Poppins', sans-serif", transition: "all 0.2s ease" },
+  footerStrip:  { background: "linear-gradient(135deg, rgba(20, 18, 30, 0.4), rgba(255, 255, 255, 0.01))", border: "1px solid rgba(255, 255, 255, 0.03)", borderRadius: 16, padding: "24px 28px", marginTop: 40, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 },
+  fi:           { display: "flex", alignItems: "flex-start", gap: 12 },
   fiIcon:       { width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  fiTitle:      { fontSize: 12.5, fontWeight: 600, color: "#f0edf8", marginBottom: 2 },
-  fiSub:        { fontSize: 11, color: "#8b87a8", lineHeight: 1.5 },
+  fiTitle:      { fontSize: 13, fontWeight: 600, color: "#f0edf8", marginBottom: 2 },
+  fiSub:        { fontSize: 11.5, color: "#8b87a8", lineHeight: 1.5 },
 };
