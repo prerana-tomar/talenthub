@@ -563,7 +563,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="th-performers-list">
-                {topPerformers.map((p, i) => (
+                {topPerformers.slice(0, 3).map((p, i) => (
                   <div key={p._id || i} className="th-performer-row"
                     style={{cursor:'pointer'}}
                     onClick={() => navigate(`/profile/${p._id}`)}
