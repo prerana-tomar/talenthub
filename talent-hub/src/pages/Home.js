@@ -105,6 +105,7 @@ export default function Home() {
   const [searching,      setSearching]      = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const searchRef = useRef(null);
+  const searchWrapRef = useRef(null);
 
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('th_user') || 'null');
@@ -162,8 +163,18 @@ export default function Home() {
     const handleKey = (e) => {
       if (e.key === 'Escape') { setSearchOpen(false); setSearchQuery(''); setSearchResults([]); }
     };
+    const handleClickOutside = (e) => {
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target)) {
+        setSearchOpen(false);
+        setSearchResults([]);
+      }
+    };
     window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
@@ -304,7 +315,7 @@ export default function Home() {
             TALENT<span>HUB</span>
           </div>
 
-          <div className="th-search-wrap">
+          <div ref={searchWrapRef} className="th-search-wrap">
             <form onSubmit={handleSearchSubmit} className="th-search-form">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2.5">
                 <circle cx="11" cy="11" r="8"/>
@@ -626,12 +637,7 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* Search overlay */}
-      {searchOpen && (
-        <div style={{ position:'fixed', inset:0, zIndex:998 }}
-          onClick={() => { setSearchOpen(false); setSearchQuery(''); setSearchResults([]); }}
-        />
-      )}
+
 
       {/* ══ MOBILE DRAWER ══ */}
       {mobileMenuOpen && (

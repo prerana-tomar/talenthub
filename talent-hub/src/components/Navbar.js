@@ -16,6 +16,7 @@ function Navbar() {
   const [activePage, setActivePage]     = useState('');
   const searchRef  = useRef(null);
   const dropdownRef = useRef(null);
+  const searchWrapRef = useRef(null);
   const navigate   = useNavigate();
   const { registerLogoNode } = useContext(LogoRefContext);
 
@@ -165,6 +166,10 @@ function Navbar() {
       if (notifDropdownRef.current && !notifDropdownRef.current.contains(e.target)) {
         setNotifDropdownOpen(false);
       }
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target)) {
+        setSearchOpen(false);
+        setSearchResults([]);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -214,7 +219,7 @@ function Navbar() {
         </Link>
 
         {/* Search Bar */}
-        <div className="navbar-search-wrap">
+        <div ref={searchWrapRef} className="navbar-search-wrap">
           <form onSubmit={handleSearchSubmit} className="navbar-search-form">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2.5" className="search-icon-left">
               <circle cx="11" cy="11" r="8" />
@@ -400,10 +405,6 @@ function Navbar() {
       </nav>
 
       {/* Backdrops */}
-      {searchOpen && (
-        <div className="search-backdrop"
-          onClick={() => { setSearchOpen(false); setSearchQuery(''); setSearchResults([]); }} />
-      )}
       {dropdownOpen && (
         <div className="search-backdrop" onClick={() => setDropdownOpen(false)} />
       )}
