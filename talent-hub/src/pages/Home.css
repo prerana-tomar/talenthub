@@ -787,12 +787,13 @@ body.light-mode .th-sidenav-item.active .th-nav-icon {
 }
 
 .th-performers-panel {
-  background: rgba(20, 18, 30, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(135deg, rgba(28, 18, 48, 0.5) 0%, rgba(13, 9, 28, 0.7) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
-  padding: 20px 16px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  padding: 22px 18px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.25), 0 0 20px rgba(124, 58, 237, 0.08);
 }
 
 .th-performers-list {
@@ -810,12 +811,63 @@ body.light-mode .th-sidenav-item.active .th-nav-icon {
   border-radius: 14px;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border-left: 3px solid transparent;
 }
 
-.th-performer-row:hover {
-  background: rgba(255, 255, 255, 0.04);
-  transform: translateX(5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+/* Rank Highlights */
+.th-performer-row:nth-child(1) {
+  background: rgba(245, 166, 35, 0.03);
+  border-left-color: rgba(245, 166, 35, 0.4);
+}
+.th-performer-row:nth-child(2) {
+  background: rgba(203, 213, 225, 0.02);
+  border-left-color: rgba(203, 213, 225, 0.3);
+}
+.th-performer-row:nth-child(3) {
+  background: rgba(217, 119, 6, 0.01);
+  border-left-color: rgba(217, 119, 6, 0.2);
+}
+
+.th-performer-row:nth-child(1):hover {
+  background: rgba(245, 166, 35, 0.07);
+  border-left-color: rgba(245, 166, 35, 0.85);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.1);
+}
+.th-performer-row:nth-child(2):hover {
+  background: rgba(203, 213, 225, 0.06);
+  border-left-color: rgba(203, 213, 225, 0.75);
+  transform: translateX(4px);
+}
+.th-performer-row:nth-child(3):hover {
+  background: rgba(217, 119, 6, 0.05);
+  border-left-color: rgba(217, 119, 6, 0.65);
+  transform: translateX(4px);
+}
+
+/* Shiny Glare Sweep Hover Effect */
+.th-performer-row::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 90px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  z-index: 2;
+  pointer-events: none;
+}
+.th-performer-row:hover::after {
+  left: 200%;
+  transition: left 0.75s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .th-rank {
@@ -831,6 +883,7 @@ body.light-mode .th-sidenav-item.active .th-nav-icon {
   flex-shrink: 0;
   color: #8b87a8;
   border: 1px solid rgba(255, 255, 255, 0.02);
+  z-index: 1;
 }
 
 .th-rank-1 {
@@ -854,22 +907,10 @@ body.light-mode .th-sidenav-item.active .th-nav-icon {
   border: 1px solid rgba(217, 119, 6, 0.5) !important;
 }
 
-.th-rank-1 {
-  background: rgba(245, 158, 11, 0.2);
-  color: #F59E0B;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
-}
-
-.th-rank-2 {
-  background: rgba(139, 92, 246, 0.2);
-  color: #a78bfa;
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
-}
-
-.th-rank-3 {
-  background: rgba(45, 212, 191, 0.2);
-  color: #2dd4bf;
-  box-shadow: 0 0 10px rgba(45, 212, 191, 0.25);
+/* Rank 1 Avatar Glow */
+.th-performer-row:nth-child(1) .th-perf-avatar-initial {
+  box-shadow: 0 0 10px rgba(245, 166, 35, 0.4) !important;
+  border: 1.5px solid rgba(245, 166, 35, 0.45) !important;
 }
 
 .th-perf-avatar-initial {
