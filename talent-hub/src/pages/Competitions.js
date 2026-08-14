@@ -1,4 +1,4 @@
-import './competitions.css';
+import './Competitions.css';
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
