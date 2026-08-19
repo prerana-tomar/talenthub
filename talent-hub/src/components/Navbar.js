@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import { User, FolderUp, MessageCircle, Bookmark, ClipboardList, Settings, LogOut, Home, Compass, Upload, Film } from 'lucide-react';
+import { User, FolderUp, MessageCircle, Bookmark, ClipboardList, Settings, LogOut, Home, Compass, Upload, Film, Heart, UserPlus, Trophy, BellOff } from 'lucide-react';
 import API from '../config';
 import { LogoRefContext } from '../App';
 import logo from '../assets/logo.jpg';
@@ -206,6 +206,75 @@ function Navbar() {
     }
   };
 
+  const getNotifIconAndClass = (type) => {
+    switch (type) {
+      case 'like':
+      case 'reaction':
+        return { icon: <Heart size={9} fill="currentColor" />, className: 'notif-badge-like' };
+      case 'comment':
+        return { icon: <MessageCircle size={9} fill="currentColor" />, className: 'notif-badge-comment' };
+      case 'follow':
+        return { icon: <UserPlus size={9} />, className: 'notif-badge-follow' };
+      case 'competition':
+      case 'winner':
+      case 'trophy':
+        return { icon: <Trophy size={9} />, className: 'notif-badge-trophy' };
+      default:
+        return { icon: <MessageCircle size={9} fill="currentColor" />, className: 'notif-badge-default' };
+    }
+  };
+
+  const getGroupedNotifications = () => {
+    const now = new Date();
+    const newNotifs = [];
+    const earlierNotifs = [];
+
+    notifications.forEach(n => {
+      const created = new Date(n.createdAt);
+      const diffHrs = (now - created) / (1000 * 60 * 60);
+      if (diffHrs < 24) {
+        newNotifs.push(n);
+      } else {
+        earlierNotifs.push(n);
+      }
+    });
+
+    return { newNotifs, earlierNotifs };
+  };
+
+  const renderNotifItem = (n) => {
+    const senderName = n.sender?.username || 'Someone';
+    const senderInitial = senderName[0]?.toUpperCase() || 'U';
+    const { icon, className } = getNotifIconAndClass(n.type);
+
+    return (
+      <div
+        key={n._id}
+        className={`notif-dropdown-item ${!n.isRead ? 'unread' : ''}`}
+        onClick={() => handleNotificationClick(n)}
+      >
+        <div className="notif-item-avatar-wrapper">
+          <div className="notif-item-avatar">
+            {n.sender?.profilePic ? (
+              <img src={n.sender.profilePic} alt={senderName} className="notif-item-avatar-img" />
+            ) : (
+              senderInitial
+            )}
+          </div>
+          <div className={`notif-type-badge ${className}`}>
+            {icon}
+          </div>
+        </div>
+        <div className="notif-item-content">
+          <span className="notif-item-text">
+            <strong>{senderName}</strong> {n.message}
+          </span>
+          <span className="notif-item-time">{timeAgo(n.createdAt)}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <nav className="navbar">
@@ -298,46 +367,59 @@ function Navbar() {
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
-              {unreadCount > 0 && <span className="notif-dot">{unreadCount}</span>}
+              {unreadCount > 0 && <span className="notif-dot">{unreadCount > 9 ? '9+' : unreadCount}</span>}
             </button>
 
             {notifDropdownOpen && (
               <div className="navbar-notif-dropdown">
                 <div className="notif-dropdown-header">
                   <span className="notif-dropdown-title">Notifications</span>
-                  {unreadCount > 0 && (
-                    <button className="notif-mark-all-btn" onClick={markAllRead}>Mark all read</button>
-                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+                    {unreadCount > 0 && (
+                      <button className="notif-mark-all-btn" onClick={markAllRead}>Mark all read</button>
+                    )}
+                    <button
+                      className="notif-settings-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setNotifDropdownOpen(false);
+                        navigate('/settings');
+                      }}
+                      title="Notification Settings"
+                    >
+                      <Settings size={14} />
+                    </button>
+                  </div>
                 </div>
                 <div className="notif-dropdown-list">
                   {notifications.length === 0 ? (
-                    <div className="notif-dropdown-empty">No notifications yet</div>
+                    <div className="notif-dropdown-empty">
+                      <div className="notif-empty-icon-wrap">
+                        <BellOff size={18} />
+                      </div>
+                      <span className="notif-empty-title">You're all caught up!</span>
+                      <span className="notif-empty-subtitle">No new notifications.</span>
+                    </div>
                   ) : (
-                    notifications.map(n => {
-                      const senderName = n.sender?.username || 'Someone';
-                      const senderInitial = senderName[0]?.toUpperCase() || 'U';
+                    (() => {
+                      const { newNotifs, earlierNotifs } = getGroupedNotifications();
                       return (
-                        <div
-                          key={n._id}
-                          className={`notif-dropdown-item ${!n.isRead ? 'unread' : ''}`}
-                          onClick={() => handleNotificationClick(n)}
-                        >
-                          <div className="notif-item-avatar">
-                            {n.sender?.profilePic ? (
-                              <img src={n.sender.profilePic} alt={senderName} className="notif-item-avatar-img" />
-                            ) : (
-                              senderInitial
-                            )}
-                          </div>
-                          <div className="notif-item-content">
-                            <span className="notif-item-text">
-                              <strong>{senderName}</strong> {n.message}
-                            </span>
-                            <span className="notif-item-time">{timeAgo(n.createdAt)}</span>
-                          </div>
-                        </div>
+                        <>
+                          {newNotifs.length > 0 && (
+                            <div className="notif-group">
+                              <div className="notif-group-header">New</div>
+                              {newNotifs.map(n => renderNotifItem(n))}
+                            </div>
+                          )}
+                          {earlierNotifs.length > 0 && (
+                            <div className="notif-group">
+                              <div className="notif-group-header">Earlier</div>
+                              {earlierNotifs.map(n => renderNotifItem(n))}
+                            </div>
+                          )}
+                        </>
                       );
-                    })
+                    })()
                   )}
                 </div>
                 <div className="notif-dropdown-footer">
