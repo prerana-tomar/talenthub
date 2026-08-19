@@ -276,3 +276,69 @@ body.light-mode .podium-section {
   .leaderboard-row { gap: 12px; padding: 10px 14px; }
   .view-profile-btn { display: none; } /* On mobile click row directly or just keep it small */
 }
+
+/* ── COMPACT LEADERBOARD OVERRIDES ───────────────────────── */
+.leaderboard-page .th-page-hero {
+  padding: 20px 24px !important;
+  margin-bottom: 20px !important;
+  gap: 16px !important;
+}
+
+.leaderboard-page .th-page-hero-title {
+  font-size: 26px !important;
+}
+
+.leaderboard-page .th-page-hero-subtitle {
+  font-size: 13px !important;
+  max-width: 480px !important;
+}
+
+/* Empty State illustrated card compaction */
+.leaderboard-page .th-empty-state-illustrated {
+  padding: 24px 20px !important;
+  margin: 20px auto !important;
+  max-width: 440px !important;
+}
+
+.leaderboard-page .th-empty-state-icon-wrapper {
+  width: 56px !important;
+  height: 56px !important;
+  margin-bottom: 12px !important;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.05) !important;
+}
+
+.leaderboard-page .th-empty-state-illustrated h3 {
+  font-size: 18px !important;
+  margin-bottom: 6px !important;
+}
+
+.leaderboard-page .th-empty-state-illustrated p {
+  font-size: 12px !important;
+  margin-bottom: 16px !important;
+  line-height: 1.5 !important;
+}
+
+/* Filter buttons overrides */
+.leaderboard-filters .fb,
+.leaderboard-filters .fbActive {
+  padding: 0 14px !important;
+  font-size: 12px !important;
+  height: 26px !important;
+  line-height: 26px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.leaderboard-filters .fbActive {
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%) !important;
+  color: #fff !important;
+}
+
+.leaderboard-filters .category-select {
+  height: 34px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  line-height: 34px !important;
+}

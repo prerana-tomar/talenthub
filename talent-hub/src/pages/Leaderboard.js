@@ -68,13 +68,13 @@ const Leaderboard = () => {
           <p className="th-page-hero-subtitle">Top performing creators and rising stars on TalentHub. Compete to claim the podium!</p>
           
           {/* Filters inside/below the text area of Hero */}
-          <div className="leaderboard-filters" style={{ marginTop: '20px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div className="filter-group" style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '30px', border: '1px solid var(--border)' }}>
+          <div className="leaderboard-filters" style={{ marginTop: '14px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="filter-group" style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.03)', padding: '3px', borderRadius: '30px', border: '1px solid var(--border)', height: '34px', alignItems: 'center', boxSizing: 'border-box' }}>
               {periods.map((p) => (
                 <button
                   key={p.value}
                   className={period === p.value ? 'fbActive' : 'fb'}
-                  style={{ padding: '6px 14px !important', border: 'none !important', background: 'transparent' }}
+                  style={{ border: 'none', background: 'transparent', padding: '0 14px', height: '26px', fontSize: '12px' }}
                   onClick={() => setPeriod(p.value)}
                 >
                   {p.label}
@@ -86,7 +86,7 @@ const Leaderboard = () => {
               className="category-select"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              style={{ border: '1px solid var(--border)', background: 'var(--bg-card)', padding: '8px 16px', borderRadius: '30px', color: 'var(--text-primary)', outline: 'none' }}
+              style={{ border: '1px solid var(--border)', background: 'var(--bg-card)', padding: '0 12px', height: '34px', fontSize: '12px', borderRadius: '30px', color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box' }}
             >
               {categories.map((c) => (
                 <option key={c} value={c}>
@@ -96,8 +96,8 @@ const Leaderboard = () => {
             </select>
           </div>
         </div>
-        <div className="th-page-hero-img-wrap" style={{ background: 'rgba(245, 166, 35, 0.1)', color: '#f5a623', borderRadius: '50%', width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Trophy size={40} />
+        <div className="th-page-hero-img-wrap" style={{ background: 'rgba(245, 166, 35, 0.1)', color: '#f5a623', borderRadius: '50%', width: '60px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Trophy size={24} />
         </div>
       </div>
 
@@ -110,7 +110,7 @@ const Leaderboard = () => {
       ) : performers.length === 0 ? (
         <div className="th-empty-state-illustrated">
           <div className="th-empty-state-icon-wrapper" style={{ background: 'rgba(139, 92, 246, 0.08)', color: '#8B5CF6' }}>
-            <Trophy size={32} />
+            <Trophy size={22} />
           </div>
           <h3>No performers found</h3>
           <p>Nobody has claimed the leaderboard ranks yet for this selection. Be the first creator to upload and rule the stage!</p>
