@@ -49,6 +49,20 @@
   transition: all 0.2s;
   box-shadow: 0 4px 20px rgba(124,58,237,0.35);
 }
+
+.th-thoughts-hero-img-wrap {
+  background: rgba(236, 72, 153, 0.12) !important;
+  color: #ec4899 !important;
+  border-radius: 50% !important;
+  width: 56px !important;
+  height: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  font-size: initial !important;
+  animation: floatPageHeroIcon 4s ease-in-out infinite alternate !important;
+}
 .new-thought-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 24px rgba(124,58,237,0.5);
@@ -284,8 +298,14 @@
 .thoughts-categories {
   display: flex;
   gap: 8px;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  flex-wrap: nowrap;
   margin-bottom: 24px;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.thoughts-categories::-webkit-scrollbar {
+  display: none;
 }
 
 .thought-cat-btn {
@@ -752,31 +772,21 @@
 
 /* ── RESPONSIVE ── */
 @media (max-width: 480px) {
-  .thoughts-page { padding: 20px 14px 40px; }
+  .thoughts-page { padding: 16px 12px calc(90px + env(safe-area-inset-bottom, 0px)); }
   .thoughts-header { flex-direction: column; align-items: flex-start; }
-  .thought-form { flex-direction: column; }
+  .thought-form { flex-direction: column; padding: 14px; }
   .form-category-row { flex-direction: column; align-items: flex-start; }
+  .thought-card { padding: 14px 16px; border-radius: 16px; }
   
-  .thought-actions {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-  .thought-actions .appreciation-bar-wrap {
-    width: 100%;
+  .thought-reactions-row {
     justify-content: space-between;
+    gap: 6px;
   }
-  .thought-secondary-actions {
-    width: 100%;
-    display: flex;
-    gap: 8px;
-  }
-  .thought-comment-toggle-btn,
-  .thought-share-btn {
+  .thought-react-btn {
     flex: 1;
     justify-content: center;
-    font-size: 0.8rem;
-    padding: 8px 10px;
+    padding: 6px 8px;
+    font-size: 0.75rem;
   }
 }
 
@@ -789,50 +799,85 @@
   display: block;
 }
 
-/* ── THOUGHT ACTION BUTTONS (COMMENT & SHARE) ── */
-.thought-comment-toggle-btn,
-.thought-share-btn {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #94a3b8;
+/* ── THOUGHT ACTION BUTTONS (REACTION BAR) ── */
+.thought-reactions-row {
+  display: flex;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+body.light-mode .thought-reactions-row {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.thought-react-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  color: #8a8a9f;
   padding: 6px 14px;
   border-radius: 50px;
   font-family: 'Poppins', sans-serif;
   transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
-
-.thought-comment-toggle-btn:hover {
-  color: #60a5fa;
-  background: rgba(96, 165, 250, 0.08);
-  border-color: rgba(96, 165, 250, 0.2);
-}
-
-.thought-share-btn:hover {
-  color: #c084fc;
-  background: rgba(192, 132, 252, 0.08);
-  border-color: rgba(192, 132, 252, 0.2);
-}
-
-body.light-mode .thought-comment-toggle-btn,
-body.light-mode .thought-share-btn {
+body.light-mode .thought-react-btn {
   background: rgba(0, 0, 0, 0.02);
   border: 1px solid rgba(0, 0, 0, 0.05);
-  color: #64748b;
+  color: #6B6B80;
 }
 
-body.light-mode .thought-comment-toggle-btn:hover {
+.thought-react-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.thought-react-btn.like-btn:hover {
+  color: #ec4899;
+  background: rgba(236, 72, 153, 0.08);
+  border-color: rgba(236, 72, 153, 0.2);
+}
+.thought-react-btn.like-btn.active {
+  color: #ec4899;
+  background: rgba(236, 72, 153, 0.12);
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+.thought-react-btn.comment-btn:hover {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+.thought-react-btn.comment-btn.active {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.thought-react-btn.share-btn:hover {
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.08);
+  border-color: rgba(167, 139, 250, 0.2);
+}
+
+body.light-mode .thought-react-btn.like-btn:hover,
+body.light-mode .thought-react-btn.like-btn.active {
+  color: #ec4899;
+  background: rgba(236, 72, 153, 0.05);
+  border-color: rgba(236, 72, 153, 0.15);
+}
+body.light-mode .thought-react-btn.comment-btn:hover,
+body.light-mode .thought-react-btn.comment-btn.active {
   color: #2563eb;
   background: rgba(37, 99, 235, 0.05);
   border-color: rgba(37, 99, 235, 0.15);
 }
-
-body.light-mode .thought-share-btn:hover {
+body.light-mode .thought-react-btn.share-btn:hover {
   color: #7c3aed;
   background: rgba(124, 58, 237, 0.05);
   border-color: rgba(124, 58, 237, 0.15);
@@ -1350,15 +1395,15 @@ body.light-mode .comment-author {
 body.light-mode .comment-text {
   color: #2D2D3F !important;
 }
-body.light-mode .comment-input-row textarea {
+body.light-mode .comment-input {
   background: #F7F7FB !important;
   border: 1px solid #E5E5EF !important;
   color: #1A1A2E !important;
 }
-body.light-mode .comment-input-row textarea::placeholder {
+body.light-mode .comment-input::placeholder {
   color: #A2A2B5 !important;
 }
-body.light-mode .comment-input-row textarea:focus {
+body.light-mode .comment-input:focus {
   border-color: #7c3aed !important;
 }
 body.light-mode .comment-post-btn {
@@ -1387,48 +1432,52 @@ body.light-mode .thought-skeleton {
   max-width: 480px !important;
 }
 
-/* Images consistent height and rounded corners (8px) */
-.thought-images-grid {
+/* Images consistent height for multi-image grids, but respect aspect ratio for single images */
+.thought-images-grid:not(.count-1) {
   height: 120px !important;
+}
+.thought-images-grid {
   border-radius: 8px !important;
   overflow: hidden !important;
   margin-top: 10px !important;
   margin-bottom: 10px !important;
 }
 
-.thought-img-wrapper {
+.thought-images-grid:not(.count-1) .thought-img-wrapper {
   height: 100% !important;
   aspect-ratio: auto !important;
 }
 
-.thought-card-image {
+.thought-images-grid:not(.count-1) .thought-card-image {
   height: 100% !important;
   width: 100% !important;
   object-fit: cover !important;
-  border-radius: 8px !important;
 }
 
+/* Styles for single image (count-1) and legacy single images */
+.thought-images-grid.count-1 {
+  width: 100%;
+}
+.thought-images-grid.count-1 .thought-img-wrapper {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  max-height: 320px;
+}
+.thought-images-grid.count-1 .thought-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Single image cover style default height */
 .thought-image {
-  height: 120px !important;
-  width: 100% !important;
-  object-fit: cover !important;
-  border-radius: 8px !important;
-  margin-top: 10px !important;
-  margin-bottom: 10px !important;
-}
-
-/* Hover effects for custom reaction buttons */
-.thought-react-btn {
-  transition: all 0.2s ease !important;
-}
-
-.thought-react-btn:hover {
-  color: var(--text-primary, #fff) !important;
-  opacity: 0.9 !important;
-  transform: translateY(-0.5px) !important;
-}
-
-.thought-react-btn.active {
-  color: #ec4899 !important;
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 

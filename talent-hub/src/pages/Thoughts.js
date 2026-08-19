@@ -494,7 +494,7 @@ export default function Thoughts() {
             </button>
           )}
         </div>
-        <div className="th-page-hero-img-wrap" style={{ background: 'rgba(236, 72, 153, 0.12)', color: '#ec4899', borderRadius: '50%', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 'initial' }}>
+        <div className="th-thoughts-hero-img-wrap">
           <MessageCircle size={24} />
         </div>
       </div>
@@ -840,27 +840,24 @@ export default function Thoughts() {
               )}
 
               {/* Reactions Row */}
-              <div className="thought-reactions-row" style={{ display: 'flex', gap: '20px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '10px', marginTop: '12px' }}>
+              <div className="thought-reactions-row">
                 <button
-                  className={`thought-react-btn ${hasUserLiked(thought) ? 'active' : ''}`}
+                  className={`thought-react-btn like-btn ${hasUserLiked(thought) ? 'active' : ''}`}
                   onClick={(e) => { e.stopPropagation(); handleLike(thought._id); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '11.5px', color: hasUserLiked(thought) ? '#ec4899' : '#888' }}
                 >
                   <Heart size={14} fill={hasUserLiked(thought) ? '#ec4899' : 'transparent'} />
                   {getLikeCount(thought)}
                 </button>
                 <button
-                  className="thought-react-btn"
+                  className={`thought-react-btn comment-btn ${openCommentId === thought._id ? 'active' : ''}`}
                   onClick={(e) => { e.stopPropagation(); toggleComments(thought._id); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '11.5px', color: '#888' }}
                 >
                   <MessageCircle size={14} />
                   {thought.comments?.length || 0}
                 </button>
                 <button
-                  className="thought-react-btn"
+                  className="thought-react-btn share-btn"
                   onClick={(e) => { e.stopPropagation(); openShareModal(thought); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '11.5px', color: '#888' }}
                 >
                   <Share2 size={14} />
                   Share
