@@ -1371,3 +1371,64 @@ body.light-mode .thought-skeleton {
   border-color: #E5E5EF !important;
 }
 
+/* ── COMPACT THOUGHTS OVERRIDES ───────────────────────── */
+.thoughts-page .th-page-hero {
+  padding: 20px 24px !important;
+  margin-bottom: 20px !important;
+  gap: 16px !important;
+}
+
+.thoughts-page .th-page-hero-title {
+  font-size: 26px !important;
+}
+
+.thoughts-page .th-page-hero-subtitle {
+  font-size: 13px !important;
+  max-width: 480px !important;
+}
+
+/* Images consistent height and rounded corners (8px) */
+.thought-images-grid {
+  height: 120px !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+.thought-img-wrapper {
+  height: 100% !important;
+  aspect-ratio: auto !important;
+}
+
+.thought-card-image {
+  height: 100% !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+}
+
+.thought-image {
+  height: 120px !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+/* Hover effects for custom reaction buttons */
+.thought-react-btn {
+  transition: all 0.2s ease !important;
+}
+
+.thought-react-btn:hover {
+  color: var(--text-primary, #fff) !important;
+  opacity: 0.9 !important;
+  transform: translateY(-0.5px) !important;
+}
+
+.thought-react-btn.active {
+  color: #ec4899 !important;
+}
+

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import API from '../config';
-import AppreciationBar from '../components/AppreciationBar';
+import { MessageCircle, Users, Heart, Share2 } from 'lucide-react';
 import './Thoughts.css';
 
 const CATEGORIES = ['All', 'General', 'Music', 'Dance', 'Poetry', 'Comedy', 'Art'];
@@ -412,6 +412,56 @@ export default function Thoughts() {
     return `${Math.floor(diff / 86400)}d ago`;
   };
 
+  const getLikeCount = (thought) => {
+    if (!thought) return 0;
+    const apprec = thought.appreciations || thought.likes;
+    if (apprec && typeof apprec === 'object' && !Array.isArray(apprec)) {
+      return Object.values(apprec).reduce((a, b) => a + (Array.isArray(b) ? b.length : (typeof b === 'number' ? b : 0)), 0);
+    }
+    if (Array.isArray(apprec)) {
+      return apprec.length;
+    }
+    return 0;
+  };
+
+  const hasUserLiked = (thought) => {
+    if (!user || !thought) return false;
+    const myId = (user._id || user.id)?.toString();
+    const apprec = thought.appreciations || thought.likes;
+    if (apprec && typeof apprec === 'object' && !Array.isArray(apprec)) {
+      return Object.values(apprec).some(arr => Array.isArray(arr) && arr.some(id => (id?._id || id)?.toString() === myId));
+    }
+    if (Array.isArray(apprec)) {
+      return apprec.some(id => (id?._id || id)?.toString() === myId);
+    }
+    return false;
+  };
+
+  const handleLike = async (thoughtId) => {
+    if (!token) { alert('Login karein pehle! ✨'); return; }
+    try {
+      const res = await fetch(`${API}/api/thoughts/${thoughtId}/appreciate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ reactionType: 'lovedIt' })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setThoughts(prev => prev.map(t => {
+          if (t._id === thoughtId) {
+            return { ...t, appreciations: data.counts || data.appreciations || t.appreciations };
+          }
+          return t;
+        }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const totalThoughts = thoughts.length;
+  const activeCreators = new Set(thoughts.map(t => t.author?._id || t.author)).size;
+
   const getImageUrl = (img) => {
     if (!img) return null;
     if (img.startsWith('http')) return img;
@@ -426,14 +476,26 @@ export default function Thoughts() {
         <div className="th-page-hero-text">
           <h1 className="th-page-hero-title">CREATOR <span>THOUGHTS</span></h1>
           <p className="th-page-hero-subtitle">Share your talent journey, insights, milestones, and connect with the creator community in real time.</p>
+          
+          <div className="hero-stats-row" style={{ display: 'flex', gap: '16px', marginTop: '10px', flexWrap: 'wrap' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#B8B8C5' }}>
+              <MessageCircle size={12} color="#f472b6" />
+              <strong>{totalThoughts}</strong> Thoughts
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#B8B8C5' }}>
+              <Users size={12} color="#a78bfa" />
+              <strong>{activeCreators}</strong> Active Creators
+            </span>
+          </div>
+
           {token && (
-            <button className="new-thought-btn" onClick={() => { setShowForm(f => !f); if (showForm) resetForm(); }} style={{ marginTop: '16px', width: 'fit-content' }}>
+            <button className="new-thought-btn" onClick={() => { setShowForm(f => !f); if (showForm) resetForm(); }} style={{ marginTop: '14px', width: 'fit-content' }}>
               {showForm ? '✕ Cancel' : '✨ Share Thought'}
             </button>
           )}
         </div>
-        <div className="th-page-hero-img-wrap">
-          💭
+        <div className="th-page-hero-img-wrap" style={{ background: 'rgba(236, 72, 153, 0.12)', color: '#ec4899', borderRadius: '50%', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 'initial' }}>
+          <MessageCircle size={24} />
         </div>
       </div>
 
@@ -608,12 +670,14 @@ export default function Thoughts() {
           {[1,2,3].map(i => <div key={i} className="thought-skeleton" />)}
         </div>
       ) : thoughts.length === 0 ? (
-        <div className="thoughts-empty">
-          <div className="thoughts-empty-icon">💭</div>
-          <h3>No thoughts yet in {category === 'All' ? 'any category' : category}</h3>
-          <p>Be the first to share your talent journey!</p>
+        <div className="thoughts-empty" style={{ border: '1px dashed rgba(139, 92, 246, 0.25)', borderRadius: '20px', padding: '36px 20px', background: 'rgba(255, 255, 255, 0.01)', maxWidth: '440px', margin: '24px auto', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="thoughts-empty-icon" style={{ width: '44px', height: '44px', borderRadius: '50%', background: 'rgba(139, 92, 246, 0.1)', color: '#a78bfa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '12px' }}>
+            💭
+          </div>
+          <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 6px 0', color: '#fff' }}>No thoughts found</h3>
+          <p style={{ fontSize: '12px', color: '#888', margin: '0 0 16px 0', lineHeight: 1.5 }}>Nobody has shared a thought in {category === 'All' ? 'any category' : category} yet. Be the first creator!</p>
           {token && (
-            <button className="thoughts-empty-btn" onClick={() => setShowForm(true)}>
+            <button className="thoughts-empty-btn" onClick={() => setShowForm(true)} style={{ padding: '8px 18px', fontSize: '12px', borderRadius: '30px', margin: 0 }}>
               ✨ Share First Thought
             </button>
           )}
@@ -624,7 +688,7 @@ export default function Thoughts() {
             <div key={thought._id} id={`thought-${thought._id}`} className="thought-card">
 
               {/* Card Header */}
-              <div className="thought-card-header">
+              <div className="thought-card-header" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
                 <div className="thought-avatar">
                   {thought.author?.profilePic ? (
                     <img src={thought.author.profilePic} alt={thought.author.username} className="thought-avatar-img" />
@@ -636,15 +700,20 @@ export default function Thoughts() {
                   <span className="thought-author">{thought.author?.username || 'Unknown'}</span>
                   <span className="thought-time">{formatTime(thought.createdAt)}</span>
                 </div>
-                {thought.category && (
-                  <span className="thought-category-badge">{thought.category}</span>
-                )}
-                {isOwner(thought) && (
-                  <div className="thought-owner-actions">
-                    <button className="thought-edit-btn" onClick={() => startEdit(thought)} title="Edit">✏️</button>
-                    <button className="thought-delete-btn" onClick={() => handleDelete(thought._id)} title="Delete">🗑</button>
-                  </div>
-                )}
+                
+                <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {thought.category && (
+                    <span className="thought-category-badge" style={{ background: 'rgba(139, 92, 246, 0.12)', color: '#a78bfa', fontSize: '10px', fontWeight: '600', padding: '4px 10px', borderRadius: '50px', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+                      {thought.category}
+                    </span>
+                  )}
+                  {isOwner(thought) && (
+                    <div className="thought-owner-actions" style={{ marginLeft: 0 }}>
+                      <button className="thought-edit-btn" onClick={() => startEdit(thought)} title="Edit">✏️</button>
+                      <button className="thought-delete-btn" onClick={() => handleDelete(thought._id)} title="Delete">🗑</button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Edit mode */}
@@ -770,27 +839,32 @@ export default function Thoughts() {
                 />
               )}
 
-              {/* Actions */}
-              <div className="thought-actions">
-                <AppreciationBar
-                  targetId={thought._id}
-                  type="thought"
-                  initialAppreciations={thought.appreciations || thought.likes}
-                />
-                <div className="thought-secondary-actions">
-                  <button
-                    className="thought-comment-toggle-btn"
-                    onClick={() => toggleComments(thought._id)}
-                  >
-                    💬 {thought.comments?.length || 0} Comments
-                  </button>
-                  <button
-                    className="thought-share-btn"
-                    onClick={() => openShareModal(thought)}
-                  >
-                    🔗 Share
-                  </button>
-                </div>
+              {/* Reactions Row */}
+              <div className="thought-reactions-row" style={{ display: 'flex', gap: '20px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '10px', marginTop: '12px' }}>
+                <button
+                  className={`thought-react-btn ${hasUserLiked(thought) ? 'active' : ''}`}
+                  onClick={(e) => { e.stopPropagation(); handleLike(thought._id); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '11.5px', color: hasUserLiked(thought) ? '#ec4899' : '#888' }}
+                >
+                  <Heart size={14} fill={hasUserLiked(thought) ? '#ec4899' : 'transparent'} />
+                  {getLikeCount(thought)}
+                </button>
+                <button
+                  className="thought-react-btn"
+                  onClick={(e) => { e.stopPropagation(); toggleComments(thought._id); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '11.5px', color: '#888' }}
+                >
+                  <MessageCircle size={14} />
+                  {thought.comments?.length || 0}
+                </button>
+                <button
+                  className="thought-react-btn"
+                  onClick={(e) => { e.stopPropagation(); openShareModal(thought); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '11.5px', color: '#888' }}
+                >
+                  <Share2 size={14} />
+                  Share
+                </button>
               </div>
 
               {/* ── COMMENTS SECTION ── */}
