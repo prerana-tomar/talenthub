@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link, useNavigate, NavLink } from 'react-router-dom';
 import { User, FolderUp, MessageCircle, Bookmark, ClipboardList, Settings, LogOut, Home, Compass, Upload, Film, Heart, UserPlus, Trophy, BellOff } from 'lucide-react';
 import API from '../config';
+import { io } from 'socket.io-client';
 import { LogoRefContext } from '../App';
 import logo from '../assets/logo.jpg';
 import './Navbar.css';
@@ -114,10 +115,30 @@ function Navbar() {
   useEffect(() => {
     if (currentUser) {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 30000);
-      return () => clearInterval(interval);
+      const interval = setInterval(fetchNotifications, 10000); // 10s fallback polling
+
+      let socket;
+      try {
+        socket = io(API, { transports: ['websocket'] });
+        socket.on('connect', () => {
+          socket.emit('join-notifications', { userId: currentUser._id || currentUser.id });
+        });
+        socket.on('new_notification', (newNotif) => {
+          setNotifications(prev => {
+            if (prev.some(n => n._id === newNotif._id)) return prev;
+            return [newNotif, ...prev];
+          });
+          setUnreadCount(prev => prev + 1);
+        });
+      } catch (err) {
+        console.error('Socket connection failed in Navbar:', err);
+      }
+
+      return () => {
+        clearInterval(interval);
+        if (socket) socket.disconnect();
+      };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
   // Set active page on load

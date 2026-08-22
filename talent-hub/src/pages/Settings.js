@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   User, Lock, Video, AlertTriangle, Save, CheckCircle2, XCircle,
   Upload, Play, Trash2, LogOut, Eye, Heart, Calendar, Clapperboard,
-  ShieldAlert, KeyRound
+  ShieldAlert, KeyRound, Bell
 } from 'lucide-react';
 import API from '../config';
 import './Settings.css';
@@ -25,6 +25,16 @@ const Settings = () => {
   const [videoLoad, setVideoLoad] = useState(false);
   const [deleting, setDeleting] = useState(null); // video id being deleted
 
+  const [notifSettings, setNotifSettings] = useState({
+    likes: true,
+    comments: true,
+    follows: true,
+    competitions: true,
+    uploads: true,
+    messages: true
+  });
+  const [fetchingSettings, setFetchingSettings] = useState(false);
+
   const token = localStorage.getItem('th_token');
   const [currentUser, setCurrentUser] = useState(() => {
     return JSON.parse(localStorage.getItem('th_user') || '{}');
@@ -41,7 +51,61 @@ const Settings = () => {
   // Fetch uploaded videos when tab opens
   useEffect(() => {
     if (activeTab === 'videos') fetchMyVideos();
+    if (activeTab === 'notifications') fetchNotifSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+
+  const fetchNotifSettings = async () => {
+    setFetchingSettings(true);
+    try {
+      const res = await fetch(`${API}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok && data.notificationSettings) {
+        setNotifSettings({
+          likes: data.notificationSettings.likes !== false,
+          comments: data.notificationSettings.comments !== false,
+          follows: data.notificationSettings.follows !== false,
+          competitions: data.notificationSettings.competitions !== false,
+          uploads: data.notificationSettings.uploads !== false,
+          messages: data.notificationSettings.messages !== false
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching notification preferences:', err);
+    } finally {
+      setFetchingSettings(false);
+    }
+  };
+
+  const handleSaveNotifSettings = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/api/auth/notification-settings`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ settings: notifSettings })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showMsg('Notification preferences saved successfully!');
+        const updated = { ...currentUser, notificationSettings: data.settings || notifSettings };
+        localStorage.setItem('th_user', JSON.stringify(updated));
+        setCurrentUser(updated);
+      } else {
+        showMsg(data.message || 'Failed to save settings', 'error');
+      }
+    } catch {
+      showMsg('Cannot connect to server.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchMyVideos = async () => {
     setVideoLoad(true);
@@ -239,6 +303,7 @@ const Settings = () => {
     { id: 'account',  icon: User,          label: 'Account'     },
     { id: 'password', icon: Lock,          label: 'Password'    },
     { id: 'videos',   icon: Video,         label: 'My Videos'   },
+    { id: 'notifications', icon: Bell,     label: 'Notifications' },
     { id: 'danger',   icon: AlertTriangle, label: 'Danger Zone' },
   ];
 
@@ -457,6 +522,58 @@ const Settings = () => {
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+        )}
+
+        {/* NOTIFICATIONS TAB */}
+        {activeTab === 'notifications' && (
+          <div className="settings-card">
+            <div style={{ marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Bell size={16} style={{ color: '#a78bfa' }} />
+                Notification Preferences
+              </h3>
+              <p style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
+                Choose which types of alerts you'd like to receive on Talent Hub.
+              </p>
+            </div>
+
+            {fetchingSettings ? (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
+                Loading preferences...
+              </div>
+            ) : (
+              <form className="settings-form" onSubmit={handleSaveNotifSettings}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {[
+                    { id: 'likes', label: 'Likes & Appreciations', desc: 'Alert when someone likes or appreciates your content' },
+                    { id: 'comments', label: 'Comments', desc: 'Alert when someone comments on your thoughts or videos' },
+                    { id: 'follows', label: 'Follows', desc: 'Alert when someone starts following your profile' },
+                    { id: 'competitions', label: 'Competitions', desc: 'Alert when you join a competition or winners are declared' },
+                    { id: 'uploads', label: 'Upload Approvals', desc: 'Alert when your video uploads are processed and approved' },
+                    { id: 'messages', label: 'Direct Messages', desc: 'Alert when you receive direct chat messages' }
+                  ].map(pref => (
+                    <div key={pref.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                      <div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#e2e8f0' }}>{pref.label}</div>
+                        <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>{pref.desc}</div>
+                      </div>
+                      <div
+                        className={`th-toggle ${notifSettings[pref.id] ? 'on' : ''}`}
+                        onClick={() => setNotifSettings(prev => ({ ...prev, [pref.id]: !prev[pref.id] }))}
+                      >
+                        <div className="th-toggle-thumb" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button type="submit" className="save-btn" style={{ marginTop: '20px' }} disabled={loading}>
+                  <Save size={16} />
+                  {loading ? 'Saving...' : 'Save Preferences'}
+                </button>
+              </form>
             )}
           </div>
         )}
