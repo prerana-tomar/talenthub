@@ -6,7 +6,7 @@ import {
   BarChart3, MessageCircle, Wand2, UserCircle, UploadCloud, Sparkles,
   Bookmark, UserPlus, MessageSquare, Settings, Crown, Video, Eye,
   ThumbsUp, Upload, Flame, Clapperboard, Send, Mic, Music2,
-  Zap, Laugh, Guitar, BookOpen
+  Zap, Laugh, Guitar, BookOpen, Heart, BellOff
 } from 'lucide-react';
 import VideoCard from '../components/VideoCard';
 import OnboardingTour from '../components/OnboardingTour';
@@ -109,6 +109,193 @@ export default function Home() {
 
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('th_user') || 'null');
+
+  // Notifications state inside Home component
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const notifDropdownRef = useRef(null);
+  const token = localStorage.getItem('th_token');
+
+  const fetchNotifications = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API}/api/notifications`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+        setUnreadCount(data.filter(n => !n.isRead).length);
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  const markAllRead = async (e) => {
+    if (e) e.stopPropagation();
+    if (!token) return;
+    try {
+      const res = await fetch(`${API}/api/notifications/read-all`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        setUnreadCount(0);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    if (!token) return;
+    try {
+      await fetch(`${API}/api/notifications/${id}/read`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleNotificationClick = async (n) => {
+    setNotifDropdownOpen(false);
+    if (!n.isRead) {
+      await markAsRead(n._id);
+    }
+    navigate(n.link);
+  };
+
+  const timeAgo = (dateString) => {
+    const now = new Date();
+    const past = new Date(dateString);
+    const ms = now - past;
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (seconds < 60) return 'just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
+
+  const getNotifIconAndClass = (type) => {
+    switch (type) {
+      case 'like':
+      case 'reaction':
+        return { icon: <Heart size={9} fill="currentColor" />, className: 'notif-badge-like' };
+      case 'comment':
+        return { icon: <MessageCircle size={9} fill="currentColor" />, className: 'notif-badge-comment' };
+      case 'follow':
+        return { icon: <UserPlus size={9} />, className: 'notif-badge-follow' };
+      case 'competition':
+      case 'winner':
+      case 'trophy':
+        return { icon: <Trophy size={9} />, className: 'notif-badge-trophy' };
+      default:
+        return { icon: <MessageCircle size={9} fill="currentColor" />, className: 'notif-badge-default' };
+    }
+  };
+
+  const getGroupedNotifications = () => {
+    const now = new Date();
+    const newNotifs = [];
+    const earlierNotifs = [];
+
+    notifications.forEach(n => {
+      const created = new Date(n.createdAt);
+      const diffHrs = (now - created) / (1000 * 60 * 60);
+      if (diffHrs < 24) {
+        newNotifs.push(n);
+      } else {
+        earlierNotifs.push(n);
+      }
+    });
+
+    return { newNotifs, earlierNotifs };
+  };
+
+  const renderNotifItem = (n) => {
+    const senderName = n.sender?.username || 'Someone';
+    const senderInitial = senderName[0]?.toUpperCase() || 'U';
+    const { icon, className } = getNotifIconAndClass(n.type);
+
+    return (
+      <div
+        key={n._id}
+        className={`notif-dropdown-item ${!n.isRead ? 'unread' : ''}`}
+        onClick={() => handleNotificationClick(n)}
+      >
+        <div className="notif-item-avatar-wrapper">
+          <div className="notif-item-avatar">
+            {n.sender?.profilePic ? (
+              <img src={n.sender.profilePic} alt={senderName} className="notif-item-avatar-img" />
+            ) : (
+              senderInitial
+            )}
+          </div>
+          <div className={`notif-type-badge ${className}`}>
+            {icon}
+          </div>
+        </div>
+        <div className="notif-item-content">
+          <span className="notif-item-text">
+            <strong>{senderName}</strong> {n.message}
+          </span>
+          <span className="notif-item-time">{timeAgo(n.createdAt)}</span>
+        </div>
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 10000); // 10s fallback polling
+
+      const { io } = require('socket.io-client');
+      let socket;
+      try {
+        socket = io(API, { transports: ['websocket'] });
+        socket.on('connect', () => {
+          socket.emit('join-notifications', { userId: user._id || user.id });
+        });
+        socket.on('new_notification', (newNotif) => {
+          setNotifications(prev => {
+            if (prev.some(n => n._id === newNotif._id)) return prev;
+            return [newNotif, ...prev];
+          });
+          setUnreadCount(prev => prev + 1);
+        });
+      } catch (err) {
+        console.error('Socket connection failed in Home page:', err);
+      }
+
+      return () => {
+        clearInterval(interval);
+        if (socket) socket.disconnect();
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (notifDropdownRef.current && !notifDropdownRef.current.contains(e.target)) {
+        setNotifDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Auto-trigger tour on first load
   useEffect(() => {
@@ -387,13 +574,84 @@ export default function Home() {
           </nav>
 
           <div className="th-topbar-right">
-            <button className="th-icon-btn" aria-label="Notifications">
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-              </svg>
-              <span className="th-notif-dot">3</span>
-            </button>
+            <div className="navbar-notif-wrap" ref={notifDropdownRef}>
+              <button
+                className="th-icon-btn"
+                aria-label="Notifications"
+                onClick={() => {
+                  if (!user) { navigate('/login'); }
+                  else { setNotifDropdownOpen(!notifDropdownOpen); }
+                }}
+              >
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                {unreadCount > 0 && (
+                  <span className="th-notif-dot">{unreadCount > 9 ? '9+' : unreadCount}</span>
+                )}
+              </button>
+
+              {notifDropdownOpen && (
+                <div className="navbar-notif-dropdown" style={{ top: 'calc(100% + 12px)' }}>
+                  <div className="notif-dropdown-header">
+                    <span className="notif-dropdown-title">Notifications</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+                      {unreadCount > 0 && (
+                        <button className="notif-mark-all-btn" onClick={markAllRead}>Mark all read</button>
+                      )}
+                      <button
+                        className="notif-settings-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setNotifDropdownOpen(false);
+                          navigate('/settings');
+                        }}
+                        title="Notification Settings"
+                      >
+                        <Settings size={14} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="notif-dropdown-list">
+                    {notifications.length === 0 ? (
+                      <div className="notif-dropdown-empty">
+                        <div className="notif-empty-icon-wrap">
+                          <BellOff size={18} />
+                        </div>
+                        <span className="notif-empty-title">You're all caught up!</span>
+                        <span className="notif-empty-subtitle">No new notifications.</span>
+                      </div>
+                    ) : (
+                      (() => {
+                        const { newNotifs, earlierNotifs } = getGroupedNotifications();
+                        return (
+                          <>
+                            {newNotifs.length > 0 && (
+                              <div className="notif-group">
+                                <div className="notif-group-header">New</div>
+                                {newNotifs.map(n => renderNotifItem(n))}
+                              </div>
+                            )}
+                            {earlierNotifs.length > 0 && (
+                              <div className="notif-group">
+                                <div className="notif-group-header">Earlier</div>
+                                {earlierNotifs.map(n => renderNotifItem(n))}
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()
+                    )}
+                  </div>
+                  <div className="notif-dropdown-footer">
+                    <Link to="/notifications" className="notif-view-all-btn" onClick={() => setNotifDropdownOpen(false)}>
+                      View all notifications
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
             <button className="th-icon-btn" aria-label="Messages">
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
