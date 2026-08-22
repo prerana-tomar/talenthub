@@ -859,10 +859,17 @@ body.light-mode .thought-react-btn {
   border-color: rgba(59, 130, 246, 0.3);
 }
 
+.thought-react-btn.share-btn {
+  flex: none !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #8a8a9f !important;
+}
+
 .thought-react-btn.share-btn:hover {
-  color: #a78bfa;
-  background: rgba(167, 139, 250, 0.08);
-  border-color: rgba(167, 139, 250, 0.2);
+  color: #a78bfa !important;
+  background: rgba(167, 139, 250, 0.08) !important;
+  border-color: rgba(167, 139, 250, 0.2) !important;
 }
 
 body.light-mode .thought-react-btn.like-btn:hover,
@@ -871,16 +878,24 @@ body.light-mode .thought-react-btn.like-btn.active {
   background: rgba(236, 72, 153, 0.05);
   border-color: rgba(236, 72, 153, 0.15);
 }
+
 body.light-mode .thought-react-btn.comment-btn:hover,
 body.light-mode .thought-react-btn.comment-btn.active {
   color: #2563eb;
   background: rgba(37, 99, 235, 0.05);
   border-color: rgba(37, 99, 235, 0.15);
 }
+
+body.light-mode .thought-react-btn.share-btn {
+  background: rgba(0, 0, 0, 0.02) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  color: #6B6B80 !important;
+}
+
 body.light-mode .thought-react-btn.share-btn:hover {
-  color: #7c3aed;
-  background: rgba(124, 58, 237, 0.05);
-  border-color: rgba(124, 58, 237, 0.15);
+  color: #7c3aed !important;
+  background: rgba(124, 58, 237, 0.05) !important;
+  border-color: rgba(124, 58, 237, 0.15) !important;
 }
 
 /* ── SHARE MODAL OVERLAY ── */
