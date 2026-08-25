@@ -101,6 +101,16 @@ router.post('/send', protect, async (req, res) => {
     await msg.populate('sender',   'username profilePic');
     await msg.populate('receiver', 'username profilePic');
 
+    // Trigger notification for private message
+    const { sendNotification } = require('../utils/notifications');
+    await sendNotification(req, {
+      recipient: receiverId,
+      sender: req.user._id,
+      type: 'message',
+      message: `sent you a message: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"`,
+      link: '/messages'
+    });
+
     res.json(msg);
   } catch (err) {
     res.status(500).json({ error: err.message });

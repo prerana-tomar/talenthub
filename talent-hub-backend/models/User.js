@@ -32,6 +32,16 @@ const userSchema = new mongoose.Schema({
   activeStreak: {
     count: { type: Number, default: 1 },
     lastActiveDate: { type: Date, default: Date.now }
+  },
+
+  // Notification Preferences
+  notificationSettings: {
+    likes:        { type: Boolean, default: true },
+    comments:     { type: Boolean, default: true },
+    follows:      { type: Boolean, default: true },
+    competitions: { type: Boolean, default: true },
+    uploads:      { type: Boolean, default: true },
+    messages:     { type: Boolean, default: true }
   }
 }, { timestamps: true });
 

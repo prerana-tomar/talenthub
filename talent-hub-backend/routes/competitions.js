@@ -184,6 +184,17 @@ router.post('/:id/register', protect, async (req, res) => {
     comp.participants.push(req.user._id);
     await comp.save();
 
+    // Trigger notification for competition join
+    const { sendNotification } = require('../utils/notifications');
+    await sendNotification(req, {
+      recipient: req.user._id,
+      sender: req.user._id,
+      type: 'competition_join',
+      message: `successfully registered for the competition: "${comp.name}"`,
+      link: '/competitions',
+      relatedCompetition: comp._id
+    });
+
     res.json({
       message: 'Registered successfully!',
       participantCount: comp.participants.length,

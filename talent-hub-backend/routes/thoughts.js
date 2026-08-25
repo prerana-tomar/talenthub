@@ -163,10 +163,10 @@ router.post('/:id/appreciate', authMiddleware, async (req, res) => {
       thought.appreciations[reactionType].push(userId);
       userSelected = reactionType;
 
-      const Notification = require('../models/Notification');
       const authorId = thought.author.toString();
       if (authorId !== userId) {
-        await Notification.create({
+        const { sendNotification } = require('../utils/notifications');
+        await sendNotification(req, {
           recipient: thought.author,
           sender: req.user.id || req.user._id,
           type: 'like',
@@ -241,10 +241,10 @@ router.post('/:id/comments', authMiddleware, async (req, res) => {
     await thought.populate('comments.author', 'username profilePic');
 
     // Trigger notification for thought comment
-    const Notification = require('../models/Notification');
     const authorId = thought.author.toString();
     if (authorId !== commenterId) {
-      await Notification.create({
+      const { sendNotification } = require('../utils/notifications');
+      await sendNotification(req, {
         recipient: thought.author,
         sender: req.user.id || req.user._id,
         type: 'comment',

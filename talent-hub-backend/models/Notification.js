@@ -13,7 +13,7 @@ const notificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['like', 'follow', 'comment', 'upload'],
+    enum: ['like', 'follow', 'comment', 'upload', 'competition_win', 'competition_join', 'upload_approved', 'message'],
     required: true
   },
   message: {
@@ -23,6 +23,16 @@ const notificationSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true
+  },
+  relatedVideo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Video',
+    default: null
+  },
+  relatedCompetition: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Competition',
+    default: null
   },
   isRead: {
     type: Boolean,

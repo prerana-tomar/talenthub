@@ -33,6 +33,8 @@ const io = new Server(server, {
   },
 });
 
+app.set('io', io);
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, Postman)
@@ -77,6 +79,13 @@ const liveRooms = new Map();
 // ── Socket.io ──
 io.on('connection', (socket) => {
   console.log('Socket connected:', socket.id);
+
+  socket.on('join-notifications', ({ userId }) => {
+    if (userId) {
+      socket.join(userId.toString());
+      console.log(`User joined notifications room: ${userId}`);
+    }
+  });
 
   socket.on('go-live', ({ hostId, hostName, title, category }) => {
     const roomId = socket.id;

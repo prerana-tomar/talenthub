@@ -6,10 +6,24 @@ const { protect } = require('../middleware/authMiddleware');
 // GET /api/notifications — get my notifications (auth required)
 router.get('/', protect, async (req, res) => {
   try {
-    const notifications = await Notification.find({ recipient: req.user._id })
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const query = { recipient: req.user._id };
+    if (req.query.type) {
+      if (req.query.type === 'unread') {
+        query.isRead = false;
+      } else {
+        query.type = req.query.type;
+      }
+    }
+
+    const notifications = await Notification.find(query)
       .populate('sender', 'username profilePic')
       .sort({ createdAt: -1 })
-      .limit(20);
+      .skip(skip)
+      .limit(limit);
     res.json(notifications);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });

@@ -154,6 +154,17 @@ router.post('/', protect, upload.single('video'), async (req, res) => {
     const { checkAndUnlockAchievements } = require('./achievements');
     await checkAndUnlockAchievements(req.user._id);
 
+    // Trigger notification for successful upload (upload_approved)
+    const { sendNotification } = require('../utils/notifications');
+    await sendNotification(req, {
+      recipient: req.user._id,
+      sender: req.user._id,
+      type: 'upload_approved',
+      message: `Your video "${video.title}" has been successfully uploaded and approved!`,
+      link: `/video/${video._id}`,
+      relatedVideo: video._id
+    });
+
     res.status(201).json(video);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -209,14 +220,15 @@ router.post('/:id/appreciate', protect, async (req, res) => {
       video.appreciations[reactionType].push(req.user._id);
       userSelected = reactionType;
 
-      const Notification = require('../models/Notification');
+      const { sendNotification } = require('../utils/notifications');
       if (video.uploader.toString() !== userId) {
-        await Notification.create({
+        await sendNotification(req, {
           recipient: video.uploader,
           sender: req.user._id,
           type: 'like',
           message: `appreciated your video "${video.title}"`,
-          link: `/video/${video._id}`
+          link: `/video/${video._id}`,
+          relatedVideo: video._id
         });
       }
     }
@@ -260,14 +272,15 @@ router.post('/:id/like', protect, async (req, res) => {
     video.likes.push(req.user._id);
     await video.save();
 
-    const Notification = require('../models/Notification');
+    const { sendNotification } = require('../utils/notifications');
     if (video.uploader.toString() !== userId) {
-      await Notification.create({
+      await sendNotification(req, {
         recipient: video.uploader,
         sender: req.user._id,
         type: 'like',
         message: `liked your video "${video.title}"`,
-        link: `/video/${video._id}`
+        link: `/video/${video._id}`,
+        relatedVideo: video._id
       });
     }
     res.json({ alreadyLiked: true, likes: video.likes.length });
@@ -317,16 +330,17 @@ router.post('/:id/comments', protect, async (req, res) => {
     const populatedVideo = await Video.findById(video._id).populate('comments.author', 'username profilePic');
 
     // Create Notification
-    const Notification = require('../models/Notification');
     const uploaderId = video.uploader.toString();
     const commenterId = req.user._id.toString();
     if (uploaderId !== commenterId) {
-      await Notification.create({
+      const { sendNotification } = require('../utils/notifications');
+      await sendNotification(req, {
         recipient: video.uploader,
         sender: req.user._id,
         type: 'comment',
         message: `commented on your video "${video.title}"`,
-        link: `/video/${video._id}`
+        link: `/video/${video._id}`,
+        relatedVideo: video._id
       });
     }
 

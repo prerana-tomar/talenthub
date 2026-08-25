@@ -183,7 +183,7 @@ router.get('/user/:id', async (req, res) => {
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-      .select('username email bio category profilePic coverPic followers following')
+      .select('username email bio category profilePic coverPic followers following notificationSettings')
       .lean();
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
@@ -202,6 +202,24 @@ router.put('/update', auth, async (req, res) => {
       { new: true }
     ).select('username email bio category profilePic coverPic');
     res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// PUT /api/auth/notification-settings — Update notification preferences (auth required)
+router.put('/notification-settings', auth, async (req, res) => {
+  try {
+    const { settings } = req.body;
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.notificationSettings = {
+      ...user.notificationSettings,
+      ...settings
+    };
+    await user.save();
+    res.json({ message: 'Notification settings updated successfully', settings: user.notificationSettings });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
@@ -239,8 +257,8 @@ router.post('/follow/:id', auth, async (req, res) => {
     } else {
       await User.findByIdAndUpdate(myId,     { $addToSet: { following: targetId } });
       await User.findByIdAndUpdate(targetId, { $addToSet: { followers: myId } });
-      const Notification = require('../models/Notification');
-      await Notification.create({
+      const { sendNotification } = require('../utils/notifications');
+      await sendNotification(req, {
         recipient: targetId,
         sender: myId,
         type: 'follow',
