@@ -76,8 +76,8 @@ export default function HighlightStudio() {
           setProcessProgress(Math.round(progress * 100));
         });
 
-        // Use single-threaded core loaded from stable unpkg CDN to bypass SharedArrayBuffer coop/coep header blocks
-        const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
+        // Use single-threaded core loaded from stable jsdelivr CDN (UMD build)
+        const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
         await ffmpeg.load({
           coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
           wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
